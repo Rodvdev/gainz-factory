@@ -1,8 +1,18 @@
+import Image from "next/image";
+
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 font-[family-name:var(--font-geist-sans)] text-white">
       <main className="flex flex-col gap-6 items-center w-full max-w-md">
         <div className="flex flex-col items-center gap-4 mb-4">
+          <Image
+            src="/logo.jpeg"
+            alt="Gainz Factory Logo"
+            width={180}
+            height={180}
+            className="rounded-full border-4 border-[#8B0000]"
+            priority
+          />
           <h1 className="text-4xl font-bold text-[#8B0000]">GAINZ FACTORY</h1>
           <p className="text-lg text-center">@elchepaaa | Recetas Fit & Bodybuilding</p>
         </div>
@@ -34,6 +44,14 @@ export default function Home() {
       
       <footer className="mt-16 text-center text-sm text-gray-400">
         <p>© 2024 Gainz Factory - Todos los derechos reservados</p>
+        <a 
+          href="https://rodrigovdev.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="mt-2 inline-block hover:text-gray-300 transition-colors"
+        >
+          Desarrollado por VdeV Digital Solutions
+        </a>
       </footer>
     </div>
   );
