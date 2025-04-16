@@ -10,19 +10,19 @@ export default function Home() {
     {
       id: "1a1",
       title: "Asesoría uno a uno",
-      message: "Hola, estoy interesado en una asesoría 1 a 1 contigo.",
+      message: "Hola Chepa, estoy interesado en una asesoría 1 a 1 contigo.",
       icon: "👤"
     },
     {
       id: "planes",
       title: "Información sobre planes",
-      message: "Hola, me gustaría saber cuáles son tus planes de asesoría disponibles.",
+      message: "Hola Chepa, me gustaría saber cuáles son tus planes de asesoría disponibles.",
       icon: "📋"
     },
     {
       id: "ebook",
       title: "eBook de recetas",
-      message: "Hola, me interesa adquirir tu eBook de recetas fit.",
+      message: "Hola Chepa, me interesa adquirir tu eBook de recetas fit.",
       icon: "📚"
     }
   ];
