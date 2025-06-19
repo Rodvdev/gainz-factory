@@ -331,7 +331,7 @@ export const resolvers = {
       return ctx.db.habit.findMany({
         where: {
           userId: ctx.user.id,
-          category,
+          category: category as HabitCategory,
           isActive: true,
         },
         include: {
