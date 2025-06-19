@@ -13,6 +13,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Usuario principal del sistema
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  password              String
+  firstName             String
+  lastName              String
+  bio                   String?
+  phoneNumber           String?
+  profileImageUrl       String?
+  isActive              Boolean   @default(true)
+  emailVerified         DateTime?
+  emailVerifiedAt       DateTime?
+  passwordResetToken    String?
+  passwordResetExpires  DateTime?
+  
+  // Relaciones con otras entidades
+  habits                Habit[]
+  dailyScores           DailyScore[]
+  challenges            Challenge[]
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([email])
+  @@index([isActive])
+}
+
 enum HabitFrequency {
   DAILY
   WEEKLY
@@ -26,43 +54,156 @@ enum EntryStatus {
   FAILED
 }
 
+enum HabitCategory {
+  MORNING_ROUTINE
+  PHYSICAL_TRAINING
+  NUTRITION
+  DEEP_WORK
+  PERSONAL_DEVELOPMENT
+  SOCIAL_CHARISMA
+  REFLECTION
+  SLEEP_RECOVERY
+}
+
+enum TrackingType {
+  BINARY          // Sí/No, Completado/No completado
+  NUMERIC         // Número (repeticiones, peso, etc.)
+  DURATION        // Tiempo en minutos
+  RATING          // Escala 1-10
+  TEXT            // Nota libre
+}
+
 model Habit {
   id           String         @id @default(cuid())
-  tenantId     String
   userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   name         String
   description  String?
+  category     HabitCategory
   frequency    HabitFrequency
   targetCount  Int            @default(1)
-
+  trackingType TrackingType   @default(BINARY)
+  
+  // Metas específicas por tipo
+  targetValue  Float?         // Para NUMERIC, DURATION, RATING
+  targetUnit   String?        // ej: "kg", "min", "pages"
+  
+  // Gamificación
+  points       Int            @default(1)
+  color        String?        @default("#3B82F6")
+  icon         String?
+  
   isActive     Boolean        @default(true)
   order        Int            @default(0)
 
   entries      HabitEntry[]
+  streaks      HabitStreak[]
 
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
-  @@index([tenantId])
   @@index([userId])
+  @@index([category])
+  @@index([userId, isActive])
 }
 
 model HabitEntry {
-  id        String      @id @default(cuid())
-  habitId   String
-  tenantId  String
+  id          String      @id @default(cuid())
+  habitId     String
+  habit       Habit       @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
-  date      DateTime    @db.Date
-  status    EntryStatus
-  note      String?
-
-  habit     Habit       @relation(fields: [habitId], references: [id])
-
-  createdAt DateTime    @default(now())
+  date        DateTime    @db.Date
+  status      EntryStatus
+  
+  // Valores flexibles según el tipo de tracking
+  value       Float?      // Para NUMERIC, DURATION, RATING
+  textValue   String?     // Para TEXT
+  note        String?
+  
+  // Metadata adicional
+  timeSpent   Int?        // Minutos dedicados
+  difficulty  Int?        // 1-5 qué tan difícil fue
+  mood        Int?        // 1-10 cómo te sentiste
+  
+  createdAt   DateTime    @default(now())
 
   @@unique([habitId, date])
   @@index([habitId])
   @@index([date])
-  @@index([tenantId])
+}
+
+model HabitStreak {
+  id        String   @id @default(cuid())
+  habitId   String
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  
+  startDate DateTime @db.Date
+  endDate   DateTime? @db.Date
+  length    Int      @default(1)
+  isActive  Boolean  @default(true)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([habitId])
+  @@index([isActive])
+}
+
+// Tablero de puntuación diaria por usuario
+model DailyScore {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date          DateTime @db.Date
+  totalPoints   Int      @default(0)
+  completedHabits Int    @default(0)
+  totalHabits   Int      @default(0)
+  
+  // Puntuación por categoría
+  morningScore     Int   @default(0)
+  physicalScore    Int   @default(0)
+  nutritionScore   Int   @default(0)
+  workScore        Int   @default(0)
+  developmentScore Int   @default(0)
+  socialScore      Int   @default(0)
+  reflectionScore  Int   @default(0)
+  sleepScore       Int   @default(0)
+  
+  // Rankings (pueden ser globales o relativos)
+  percentile    Float?   // Percentil vs otros días del usuario
+  rank          Int?     // Ranking del día (vs otros usuarios o histórico)
+  
+  createdAt     DateTime @default(now())
+  
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+  @@index([userId, date])
+}
+
+// Metas y desafíos por usuario
+model Challenge {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  category    HabitCategory?
+  
+  startDate   DateTime @db.Date
+  endDate     DateTime @db.Date
+  
+  targetValue Int      // Ej: 30 días, 50 repeticiones, etc.
+  currentValue Int     @default(0)
+  
+  isCompleted Boolean  @default(false)
+  reward      String?  // Descripción de la recompensa
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([isCompleted])
+  @@index([userId, isCompleted])
 }

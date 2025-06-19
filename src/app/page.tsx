@@ -32,7 +32,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 font-[family-name:var(--font-geist-sans)] text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-white">
       <main className="flex flex-col gap-6 items-center w-full max-w-md">
         <div className="flex flex-col items-center gap-4 mb-4">
           <Image

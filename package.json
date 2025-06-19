@@ -6,11 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@apollo/server": "^4.12.2",
+    "@as-integrations/next": "^3.2.0",
     "@prisma/client": "^6.10.1",
     "@shadcn/ui": "^0.0.4",
     "class-variance-authority": "^0.7.1",
@@ -35,6 +39,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
     "tailwindcss": "^4",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

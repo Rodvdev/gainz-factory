@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import ClientApolloProvider from './ClientApolloProvider';
+import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
-  title: "Gainz Factory | @elchepaaa",
-  description: "Recetas Fit & Bodybuilding por @elchepaaa",
+  title: "Gainz Factory - Growth Engine",
+  description: "Your personal growth and habit tracking platform",
 };
 
 export default function RootLayout({
@@ -23,11 +14,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es" className="h-full">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var darkMode = localStorage.getItem('darkMode');
+                  if (darkMode === 'true') {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={` antialiased h-full bg-gray-50 dark:bg-gray-900`}
       >
-        {children}
+        <ClientApolloProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ClientApolloProvider>
       </body>
     </html>
   );
