@@ -486,7 +486,7 @@ export const resolvers = {
           category,
           totalHabits: habits.length,
           completedToday: entriesQuery.length,
-          averageScore: habits.reduce((sum: number, h: Habit) => sum + (h.points || 0), 0) / (habits.length || 1),
+          averageScore: habits.reduce((sum: number, h: Habit) => sum + (Number(h.points) || 0), 0) / (habits.length || 1),
           streak: 0, // TODO: Implementar cálculo de racha
         });
       }
