@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useQuery, useMutation } from '@apollo/client';
-import { Plus, CheckCircle, Target, Zap, Sun, Moon, TrendingUp, Calendar, Star, MoreVertical, Play, Pause } from 'lucide-react';
-import { GET_MY_HABITS, GET_TODAY_SCORE, LOG_HABIT_ENTRY } from '@/lib/graphql/growth/client-queries';
+import { Plus, CheckCircle, Target, Zap, Sun, Moon, TrendingUp, Calendar, Star, MoreVertical, Play, Pause, User, Loader2, Archive, RotateCcw, Clock, Award } from 'lucide-react';
+import { GET_MY_HABITS, GET_TODAY_SCORE, LOG_HABIT_ENTRY, GET_CURRENT_USER, UPDATE_HABIT } from '@/lib/graphql/growth/client-queries';
+import { getCurrentUser, getAllUsers, switchUser } from '@/lib/auth';
 import ResetButton from '@/components/growth/ResetButton';
 import { useDailyReset, useNewDayIndicator } from '@/hooks/useDailyReset';
 
@@ -32,6 +33,20 @@ function useDarkMode() {
 }
 
 // Types
+interface UIHabitEntry {
+  id: string;
+  date: string;
+  status: string;
+  value?: number;
+  note?: string;
+}
+
+interface UIHabitStreak {
+  id: string;
+  length: number;
+  isActive: boolean;
+}
+
 interface Habit {
   id: string;
   name: string;
@@ -39,100 +54,25 @@ interface Habit {
   category: string;
   frequency: string;
   targetCount: number;
-  currentStreak: number;
+  currentStreak?: number;
   isActive: boolean;
-  completedToday: boolean;
+  completedToday?: boolean;
   points: number;
   color: string;
   icon: string;
-  timeSlot: string;
-  entries?: Array<{
-    id: string;
-    date: string;
-    status: string;
-    value?: number;
-    note?: string;
-  }>;
+  entries?: UIHabitEntry[];
+  streaks?: UIHabitStreak[];
 }
 
-// Mock data - será reemplazado con GraphQL
-const mockHabits = [
-  {
-    id: '1',
-    name: 'Despertar 5:00 AM',
-    description: 'Levantarse temprano para aprovechar el día',
-    category: 'MORNING_ROUTINE',
-    frequency: 'DAILY',
-    targetCount: 1,
-    currentStreak: 7,
-    isActive: true,
-    completedToday: true,
-    points: 15,
-    color: 'purple',
-    icon: '🌅',
-    timeSlot: '05:00',
-  },
-  {
-    id: '2',
-    name: 'Ejercicio intenso',
-    description: '45 minutos de entrenamiento físico',
-    category: 'PHYSICAL_TRAINING',
-    frequency: 'DAILY',
-    targetCount: 1,
-    currentStreak: 5,
-    isActive: true,
-    completedToday: false,
-    points: 35,
-    color: 'red',
-    icon: '💪',
-    timeSlot: '06:00',
-  },
-  {
-    id: '3',
-    name: 'Meditación',
-    description: '15 minutos de mindfulness',
-    category: 'PERSONAL_DEVELOPMENT',
-    frequency: 'DAILY',
-    targetCount: 1,
-    currentStreak: 12,
-    isActive: true,
-    completedToday: false,
-    points: 20,
-    color: 'indigo',
-    icon: '🧘',
-    timeSlot: '07:00',
-  },
-  {
-    id: '4',
-    name: 'Deep Work',
-    description: '2 horas de trabajo concentrado',
-    category: 'DEEP_WORK',
-    frequency: 'DAILY',
-    targetCount: 2,
-    currentStreak: 3,
-    isActive: true,
-    completedToday: false,
-    points: 40,
-    color: 'blue',
-    icon: '💻',
-    timeSlot: '09:00',
-  },
-  {
-    id: '5',
-    name: 'Lectura',
-    description: '30 minutos de lectura técnica',
-    category: 'PERSONAL_DEVELOPMENT',
-    frequency: 'DAILY',
-    targetCount: 1,
-    currentStreak: 8,
-    isActive: true,
-    completedToday: true,
-    points: 25,
-    color: 'green',
-    icon: '📚',
-    timeSlot: '21:00',
-  },
-];
+interface AuthUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  bio?: string;
+  profileImageUrl?: string;
+  isActive: boolean;
+}
 
 const categories = {
   MORNING_ROUTINE: { name: 'Rutina Matutina', color: 'purple' },
@@ -145,13 +85,98 @@ const categories = {
   SLEEP_RECOVERY: { name: 'Descanso', color: 'slate' },
 };
 
+// Authentication component
+function UserSwitcher() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [users, setUsers] = useState<AuthUser[]>([]);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const [allUsers, current] = await Promise.all([
+          getAllUsers(),
+          getCurrentUser()
+        ]);
+        setUsers(allUsers);
+        setCurrentUser(current);
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    };
+    loadUsers();
+  }, []);
+
+  const handleSwitchUser = async (userId: string) => {
+    try {
+      await switchUser(userId);
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error switching user:', error);
+    }
+  };
+
+  if (!currentUser) return null;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        <User className="w-4 h-4" />
+        <span className="text-sm font-medium">{currentUser.firstName}</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg z-50">
+          <div className="p-3 border-b dark:border-gray-700">
+            <div className="text-sm font-medium text-gray-900 dark:text-white">
+              {currentUser.firstName} {currentUser.lastName}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {currentUser.email}
+            </div>
+          </div>
+          
+          <div className="p-2">
+            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">
+              Cambiar usuario:
+            </div>
+            {users.filter(u => u.id !== currentUser.id).map((user) => (
+              <button
+                key={user.id}
+                onClick={() => handleSwitchUser(user.id)}
+                className="w-full text-left px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+              >
+                <div className="font-medium">{user.firstName} {user.lastName}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function HabitDashboard() {
   const [isDark, setIsDark] = useDarkMode();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
   
   // GraphQL queries
-  const { data: habitsData, refetch: refetchHabits } = useQuery(GET_MY_HABITS);
-  const { data: scoreData, refetch: refetchScore } = useQuery(GET_TODAY_SCORE);
+  const { data: habitsData, refetch: refetchHabits, loading: habitsLoading } = useQuery(GET_MY_HABITS, {
+    errorPolicy: 'all',
+    fetchPolicy: 'cache-and-network' // Para obtener datos frescos
+  });
+  const { data: scoreData, refetch: refetchScore, loading: scoreLoading } = useQuery(GET_TODAY_SCORE, {
+    errorPolicy: 'all',
+    fetchPolicy: 'cache-and-network'
+  });
+  const { data: userData } = useQuery(GET_CURRENT_USER, {
+    errorPolicy: 'all'
+  });
   
   // Auto-reset diario (reinicia a las 6:00 AM)
   const { isNewDay } = useDailyReset({
@@ -167,35 +192,109 @@ export default function HabitDashboard() {
   // Indicador de nuevo día
   const { isNewDay: showNewDayBanner, markAsViewed } = useNewDayIndicator();
   
+  // Estado para manejar qué hábito se está procesando
+  const [processingHabitId, setProcessingHabitId] = useState<string | null>(null);
+  
+  // Estado para mensajes de feedback
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
   // GraphQL mutations
   const [logHabitEntry] = useMutation(LOG_HABIT_ENTRY, {
     refetchQueries: [GET_MY_HABITS, GET_TODAY_SCORE],
+    awaitRefetchQueries: true, // Esperar a que se actualicen las queries
+    onCompleted: (data) => {
+      // Refrescar datos manualmente para asegurar sincronización
+      refetchHabits();
+      refetchScore();
+      setProcessingHabitId(null); // Limpiar estado de procesamiento
+      
+      // Mostrar mensaje de éxito
+      const habitName = habits.find(h => h.id === data.logHabitEntry.habitId)?.name || 'Hábito';
+      const status = data.logHabitEntry.status === 'COMPLETED' ? 'completado' : 'no completado';
+      setMessage({ type: 'success', text: `${habitName} marcado como ${status}` });
+      
+      // Limpiar mensaje después de 3 segundos
+      setTimeout(() => setMessage(null), 3000);
+    },
+    onError: (error) => {
+      console.error('Error al registrar hábito:', error);
+      setProcessingHabitId(null); // Limpiar estado de procesamiento en caso de error
+      setMessage({ type: 'error', text: 'Error al actualizar el hábito' });
+      setTimeout(() => setMessage(null), 3000);
+    }
   });
 
-  // Use GraphQL data
-  const habits: Habit[] = habitsData?.myHabits || [];
+  const [updateHabit] = useMutation(UPDATE_HABIT, {
+    refetchQueries: [GET_MY_HABITS],
+    onCompleted: (data) => {
+      refetchHabits();
+      const action = data.updateHabit.isActive ? 'reactivado' : 'archivado';
+      setMessage({ type: 'success', text: `Hábito ${action} exitosamente` });
+      setTimeout(() => setMessage(null), 3000);
+    },
+    onError: (error) => {
+      console.error('Error al actualizar hábito:', error);
+      setMessage({ type: 'error', text: 'Error al archivar/desarchivar el hábito' });
+      setTimeout(() => setMessage(null), 3000);
+    }
+  });
+
+  // Process GraphQL data
+  const habits: Habit[] = habitsData?.myHabits?.map((habit: Habit) => {
+    const today = new Date().toISOString().split('T')[0];
+    const todaysEntry = habit.entries?.find((entry: UIHabitEntry) => 
+      entry.date.split('T')[0] === today
+    );
+    const activeStreak = habit.streaks?.find((streak: UIHabitStreak) => streak.isActive);
+    
+    return {
+      ...habit,
+      completedToday: todaysEntry?.status === 'COMPLETED',
+      currentStreak: activeStreak?.length || 0,
+      // Ensure we have default values for UI
+      color: habit.color || 'blue',
+      icon: habit.icon || '⭐',
+    };
+  }) || [];
+
   const todayScore = scoreData?.todayScore;
 
-  const completedToday = todayScore?.completedHabits || habits.filter((h: Habit) => h.completedToday).length;
-  const totalHabits = todayScore?.totalHabits || habits.length;
-  const totalPoints = todayScore?.totalPoints || habits.filter((h: Habit) => h.completedToday).reduce((sum: number, h: Habit) => sum + h.points, 0);
-  const maxPoints = habits.reduce((sum: number, h: Habit) => sum + h.points, 0);
+  // Filtrar hábitos por estado (activos vs completados)
+  const activeHabits = habits.filter(h => h.isActive);
+  const completedHabits = habits.filter(h => !h.isActive);
+  
+  const completedToday = todayScore?.completedHabits || activeHabits.filter((h: Habit) => h.completedToday).length;
+  const totalHabits = todayScore?.totalHabits || activeHabits.length;
+  const totalPoints = todayScore?.totalPoints || activeHabits.filter((h: Habit) => h.completedToday).reduce((sum: number, h: Habit) => sum + h.points, 0);
+  const maxPoints = activeHabits.reduce((sum: number, h: Habit) => sum + h.points, 0);
   const completionPercentage = totalHabits > 0 ? Math.round((completedToday / totalHabits) * 100) : 0;
 
   const handleToggleHabit = async (habitId: string) => {
+    if (processingHabitId) return; // Prevenir múltiples clicks mientras se procesa
+    
+    setProcessingHabitId(habitId); // Marcar como procesando
+    
     try {
       const today = new Date().toISOString().split('T')[0];
       const habit = habits.find(h => h.id === habitId);
       
       if (habit) {
-        // Check if there's an entry for today
+        // Verificar si hay una entrada para hoy
         const todaysEntry = habit.entries?.find(entry => 
           entry.date.split('T')[0] === today
         );
         
-        const newStatus = todaysEntry?.status === 'COMPLETED' ? 'FAILED' : 'COMPLETED';
+        // Alternar entre COMPLETED y FAILED/SKIPPED
+        let newStatus: 'COMPLETED' | 'FAILED' | 'SKIPPED';
+        if (todaysEntry?.status === 'COMPLETED') {
+          newStatus = 'FAILED';
+        } else {
+          newStatus = 'COMPLETED';
+        }
         
-        await logHabitEntry({
+        console.log(`Cambiando hábito ${habit.name} de ${todaysEntry?.status || 'sin entrada'} a ${newStatus}`);
+        
+        const result = await logHabitEntry({
           variables: {
             input: {
               habitId,
@@ -204,28 +303,41 @@ export default function HabitDashboard() {
             }
           }
         });
+        
+        console.log('Resultado de la mutación:', result);
       }
     } catch (error) {
-      console.error('Error logging habit entry:', error);
-      // Fallback to local state for demo purposes
-      setMockHabits(prev => prev.map(habit => 
-        habit.id === habitId 
-          ? { 
-              ...habit, 
-              completedToday: !habit.completedToday,
-              currentStreak: !habit.completedToday ? habit.currentStreak + 1 : Math.max(0, habit.currentStreak - 1)
-            }
-          : habit
-      ));
+      console.error('Error al cambiar estado del hábito:', error);
+      // El mensaje de error se maneja en el onError del mutation
+      setProcessingHabitId(null); // Limpiar estado en caso de error
     }
   };
 
-  // Local state for fallback
-  const [, setMockHabits] = useState(mockHabits);
+  const handleArchiveHabit = async (habitId: string, currentStatus: boolean) => {
+    if (processingHabitId) return;
+    
+    setProcessingHabitId(habitId);
+    
+    try {
+      await updateHabit({
+        variables: {
+          id: habitId,
+          input: {
+            isActive: !currentStatus
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error al archivar/desarchivar hábito:', error);
+      setProcessingHabitId(null);
+    }
+  };
 
+  // Aplicar filtro por categoría según la pestaña activa
+  const currentHabits = activeTab === 'active' ? activeHabits : completedHabits;
   const filteredHabits = selectedCategory 
-    ? habits.filter(h => h.category === selectedCategory)
-    : habits;
+    ? currentHabits.filter(h => h.category === selectedCategory)
+    : currentHabits;
 
   const getColorClasses = (color: string, type: 'bg' | 'text' | 'border' = 'bg') => {
     const colors = {
@@ -241,8 +353,49 @@ export default function HabitDashboard() {
     return colors[color as keyof typeof colors]?.[type] || colors.blue[type];
   };
 
+  // Loading state
+  if (habitsLoading || scoreLoading) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-48 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+      {/* Message Notification */}
+      {message && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+          message.type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <div className="flex items-center gap-2">
+            {message.type === 'success' ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <Target className="w-5 h-5" />
+            )}
+            <span className="font-medium">{message.text}</span>
+            <button
+              onClick={() => setMessage(null)}
+              className="ml-2 text-white/80 hover:text-white"
+            >
+              <Plus className="w-4 h-4 rotate-45" />
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Philosophy Banner */}
       <div className="mb-8 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-6 rounded-xl text-white shadow-lg">
         <div className="max-w-4xl mx-auto text-center">
@@ -271,7 +424,7 @@ export default function HabitDashboard() {
         <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-2xl">🌅</div>
-          <div>
+            <div>
               <h3 className="font-semibold">¡Nuevo día, nuevas oportunidades!</h3>
               <p className="text-sm opacity-90">
                 {isNewDay ? 'Progreso reiniciado automáticamente a las 6:00 AM' : 'Es hora de empezar con tus hábitos de hoy'}
@@ -302,9 +455,17 @@ export default function HabitDashboard() {
               day: 'numeric' 
             })}
           </p>
+          {userData?.currentUser && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Bienvenido, {userData.currentUser.firstName} {userData.currentUser.lastName}
+            </p>
+          )}
         </div>
         
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* User Switcher */}
+          <UserSwitcher />
+          
           {/* Dark Mode Toggle */}
           <button
             onClick={() => setIsDark(!isDark)}
@@ -332,6 +493,37 @@ export default function HabitDashboard() {
             <span className="hidden sm:inline">Nuevo</span>
           </Link>
         </div>
+      </div>
+
+      {/* Tabs for Active vs Completed Habits */}
+      <div className="flex items-center gap-4 border-b border-gray-200 dark:border-gray-700">
+        <button
+          onClick={() => setActiveTab('active')}
+          className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
+            activeTab === 'active'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          Hábitos Activos ({activeHabits.length})
+          {activeTab === 'active' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"></div>
+          )}
+        </button>
+        
+        <button
+          onClick={() => setActiveTab('completed')}
+          className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
+            activeTab === 'completed'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          Tareas Completadas ({completedHabits.length})
+          {activeTab === 'completed' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"></div>
+          )}
+        </button>
       </div>
 
       {/* Progress Summary */}
@@ -381,7 +573,7 @@ export default function HabitDashboard() {
             <div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Racha Máxima</p>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
-                {Math.max(...habits.map(h => h.currentStreak))} días
+                {activeHabits.length > 0 ? Math.max(...activeHabits.map(h => h.currentStreak || 0)) : 0} días
               </p>
             </div>
           </div>
@@ -403,7 +595,7 @@ export default function HabitDashboard() {
             <div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Activos</p>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
-                {habits.filter(h => h.isActive).length}
+                {activeHabits.length}
               </p>
             </div>
           </div>
@@ -414,7 +606,9 @@ export default function HabitDashboard() {
             <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             <div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Esta Semana</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">85%</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
+                {completionPercentage}%
+              </p>
             </div>
           </div>
         </div>
@@ -430,10 +624,11 @@ export default function HabitDashboard() {
               : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border dark:border-gray-700'
           }`}
         >
-          Todas
+          Todas ({currentHabits.length})
         </button>
         {Object.entries(categories).map(([key, category]) => {
           const isSelected = selectedCategory === key;
+          const categoryCount = currentHabits.filter(h => h.category === key).length;
           
           return (
             <button
@@ -445,7 +640,7 @@ export default function HabitDashboard() {
                   : `bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border dark:border-gray-700 ${getColorClasses(category.color, 'border')}`
               }`}
             >
-              {category.name}
+              {category.name} ({categoryCount})
             </button>
           );
         })}
@@ -466,63 +661,104 @@ export default function HabitDashboard() {
                   {habit.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-                    {habit.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                      {habit.name}
+                    </h3>
+                    {!habit.isActive && (
+                      <span className="inline-flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
+                        <Archive className="w-3 h-3" />
+                        Archivado
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
                     {habit.description}
                   </p>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-xs px-2 py-1 rounded-full ${getColorClasses(habit.color, 'bg')} ${getColorClasses(habit.color, 'text')}`}>
                       {categories[habit.category as keyof typeof categories]?.name}
                     </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {habit.timeSlot}
+                    <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                      <Clock className="w-3 h-3" />
+                      {habit.frequency}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                      <Target className="w-3 h-3" />
+                      Meta: {habit.targetCount}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                      <Award className="w-3 h-3" />
+                      {habit.points} pts
                     </span>
                   </div>
                 </div>
               </div>
 
-              <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <MoreVertical className="w-4 h-4" />
-              </button>
-                </div>
-                
+              <div className="flex flex-col gap-1">
+                <button 
+                  onClick={() => handleArchiveHabit(habit.id, habit.isActive)}
+                  disabled={processingHabitId === habit.id}
+                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  title={habit.isActive ? 'Archivar hábito' : 'Reactivar hábito'}
+                >
+                  {processingHabitId === habit.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : habit.isActive ? (
+                    <Archive className="w-4 h-4" />
+                  ) : (
+                    <RotateCcw className="w-4 h-4" />
+                  )}
+                </button>
+                <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                  <MoreVertical className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="text-center">
                   <div className="text-lg font-bold text-gray-900 dark:text-white">
-                    {habit.currentStreak}
+                    {habit.currentStreak || 0}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">Racha</div>
                 </div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
                     +{habit.points}
-                    </div>
+                  </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">Puntos</div>
                 </div>
-                </div>
+              </div>
 
               <button
                 onClick={() => handleToggleHabit(habit.id)}
-                className={`p-3 rounded-full transition-all ${
-                  habit.completedToday
-                    ? 'bg-green-600 text-white hover:bg-green-700'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
+                disabled={processingHabitId === habit.id || !habit.isActive}
+                className={`p-3 rounded-full transition-all relative ${
+                  !habit.isActive
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60'
+                    : habit.completedToday
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                } ${processingHabitId === habit.id ? 'opacity-75 cursor-not-allowed' : ''}`}
+                title={!habit.isActive ? 'Reactiva el hábito para poder marcarlo' : ''}
               >
-                <CheckCircle className="w-6 h-6" />
+                {processingHabitId === habit.id ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <CheckCircle className="w-6 h-6" />
+                )}
               </button>
             </div>
 
             <div className="flex items-center justify-between">
-                <Link
+              <Link
                 href={`/es/growth/habit/${habit.id}`}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-                >
+              >
                 Ver detalles
-                </Link>
+              </Link>
               
               <div className="flex items-center gap-2">
                 {habit.isActive ? (
@@ -545,20 +781,35 @@ export default function HabitDashboard() {
       {/* Empty State */}
       {filteredHabits.length === 0 && (
         <div className="text-center py-12">
-          <Target className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+          {activeTab === 'completed' ? (
+            <Archive className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+          ) : (
+            <Target className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+          )}
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No hay hábitos en esta categoría
+            {activeTab === 'completed' 
+              ? (selectedCategory ? 'No hay hábitos archivados en esta categoría' : 'No tienes hábitos archivados')
+              : (selectedCategory ? 'No hay hábitos activos en esta categoría' : 'No tienes hábitos activos')
+            }
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Crea tu primer hábito para empezar tu viaje de crecimiento personal
+            {activeTab === 'completed'
+              ? 'Los hábitos que archives aparecerán aquí'
+              : (selectedCategory 
+                  ? 'Crea tu primer hábito en esta categoría'
+                  : 'Crea tu primer hábito para empezar tu viaje de crecimiento personal'
+                )
+            }
           </p>
-        <Link
-            href="/es/growth/habit/new"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-            <Plus className="w-5 h-5" />
-            Crear Hábito
-        </Link>
+          {activeTab === 'active' && (
+            <Link
+              href="/es/growth/habit/new"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Crear Hábito
+            </Link>
+          )}
         </div>
       )}
 
@@ -568,21 +819,21 @@ export default function HabitDashboard() {
           Acciones Rápidas
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <Link
+          <Link
             href="/es/growth/habit/analytics"
             className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
-        >
+          >
             <TrendingUp className="w-5 h-5" />
-          <span className="font-medium">Analytics</span>
-        </Link>
+            <span className="font-medium">Analytics</span>
+          </Link>
           
-        <Link
+          <Link
             href="/es/growth/habit/calendar"
             className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-        >
-          <Calendar className="w-5 h-5" />
-          <span className="font-medium">Calendario</span>
-        </Link>
+          >
+            <Calendar className="w-5 h-5" />
+            <span className="font-medium">Calendario</span>
+          </Link>
           
           <Link
             href="/es/growth/habit/challenges"

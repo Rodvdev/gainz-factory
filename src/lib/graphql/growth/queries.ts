@@ -454,6 +454,7 @@ export const resolvers = {
 
     categoryStats: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       const today = new Date().toISOString().split('T')[0];
+      const todayDate = new Date(today);
       const categories = [
         'MORNING_ROUTINE', 'PHYSICAL_TRAINING', 'NUTRITION', 'DEEP_WORK',
         'PERSONAL_DEVELOPMENT', 'SOCIAL_CHARISMA', 'SLEEP_RECOVERY', 'REFLECTION'
@@ -472,7 +473,7 @@ export const resolvers = {
 
         const entriesQuery = await ctx.db.habitEntry.findMany({
           where: {
-            date: today,
+            date: todayDate,
             habit: {
               userId: ctx.user.id,
               category: category as HabitCategory,
@@ -622,7 +623,7 @@ export const resolvers = {
       });
       
       // Recalcular score del día
-      await recalculateDailyScore(ctx, entry.date);
+      await recalculateDailyScore(ctx, entry.date.toISOString().split('T')[0]);
       
       return true;
     },
@@ -746,7 +747,6 @@ async function recalculateDailyScore(ctx: GraphQLContext, date: string) {
 
   const scoreData = {
     userId: ctx.user.id,
-    date,
     totalPoints,
     completedHabits,
     totalHabits: allHabits.length,
@@ -762,6 +762,9 @@ async function recalculateDailyScore(ctx: GraphQLContext, date: string) {
     workScore: entriesForDay
       .filter((e: HabitEntry) => e.habit.category === 'DEEP_WORK' && e.status === 'COMPLETED')
       .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
+    developmentScore: entriesForDay
+      .filter((e: HabitEntry) => e.habit.category === 'PERSONAL_DEVELOPMENT' && e.status === 'COMPLETED')
+      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
     socialScore: entriesForDay
       .filter((e: HabitEntry) => e.habit.category === 'SOCIAL_CHARISMA' && e.status === 'COMPLETED')
       .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
@@ -775,17 +778,17 @@ async function recalculateDailyScore(ctx: GraphQLContext, date: string) {
     rank: Math.max(1, 101 - Math.floor((completedHabits / allHabits.length) * 100)),
   };
 
-             return ctx.db.dailyScore.upsert({
-        where: {
-          userId_date: {
-            userId: ctx.user.id,
-            date: dateObj,
-          },
-        },
-        update: scoreData,
-        create: {
-          ...scoreData,
-          date: dateObj,
-        },
-      });
+  return ctx.db.dailyScore.upsert({
+    where: {
+      userId_date: {
+        userId: ctx.user.id,
+        date: dateObj,
+      },
+    },
+    update: scoreData,
+    create: {
+      ...scoreData,
+      date: dateObj,
+    },
+  });
    } 
