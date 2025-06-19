@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum HabitFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum EntryStatus {
+  COMPLETED
+  SKIPPED
+  PARTIAL
+  FAILED
+}
+
+model Habit {
+  id           String         @id @default(cuid())
+  tenantId     String
+  userId       String
+
+  name         String
+  description  String?
+  frequency    HabitFrequency
+  targetCount  Int            @default(1)
+
+  isActive     Boolean        @default(true)
+  order        Int            @default(0)
+
+  entries      HabitEntry[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model HabitEntry {
+  id        String      @id @default(cuid())
+  habitId   String
+  tenantId  String
+
+  date      DateTime    @db.Date
+  status    EntryStatus
+  note      String?
+
+  habit     Habit       @relation(fields: [habitId], references: [id])
+
+  createdAt DateTime    @default(now())
+
+  @@unique([habitId, date])
+  @@index([habitId])
+  @@index([date])
+  @@index([tenantId])
+}
