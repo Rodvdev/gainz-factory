@@ -117,7 +117,6 @@ export const typeDefs = `#graphql
     currentValue: Int!
     isCompleted: Boolean!
     reward: String
-    progress: Float!
     createdAt: String!
   }
 
@@ -638,7 +637,6 @@ export const resolvers = {
           userId: ctx.user.id,
           currentValue: 0,
           isCompleted: false,
-          progress: 0,
           startDate: new Date(input.startDate),
           endDate: new Date(input.endDate),
         },
@@ -660,7 +658,6 @@ export const resolvers = {
         where: { id },
         data: {
           currentValue: progress,
-          progress: newProgress,
           isCompleted: newProgress >= 100,
         },
         include: { user: true }
@@ -680,7 +677,6 @@ export const resolvers = {
         where: { id },
         data: {
           isCompleted: true,
-          progress: 100,
         },
         include: { user: true }
       });
