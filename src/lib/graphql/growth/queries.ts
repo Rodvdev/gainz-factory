@@ -482,11 +482,14 @@ export const resolvers = {
           },
         });
 
+        const totalPoints = habits.reduce((sum: number, h: { points: number }) => sum + h.points, 0);
+        const averageScore = habits.length > 0 ? totalPoints / habits.length : 0;
+        
         stats.push({
           category,
           totalHabits: habits.length,
           completedToday: entriesQuery.length,
-          averageScore: habits.reduce((sum: number, h: Habit) => sum + (Number(h.points) || 0), 0) / (habits.length || 1),
+          averageScore,
           streak: 0, // TODO: Implementar cálculo de racha
         });
       }
