@@ -1,8 +1,56 @@
 import { PrismaClient } from '@prisma/client';
 
-// Tipos de GraphQL para el sistema de crecimiento personal
+// GraphQL Context interface
+export interface GraphQLContext {
+  db: PrismaClient;
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    bio?: string;
+    phoneNumber?: string;
+    profileImageUrl?: string;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
 
-// Usuario
+// Enums
+export enum HabitCategory {
+  MORNING_ROUTINE = 'MORNING_ROUTINE',
+  PHYSICAL_TRAINING = 'PHYSICAL_TRAINING',
+  NUTRITION = 'NUTRITION',
+  DEEP_WORK = 'DEEP_WORK',
+  PERSONAL_DEVELOPMENT = 'PERSONAL_DEVELOPMENT',
+  SOCIAL_CHARISMA = 'SOCIAL_CHARISMA',
+  REFLECTION = 'REFLECTION',
+  SLEEP_RECOVERY = 'SLEEP_RECOVERY'
+}
+
+export enum HabitFrequency {
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY'
+}
+
+export enum TrackingType {
+  BINARY = 'BINARY',
+  NUMERIC = 'NUMERIC',
+  DURATION = 'DURATION',
+  RATING = 'RATING',
+  TEXT = 'TEXT'
+}
+
+export enum EntryStatus {
+  COMPLETED = 'COMPLETED',
+  SKIPPED = 'SKIPPED',
+  PARTIAL = 'PARTIAL',
+  FAILED = 'FAILED'
+}
+
+// Core types
 export interface User {
   id: string;
   email: string;
@@ -16,14 +64,11 @@ export interface User {
   emailVerifiedAt?: string;
   createdAt: string;
   updatedAt: string;
-  
-  // Relaciones
   habits: Habit[];
   dailyScores: DailyScore[];
   challenges: Challenge[];
 }
 
-// Hábito
 export interface Habit {
   id: string;
   userId: string;
@@ -32,8 +77,8 @@ export interface Habit {
   description?: string;
   category: HabitCategory;
   frequency: HabitFrequency;
-  targetCount: number;
   trackingType: TrackingType;
+  targetCount: number;
   targetValue?: number;
   targetUnit?: string;
   points: number;
@@ -41,20 +86,12 @@ export interface Habit {
   icon?: string;
   isActive: boolean;
   order: number;
-  createdAt: string;
-  updatedAt: string;
-  
-  // Relaciones
   entries: HabitEntry[];
   streaks: HabitStreak[];
-  
-  // Campos calculados
-  currentStreak?: number;
-  completedToday?: boolean;
-  completionRate?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// Resto de tipos existentes con ajustes para multi-usuario...
 export interface HabitEntry {
   id: string;
   habitId: string;
@@ -118,64 +155,54 @@ export interface Challenge {
   createdAt: string;
 }
 
-// Enums
-export enum HabitCategory {
-  MORNING_ROUTINE = 'MORNING_ROUTINE',
-  PHYSICAL_TRAINING = 'PHYSICAL_TRAINING',
-  NUTRITION = 'NUTRITION',
-  DEEP_WORK = 'DEEP_WORK',
-  PERSONAL_DEVELOPMENT = 'PERSONAL_DEVELOPMENT',
-  SOCIAL_CHARISMA = 'SOCIAL_CHARISMA',
-  REFLECTION = 'REFLECTION',
-  SLEEP_RECOVERY = 'SLEEP_RECOVERY',
+// Profile and Calendar specific types
+export interface ProfileStats {
+  totalDays: number;
+  currentStreak: number;
+  longestStreak: number;
+  completedHabits: number;
+  totalPoints: number;
+  averageScore: number;
+  satisfactionRating: number;
 }
 
-export enum HabitFrequency {
-  DAILY = 'DAILY',
-  WEEKLY = 'WEEKLY',
-  MONTHLY = 'MONTHLY',
+export interface CalendarDay {
+  date: string;
+  completedHabits: number;
+  totalHabits: number;
+  points: number;
+  completionPercentage: number;
+  hasStreak: boolean;
+  entries: HabitEntry[];
 }
 
-export enum EntryStatus {
-  COMPLETED = 'COMPLETED',
-  SKIPPED = 'SKIPPED',
-  PARTIAL = 'PARTIAL',
-  FAILED = 'FAILED',
+export interface MonthlyStats {
+  month: string;
+  year: number;
+  totalDays: number;
+  activeDays: number;
+  averageCompletion: number;
+  longestStreak: number;
+  totalPoints: number;
+  categoryBreakdown: CategoryStats[];
 }
 
-export enum TrackingType {
-  BINARY = 'BINARY',
-  NUMERIC = 'NUMERIC',
-  DURATION = 'DURATION',
-  RATING = 'RATING',
-  TEXT = 'TEXT',
+export interface CategoryStats {
+  category: HabitCategory;
+  totalHabits: number;
+  completedToday: number;
+  averageScore: number;
+  streak: number;
 }
 
-// Input types para mutaciones
-export interface NewUserInput {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  bio?: string;
-  phoneNumber?: string;
-}
-
-export interface UpdateUserInput {
-  firstName?: string;
-  lastName?: string;
-  bio?: string;
-  phoneNumber?: string;
-  profileImageUrl?: string;
-}
-
+// Input types
 export interface NewHabitInput {
   name: string;
-  description?: string;
   category: HabitCategory;
   frequency: HabitFrequency;
-  targetCount?: number;
   trackingType?: TrackingType;
+  description?: string;
+  targetCount?: number;
   targetValue?: number;
   targetUnit?: string;
   points?: number;
@@ -189,8 +216,8 @@ export interface UpdateHabitInput {
   description?: string;
   category?: HabitCategory;
   frequency?: HabitFrequency;
-  targetCount?: number;
   trackingType?: TrackingType;
+  targetCount?: number;
   targetValue?: number;
   targetUnit?: string;
   points?: number;
@@ -198,6 +225,14 @@ export interface UpdateHabitInput {
   icon?: string;
   isActive?: boolean;
   order?: number;
+}
+
+export interface UpdateUserProfileInput {
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  phoneNumber?: string;
+  profileImageUrl?: string;
 }
 
 export interface HabitEntryInput {
@@ -222,30 +257,8 @@ export interface NewChallengeInput {
   reward?: string;
 }
 
-// Contexto de GraphQL con usuario autenticado
-export interface GraphQLContext {
-  db: PrismaClient;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
-}
-
-// Tipos de categorías con metadata
-export interface CategoryStats {
-  category: HabitCategory;
-  totalHabits: number;
-  completedToday: number;
-  averageScore: number;
-  streak: number;
-}
-
-// Tipos para rankings y leaderboards
-export interface UserRanking {
-  user: User;
-  totalPoints: number;
-  rank: number;
-  percentile: number;
+export interface ResetProgressResult {
+  success: boolean;
+  message: string;
+  resetsCount: number;
 } 

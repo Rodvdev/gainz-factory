@@ -1,4 +1,4 @@
-import { GraphQLContext, Habit, HabitCategory, HabitEntry, HabitEntryInput, HabitStreak, NewChallengeInput, NewHabitInput, UpdateHabitInput } from './types';
+import { GraphQLContext, HabitCategory, HabitEntryInput, NewChallengeInput, NewHabitInput, UpdateHabitInput, UpdateUserProfileInput } from './types';
 
 // growth/queries.ts
 export const typeDefs = `#graphql
@@ -34,6 +34,37 @@ export const typeDefs = `#graphql
     challenges: [Challenge!]!
   }
 
+  type ProfileStats {
+    totalDays: Int!
+    currentStreak: Int!
+    longestStreak: Int!
+    completedHabits: Int!
+    totalPoints: Int!
+    averageScore: Float!
+    satisfactionRating: Float!
+  }
+
+  type CalendarDay {
+    date: String!
+    completedHabits: Int!
+    totalHabits: Int!
+    points: Int!
+    completionPercentage: Float!
+    hasStreak: Boolean!
+    entries: [HabitEntry!]!
+  }
+
+  type MonthlyStats {
+    month: String!
+    year: Int!
+    totalDays: Int!
+    activeDays: Int!
+    averageCompletion: Float!
+    longestStreak: Int!
+    totalPoints: Int!
+    categoryBreakdown: [CategoryStats!]!
+  }
+
   type Habit {
     id: ID!
     userId: ID!
@@ -53,6 +84,7 @@ export const typeDefs = `#graphql
     order: Int!
     entries(limit: Int): [HabitEntry!]!
     streaks(active: Boolean): [HabitStreak!]!
+    currentStreak: Int!
     createdAt: String!
     updatedAt: String!
   }
@@ -121,17 +153,24 @@ export const typeDefs = `#graphql
   }
 
   type Query {
-    # Usuario
+    # Usuario y Perfil
     currentUser: User
     user(id: ID!): User
     users: [User!]!
     authenticateUser(email: String!, password: String!): User
+    userProfile: User
+    profileStats: ProfileStats!
     
     # Hábitos
     myHabits: [Habit!]!
     habitsByCategory(category: HabitCategory!): [Habit!]!
     habitEntries(habitId: ID!): [HabitEntry!]!
     habitWithEntries(habitId: ID!): Habit
+    
+    # Calendario
+    calendarData(month: Int!, year: Int!): [CalendarDay!]!
+    calendarDay(date: String!): CalendarDay
+    monthlyStats(month: Int!, year: Int!): MonthlyStats!
     
     # Dashboard
     todayScore: DailyScore
@@ -167,6 +206,7 @@ export const typeDefs = `#graphql
     points: Int
     color: String
     icon: String
+    order: Int
   }
 
   input UpdateHabitInput {
@@ -183,6 +223,14 @@ export const typeDefs = `#graphql
     icon: String
     isActive: Boolean
     order: Int
+  }
+
+  input UpdateUserProfileInput {
+    firstName: String
+    lastName: String
+    bio: String
+    phoneNumber: String
+    profileImageUrl: String
   }
 
   input LogHabitEntryInput {
@@ -214,6 +262,9 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
+    # Perfil
+    updateUserProfile(input: UpdateUserProfileInput!): User!
+    
     # Hábitos
     createHabit(input: NewHabitInput!): Habit!
     updateHabit(id: ID!, input: UpdateHabitInput!): Habit!
@@ -237,16 +288,31 @@ export const typeDefs = `#graphql
 export const resolvers = {
   // Resolvers de campos para tipos complejos
   Habit: {
-    entries: async (parent: Habit, args: { limit?: number }) => {
-      return parent.entries?.slice(0, args.limit || parent.entries.length) || [];
+    entries: async (parent: any, args: { limit?: number }, ctx: GraphQLContext) => {
+      const habits = await ctx.db.habitEntry.findMany({
+        where: { habitId: parent.id },
+        orderBy: { date: 'desc' },
+        take: args.limit || 30
+      });
+      return habits;
     },
-    streaks: async (parent: Habit, args: { active?: boolean }) => {
-      if (!parent.streaks) return [];
+    streaks: async (parent: any, args: { active?: boolean }, ctx: GraphQLContext) => {
+      const where: any = { habitId: parent.id };
       if (args.active !== undefined) {
-        return parent.streaks.filter((streak: HabitStreak) => streak.isActive === args.active);
+        where.isActive = args.active;
       }
-      return parent.streaks;
+      return ctx.db.habitStreak.findMany({
+        where,
+        orderBy: { startDate: 'desc' }
+      });
     },
+    currentStreak: async (parent: any, _args: unknown, ctx: GraphQLContext) => {
+      const activeStreak = await ctx.db.habitStreak.findFirst({
+        where: { habitId: parent.id, isActive: true },
+        orderBy: { startDate: 'desc' }
+      });
+      return activeStreak?.length || 0;
+    }
   },
 
   Query: {
@@ -254,11 +320,242 @@ export const resolvers = {
       return ctx.db.user.findUnique({
         where: { id: ctx.user.id },
         include: {
-          habits: true,
+          habits: { where: { isActive: true } },
           dailyScores: { take: 30, orderBy: { date: 'desc' } },
           challenges: true,
         },
       });
+    },
+
+    userProfile: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
+      return ctx.db.user.findUnique({
+        where: { id: ctx.user.id },
+      });
+    },
+
+    profileStats: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const dailyScores = await ctx.db.dailyScore.findMany({
+        where: {
+          userId: ctx.user.id,
+          date: { gte: thirtyDaysAgo }
+        },
+        orderBy: { date: 'desc' }
+      });
+
+      const completedHabits = await ctx.db.habitEntry.count({
+        where: {
+          habit: { userId: ctx.user.id },
+          status: 'COMPLETED',
+          date: { gte: thirtyDaysAgo }
+        }
+      });
+
+      const allStreaks = await ctx.db.habitStreak.findMany({
+        where: { habit: { userId: ctx.user.id } },
+        orderBy: { length: 'desc' }
+      });
+
+      const currentStreaks = allStreaks.filter(s => s.isActive);
+      const longestStreak = allStreaks[0]?.length || 0;
+      const currentStreak = currentStreaks.reduce((max, s) => Math.max(max, s.length), 0);
+
+      const totalPoints = dailyScores.reduce((sum, score) => sum + score.totalPoints, 0);
+      const averageScore = dailyScores.length > 0 
+        ? dailyScores.reduce((sum, score) => sum + ((score.completedHabits / Math.max(score.totalHabits, 1)) * 100), 0) / dailyScores.length
+        : 0;
+
+      return {
+        totalDays: dailyScores.length,
+        currentStreak,
+        longestStreak,
+        completedHabits,
+        totalPoints,
+        averageScore,
+        satisfactionRating: 95.0 // Simulated for now
+      };
+    },
+
+    calendarData: async (_parent: unknown, { month, year }: { month: number; year: number }, ctx: GraphQLContext) => {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+      
+      const dailyScores = await ctx.db.dailyScore.findMany({
+        where: {
+          userId: ctx.user.id,
+          date: {
+            gte: startDate,
+            lte: endDate
+          }
+        },
+        include: {
+          user: {
+            include: {
+              habits: {
+                where: { isActive: true },
+                include: {
+                  entries: {
+                    where: {
+                      date: {
+                        gte: startDate,
+                        lte: endDate
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Generate calendar days with data
+      const calendarDays = [];
+      for (let day = 1; day <= endDate.getDate(); day++) {
+        const currentDate = new Date(year, month - 1, day);
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
+        const dayScore = dailyScores.find(score => 
+          score.date.toISOString().split('T')[0] === dateStr
+        );
+
+        if (dayScore) {
+          const completionPercentage = dayScore.totalHabits > 0 
+            ? (dayScore.completedHabits / dayScore.totalHabits) * 100 
+            : 0;
+
+          calendarDays.push({
+            date: dateStr,
+            completedHabits: dayScore.completedHabits,
+            totalHabits: dayScore.totalHabits,
+            points: dayScore.totalPoints,
+            completionPercentage,
+            hasStreak: completionPercentage >= 70,
+            entries: [] // Will be populated if needed
+          });
+        } else {
+          // No data for this day
+          calendarDays.push({
+            date: dateStr,
+            completedHabits: 0,
+            totalHabits: 0,
+            points: 0,
+            completionPercentage: 0,
+            hasStreak: false,
+            entries: []
+          });
+        }
+      }
+
+      return calendarDays;
+    },
+
+    calendarDay: async (_parent: unknown, { date }: { date: string }, ctx: GraphQLContext) => {
+      const targetDate = new Date(date);
+      
+      const dailyScore = await ctx.db.dailyScore.findFirst({
+        where: {
+          userId: ctx.user.id,
+          date: targetDate
+        }
+      });
+
+      const entries = await ctx.db.habitEntry.findMany({
+        where: {
+          habit: { userId: ctx.user.id },
+          date: targetDate
+        },
+        include: {
+          habit: true
+        }
+      });
+
+      if (!dailyScore) {
+        return {
+          date,
+          completedHabits: 0,
+          totalHabits: 0,
+          points: 0,
+          completionPercentage: 0,
+          hasStreak: false,
+          entries
+        };
+      }
+
+      const completionPercentage = dailyScore.totalHabits > 0 
+        ? (dailyScore.completedHabits / dailyScore.totalHabits) * 100 
+        : 0;
+
+      return {
+        date,
+        completedHabits: dailyScore.completedHabits,
+        totalHabits: dailyScore.totalHabits,
+        points: dailyScore.totalPoints,
+        completionPercentage,
+        hasStreak: completionPercentage >= 70,
+        entries
+      };
+    },
+
+    monthlyStats: async (_parent: unknown, { month, year }: { month: number; year: number }, ctx: GraphQLContext) => {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+      
+      const dailyScores = await ctx.db.dailyScore.findMany({
+        where: {
+          userId: ctx.user.id,
+          date: {
+            gte: startDate,
+            lte: endDate
+          }
+        }
+      });
+
+      const activeDays = dailyScores.filter(score => score.completedHabits > 0).length;
+      const totalPoints = dailyScores.reduce((sum, score) => sum + score.totalPoints, 0);
+      const averageCompletion = dailyScores.length > 0 
+        ? dailyScores.reduce((sum, score) => sum + ((score.completedHabits / Math.max(score.totalHabits, 1)) * 100), 0) / dailyScores.length
+        : 0;
+
+      // Calculate longest streak in month
+      let longestStreak = 0;
+      let currentStreak = 0;
+      
+      dailyScores.sort((a, b) => a.date.getTime() - b.date.getTime());
+      for (const score of dailyScores) {
+        const completion = score.totalHabits > 0 ? (score.completedHabits / score.totalHabits) * 100 : 0;
+        if (completion >= 70) {
+          currentStreak++;
+          longestStreak = Math.max(longestStreak, currentStreak);
+        } else {
+          currentStreak = 0;
+        }
+      }
+
+      // Generate category breakdown
+      const categoryBreakdown = [
+        { category: HabitCategory.MORNING_ROUTINE, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 },
+        { category: HabitCategory.PHYSICAL_TRAINING, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 },
+        { category: HabitCategory.NUTRITION, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 },
+        { category: HabitCategory.DEEP_WORK, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 },
+        { category: HabitCategory.PERSONAL_DEVELOPMENT, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 },
+        { category: HabitCategory.SOCIAL_CHARISMA, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 },
+        { category: HabitCategory.REFLECTION, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 },
+        { category: HabitCategory.SLEEP_RECOVERY, totalHabits: 0, completedToday: 0, averageScore: 0, streak: 0 }
+      ];
+
+      return {
+        month: startDate.toLocaleDateString('es-ES', { month: 'long' }),
+        year,
+        totalDays: endDate.getDate(),
+        activeDays,
+        averageCompletion,
+        longestStreak,
+        totalPoints,
+        categoryBreakdown
+      };
     },
 
     user: async (_parent: unknown, { id }: { id: string }, ctx: GraphQLContext) => {
@@ -284,212 +581,135 @@ export const resolvers = {
       });
     },
 
-    authenticateUser: async (_parent: unknown, { email }: { email: string, password: string }, ctx: GraphQLContext) => {
-      // En producción, aquí verificarías el password hash
-      // Por ahora, solo buscar por email
-      const user = await ctx.db.user.findUnique({
-        where: { email },
-        include: {
-          habits: true,
-          dailyScores: { take: 30, orderBy: { date: 'desc' } },
-          challenges: true,
-        },
-      });
-
-      if (user && user.isActive) {
-        return user;
-      }
-
-      throw new Error('Credenciales inválidas');
-    },
-
     myHabits: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.habit.findMany({
-        where: {
-          userId: ctx.user.id,
-          isActive: true,
-        },
+        where: { userId: ctx.user.id, isActive: true },
         include: {
-          user: true,
-          entries: {
-            orderBy: { date: 'desc' },
-            take: 7
-          },
-          streaks: {
-            where: { isActive: true }
-          }
+          entries: { take: 7, orderBy: { date: 'desc' } },
+          streaks: { where: { isActive: true } },
         },
-        orderBy: [
-          { category: 'asc' },
-          { order: 'asc' }
-        ]
+        orderBy: { order: 'asc' },
       });
     },
 
-    habitsByCategory: async (_parent: unknown, { category }: { category: string }, ctx: GraphQLContext) => {
+    habitsByCategory: async (_parent: unknown, { category }: { category: HabitCategory }, ctx: GraphQLContext) => {
       return ctx.db.habit.findMany({
-        where: {
-          userId: ctx.user.id,
-          category: category as HabitCategory,
-          isActive: true,
-        },
+        where: { userId: ctx.user.id, category, isActive: true },
         include: {
-          user: true,
-          entries: {
-            orderBy: { date: 'desc' },
-            take: 7
-          },
-          streaks: {
-            where: { isActive: true }
-          }
+          entries: { take: 7, orderBy: { date: 'desc' } },
+          streaks: { where: { isActive: true } },
         },
-        orderBy: { order: 'asc' }
+        orderBy: { order: 'asc' },
       });
     },
 
     habitEntries: async (_parent: unknown, { habitId }: { habitId: string }, ctx: GraphQLContext) => {
-      // Verificar que el hábito pertenece al usuario
-      const habit = await ctx.db.habit.findFirst({
-        where: { id: habitId, userId: ctx.user.id }
-      });
-      
-      if (!habit) {
-        throw new Error('Hábito no encontrado o no tienes permisos');
-      }
-
       return ctx.db.habitEntry.findMany({
         where: { habitId },
         include: { habit: true },
-        orderBy: { date: 'desc' }
+        orderBy: { date: 'desc' },
       });
     },
 
     habitWithEntries: async (_parent: unknown, { habitId }: { habitId: string }, ctx: GraphQLContext) => {
-      return ctx.db.habit.findFirst({
-        where: {
-          id: habitId,
-          userId: ctx.user.id,
-        },
+      return ctx.db.habit.findUnique({
+        where: { id: habitId },
         include: {
-          user: true,
-          entries: {
-            orderBy: { date: 'desc' }
-          },
-          streaks: true
-        }
+          entries: { orderBy: { date: 'desc' } },
+          streaks: true,
+        },
       });
     },
 
     todayScore: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
-      const today = new Date().toISOString().split('T')[0];
-      const todayDate = new Date(today);
-      return ctx.db.dailyScore.findUnique({
+      const today = new Date();
+      return ctx.db.dailyScore.findFirst({
         where: {
-          userId_date: {
-            userId: ctx.user.id,
-            date: todayDate,
-          },
+          userId: ctx.user.id,
+          date: today,
         },
+        include: { user: true },
       });
     },
 
     weeklyScores: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
-      const today = new Date();
-      const weekAgo = new Date(today);
-      weekAgo.setDate(today.getDate() - 7);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
       
       return ctx.db.dailyScore.findMany({
         where: {
           userId: ctx.user.id,
-          date: {
-            gte: weekAgo,
-            lte: today,
-          },
+          date: { gte: weekAgo },
         },
-        orderBy: { date: 'desc' },
+        include: { user: true },
+        orderBy: { date: 'asc' },
       });
     },
 
     monthlyScores: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
-      const today = new Date();
-      const monthAgo = new Date(today);
-      monthAgo.setDate(today.getDate() - 30);
+      const monthAgo = new Date();
+      monthAgo.setDate(monthAgo.getDate() - 30);
       
       return ctx.db.dailyScore.findMany({
         where: {
           userId: ctx.user.id,
-          date: {
-            gte: monthAgo,
-            lte: today,
-          },
+          date: { gte: monthAgo },
         },
-        orderBy: { date: 'desc' },
+        include: { user: true },
+        orderBy: { date: 'asc' },
       });
     },
 
     activeChallenges: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
-      const today = new Date().toISOString().split('T')[0];
       return ctx.db.challenge.findMany({
-        where: {
-          userId: ctx.user.id,
-          isCompleted: false,
-          endDate: {
-            gte: today,
-          },
-        },
-        orderBy: { endDate: 'asc' },
+        where: { userId: ctx.user.id, isCompleted: false },
+        include: { user: true },
+        orderBy: { createdAt: 'desc' },
       });
     },
 
     completedChallenges: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.challenge.findMany({
-        where: {
-          userId: ctx.user.id,
-          isCompleted: true,
-        },
+        where: { userId: ctx.user.id, isCompleted: true },
+        include: { user: true },
         orderBy: { createdAt: 'desc' },
       });
     },
 
     categoryStats: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
-      const today = new Date().toISOString().split('T')[0];
-      const todayDate = new Date(today);
-      const categories = [
-        'MORNING_ROUTINE', 'PHYSICAL_TRAINING', 'NUTRITION', 'DEEP_WORK',
-        'PERSONAL_DEVELOPMENT', 'SOCIAL_CHARISMA', 'SLEEP_RECOVERY', 'REFLECTION'
+      const categories: HabitCategory[] = [
+        HabitCategory.MORNING_ROUTINE, 
+        HabitCategory.PHYSICAL_TRAINING, 
+        HabitCategory.NUTRITION, 
+        HabitCategory.DEEP_WORK,
+        HabitCategory.PERSONAL_DEVELOPMENT, 
+        HabitCategory.SOCIAL_CHARISMA, 
+        HabitCategory.REFLECTION, 
+        HabitCategory.SLEEP_RECOVERY
       ];
 
       const stats = [];
+      const today = new Date();
       
       for (const category of categories) {
-        const habits = await ctx.db.habit.findMany({
-          where: {
-            userId: ctx.user.id,
-            category: category as HabitCategory,
-            isActive: true,
-          },
+        const totalHabits = await ctx.db.habit.count({
+          where: { userId: ctx.user.id, category, isActive: true }
         });
 
-        const entriesQuery = await ctx.db.habitEntry.findMany({
+        const completedToday = await ctx.db.habitEntry.count({
           where: {
-            date: todayDate,
-            habit: {
-              userId: ctx.user.id,
-              category: category as HabitCategory,
-            },
-            status: 'COMPLETED',
-          },
+            habit: { userId: ctx.user.id, category },
+            date: today,
+            status: 'COMPLETED'
+          }
         });
 
-        const totalPoints = habits.reduce((sum: number, h: { points: number }) => sum + h.points, 0);
-        const averageScore = habits.length > 0 ? totalPoints / habits.length : 0;
-        
         stats.push({
           category,
-          totalHabits: habits.length,
-          completedToday: entriesQuery.length,
-          averageScore,
-          streak: 0, // TODO: Implementar cálculo de racha
+          totalHabits,
+          completedToday,
+          averageScore: totalHabits > 0 ? (completedToday / totalHabits) * 100 : 0,
+          streak: 0 // Simplified for now
         });
       }
 
@@ -498,9 +718,7 @@ export const resolvers = {
 
     longestStreaks: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.habitStreak.findMany({
-        where: {
-          habit: { userId: ctx.user.id }
-        },
+        where: { habit: { userId: ctx.user.id } },
         include: { habit: true },
         orderBy: { length: 'desc' },
         take: 10,
@@ -509,81 +727,71 @@ export const resolvers = {
   },
 
   Mutation: {
-    createHabit: async (_parent: unknown, { input }: { input: NewHabitInput }, ctx: GraphQLContext) => {
-      const habitCount = await ctx.db.habit.count({
-        where: { userId: ctx.user.id }
+    updateUserProfile: async (_parent: unknown, { input }: { input: UpdateUserProfileInput }, ctx: GraphQLContext) => {
+      return ctx.db.user.update({
+        where: { id: ctx.user.id },
+        data: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          bio: input.bio,
+          phoneNumber: input.phoneNumber,
+          profileImageUrl: input.profileImageUrl,
+          updatedAt: new Date()
+        }
       });
-      
+    },
+
+    createHabit: async (_parent: unknown, { input }: { input: NewHabitInput }, ctx: GraphQLContext) => {
       return ctx.db.habit.create({
         data: {
           userId: ctx.user.id,
-          order: habitCount + 1,
-          isActive: true,
-          ...input,
+          name: input.name,
+          description: input.description,
+          category: input.category,
+          frequency: input.frequency,
+          trackingType: input.trackingType || 'BINARY',
+          targetCount: input.targetCount || 1,
+          targetValue: input.targetValue,
+          targetUnit: input.targetUnit,
+          points: input.points || 1,
+          color: input.color || '#3B82F6',
+          icon: input.icon,
+          order: input.order || 0,
         },
         include: {
           entries: true,
           streaks: true,
-        }
+        },
       });
     },
 
-    updateHabit: async (_parent: unknown, { id, input }: { id: string, input: UpdateHabitInput }, ctx: GraphQLContext) => {
-      // Verificar que el hábito existe y pertenece al usuario
-      const existingHabit = await ctx.db.habit.findFirst({
-        where: { id, userId: ctx.user.id }
-      });
-      
-      if (!existingHabit) {
-        throw new Error('Hábito no encontrado o no tienes permisos');
-      }
-
+    updateHabit: async (_parent: unknown, { id, input }: { id: string; input: UpdateHabitInput }, ctx: GraphQLContext) => {
       return ctx.db.habit.update({
         where: { id },
-        data: input,
+        data: {
+          ...input,
+          updatedAt: new Date(),
+        },
         include: {
-          user: true,
           entries: true,
           streaks: true,
-        }
+        },
       });
     },
 
     deleteHabit: async (_parent: unknown, { id }: { id: string }, ctx: GraphQLContext) => {
-      // Verificar que el hábito existe y pertenece al usuario
-      const existingHabit = await ctx.db.habit.findFirst({
-        where: { id, userId: ctx.user.id }
-      });
-      
-      if (!existingHabit) {
-        throw new Error('Hábito no encontrado o no tienes permisos');
-      }
-
       await ctx.db.habit.update({
         where: { id },
-        data: { isActive: false }
+        data: { isActive: false },
       });
       return true;
     },
 
     logHabitEntry: async (_parent: unknown, { input }: { input: HabitEntryInput }, ctx: GraphQLContext) => {
-      // Verificar que el hábito pertenece al usuario
-      const habit = await ctx.db.habit.findFirst({
-        where: { id: input.habitId, userId: ctx.user.id }
-      });
-      
-      if (!habit) {
-        throw new Error('Hábito no encontrado o no tienes permisos');
-      }
-
-      const entry = await ctx.db.habitEntry.upsert({
-        where: {
-          habitId_date: {
-            habitId: input.habitId,
-            date: new Date(input.date),
-          },
-        },
-        update: {
+      const entry = await ctx.db.habitEntry.create({
+        data: {
+          habitId: input.habitId,
+          date: new Date(input.date),
           status: input.status,
           value: input.value,
           textValue: input.textValue,
@@ -592,202 +800,173 @@ export const resolvers = {
           difficulty: input.difficulty,
           mood: input.mood,
         },
-        create: {
-          ...input,
-          date: new Date(input.date),
-        },
-        include: {
-          habit: true
-        }
+        include: { habit: true },
       });
 
-      // Recalcular score del día
-      await recalculateDailyScore(ctx, input.date);
+      // Update or create daily score
+      await updateDailyScore(ctx, ctx.user.id, new Date(input.date));
 
       return entry;
     },
 
     deleteHabitEntry: async (_parent: unknown, { id }: { id: string }, ctx: GraphQLContext) => {
-      const entry = await ctx.db.habitEntry.findFirst({
-        where: { 
-          id,
-          habit: { userId: ctx.user.id }
-        },
-        include: { habit: true }
-      });
-      
-      if (!entry) {
-        throw new Error('Entrada no encontrada o no tienes permisos');
+      const entry = await ctx.db.habitEntry.findUnique({ where: { id } });
+      if (entry) {
+        await ctx.db.habitEntry.delete({ where: { id } });
+        await updateDailyScore(ctx, ctx.user.id, entry.date);
       }
-      
-      await ctx.db.habitEntry.delete({
-        where: { id },
-      });
-      
-      // Recalcular score del día
-      await recalculateDailyScore(ctx, entry.date.toISOString().split('T')[0]);
-      
       return true;
     },
 
     createChallenge: async (_parent: unknown, { input }: { input: NewChallengeInput }, ctx: GraphQLContext) => {
       return ctx.db.challenge.create({
         data: {
-          ...input,
           userId: ctx.user.id,
-          currentValue: 0,
-          isCompleted: false,
+          name: input.name,
+          description: input.description,
+          category: input.category,
           startDate: new Date(input.startDate),
           endDate: new Date(input.endDate),
+          targetValue: input.targetValue,
+          reward: input.reward,
         },
+        include: { user: true },
       });
     },
 
-    updateChallengeProgress: async (_parent: unknown, { id, progress }: { id: string, progress: number }, ctx: GraphQLContext) => {
-      const challenge = await ctx.db.challenge.findFirst({ 
-        where: { id, userId: ctx.user.id } 
-      });
-      
-      if (!challenge) {
-        throw new Error('Challenge no encontrado o no tienes permisos');
-      }
-
-      const newProgress = Math.min(100, (progress / challenge.targetValue) * 100);
-      
+    updateChallengeProgress: async (_parent: unknown, { id, progress }: { id: string; progress: number }, ctx: GraphQLContext) => {
       return ctx.db.challenge.update({
         where: { id },
-        data: {
-          currentValue: progress,
-          isCompleted: newProgress >= 100,
-        },
-        include: { user: true }
+        data: { currentValue: progress },
+        include: { user: true },
       });
     },
 
     completeChallenge: async (_parent: unknown, { id }: { id: string }, ctx: GraphQLContext) => {
-      const challenge = await ctx.db.challenge.findFirst({ 
-        where: { id, userId: ctx.user.id } 
-      });
-      
-      if (!challenge) {
-        throw new Error('Challenge no encontrado o no tienes permisos');
-      }
-
       return ctx.db.challenge.update({
         where: { id },
-        data: {
-          isCompleted: true,
-        },
-        include: { user: true }
+        data: { isCompleted: true },
+        include: { user: true },
       });
     },
 
     recalculateDailyScore: async (_parent: unknown, { date }: { date: string }, ctx: GraphQLContext) => {
-      return recalculateDailyScore(ctx, date);
+      const targetDate = new Date(date);
+      return updateDailyScore(ctx, ctx.user.id, targetDate);
     },
 
     resetTodayProgress: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const todayDate = new Date(today);
-        
-        // Eliminar todas las entradas de hábitos de hoy
-        const deletedEntries = await ctx.db.habitEntry.deleteMany({
-          where: {
-            date: todayDate,
-            habit: {
-              userId: ctx.user.id,
-            },
-          },
-        });
+      const today = new Date();
+      const deleted = await ctx.db.habitEntry.deleteMany({
+        where: {
+          habit: { userId: ctx.user.id },
+          date: today,
+        },
+      });
 
-        // Recalcular el score diario (debería quedar en 0)
-        await recalculateDailyScore(ctx, today);
+      await updateDailyScore(ctx, ctx.user.id, today);
 
-        return {
-          success: true,
-          message: `Progreso diario reiniciado. ${deletedEntries.count} entradas eliminadas.`,
-          resetsCount: deletedEntries.count,
-        };
-      } catch (error) {
-        console.error('Error resetting today progress:', error);
-        return {
-          success: false,
-          message: 'Error al reiniciar el progreso diario',
-          resetsCount: 0,
-        };
-      }
+      return {
+        success: true,
+        message: `Reset ${deleted.count} habit entries for today`,
+        resetsCount: deleted.count,
+      };
     },
   },
 };
 
-// Función auxiliar para recalcular score diario
-async function recalculateDailyScore(ctx: GraphQLContext, date: string) {
-  const dateObj = new Date(date);
-  const entriesForDay = await ctx.db.habitEntry.findMany({
-    where: {
-      date: dateObj,
-      habit: { userId: ctx.user.id },
-    },
-    include: { habit: true },
+// Helper function to update daily scores
+async function updateDailyScore(ctx: GraphQLContext, userId: string, date: Date) {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  // Get all user habits
+  const habits = await ctx.db.habit.findMany({
+    where: { userId, isActive: true }
   });
 
-  const allHabits = await ctx.db.habit.findMany({
+  // Get all entries for the day
+  const entries = await ctx.db.habitEntry.findMany({
     where: {
-      userId: ctx.user.id,
-      isActive: true,
+      habit: { userId },
+      date: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
     },
+    include: { habit: true }
   });
 
-  const completedHabits = entriesForDay.filter((e: HabitEntry) => e.status === 'COMPLETED').length;
-  const totalPoints = entriesForDay
-    .filter((e: HabitEntry) => e.status === 'COMPLETED')
-    .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0);
+  const completedEntries = entries.filter(entry => entry.status === 'COMPLETED');
+  const totalPoints = completedEntries.reduce((sum, entry) => sum + entry.habit.points, 0);
 
-  const scoreData = {
-    userId: ctx.user.id,
-    totalPoints,
-    completedHabits,
-    totalHabits: allHabits.length,
-    morningScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'MORNING_ROUTINE' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    physicalScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'PHYSICAL_TRAINING' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    nutritionScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'NUTRITION' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    workScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'DEEP_WORK' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    developmentScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'PERSONAL_DEVELOPMENT' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    socialScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'SOCIAL_CHARISMA' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    sleepScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'SLEEP_RECOVERY' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    reflectionScore: entriesForDay
-      .filter((e: HabitEntry) => e.habit.category === 'REFLECTION' && e.status === 'COMPLETED')
-      .reduce((sum: number, e: HabitEntry) => sum + (e.habit.points || 0), 0),
-    percentile: completedHabits > 0 ? Math.min(100, Math.floor((completedHabits / allHabits.length) * 100) + 20) : 0,
-    rank: Math.max(1, 101 - Math.floor((completedHabits / allHabits.length) * 100)),
+  // Calculate category scores
+  const categoryScores = {
+    morningScore: 0,
+    physicalScore: 0,
+    nutritionScore: 0,
+    workScore: 0,
+    developmentScore: 0,
+    socialScore: 0,
+    reflectionScore: 0,
+    sleepScore: 0
   };
 
+  completedEntries.forEach(entry => {
+    const points = entry.habit.points;
+    switch (entry.habit.category) {
+      case 'MORNING_ROUTINE':
+        categoryScores.morningScore += points;
+        break;
+      case 'PHYSICAL_TRAINING':
+        categoryScores.physicalScore += points;
+        break;
+      case 'NUTRITION':
+        categoryScores.nutritionScore += points;
+        break;
+      case 'DEEP_WORK':
+        categoryScores.workScore += points;
+        break;
+      case 'PERSONAL_DEVELOPMENT':
+        categoryScores.developmentScore += points;
+        break;
+      case 'SOCIAL_CHARISMA':
+        categoryScores.socialScore += points;
+        break;
+      case 'REFLECTION':
+        categoryScores.reflectionScore += points;
+        break;
+      case 'SLEEP_RECOVERY':
+        categoryScores.sleepScore += points;
+        break;
+    }
+  });
+
+  // Upsert daily score
   return ctx.db.dailyScore.upsert({
     where: {
       userId_date: {
-        userId: ctx.user.id,
-        date: dateObj,
-      },
+        userId,
+        date: startOfDay
+      }
     },
-    update: scoreData,
+    update: {
+      totalPoints,
+      completedHabits: completedEntries.length,
+      totalHabits: habits.length,
+      ...categoryScores
+    },
     create: {
-      ...scoreData,
-      date: dateObj,
+      userId,
+      date: startOfDay,
+      totalPoints,
+      completedHabits: completedEntries.length,
+      totalHabits: habits.length,
+      ...categoryScores
     },
+    include: { user: true }
   });
-   } 
+} 
