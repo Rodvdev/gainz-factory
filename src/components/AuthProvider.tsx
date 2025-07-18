@@ -1,50 +1,77 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { initializeAuth, getCurrentUserSync, AuthUser } from '@/lib/auth';
+
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  profileImageUrl?: string;
+  bio?: string;
+}
 
 interface AuthContextType {
-  user: AuthUser | null;
+  user: User | null;
   isLoading: boolean;
-  isInitialized: boolean;
-  refreshUser: () => Promise<void>;
+  isAuthenticated: boolean;
+  login: (token: string, userData: User) => void;
+  logout: () => void;
+  refreshUser: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
 
-  const refreshUser = async () => {
+  const refreshUser = () => {
     try {
-      setIsLoading(true);
-      const currentUser = await initializeAuth();
-      setUser(currentUser);
+      const token = localStorage.getItem("authToken");
+      const userData = localStorage.getItem("user");
+      
+      if (token && userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } else {
+        setUser(null);
+      }
     } catch (error) {
-      console.error('Error refreshing user:', error);
-      // Fallback al usuario síncrono
-      setUser(getCurrentUserSync());
-    } finally {
-      setIsLoading(false);
-      setIsInitialized(true);
+      console.error("Error refreshing user:", error);
+      setUser(null);
     }
   };
 
+  const login = (token: string, userData: User) => {
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    setUser(null);
+  };
+
   useEffect(() => {
+    // Initialize auth state on mount
     refreshUser();
+    setIsLoading(false);
   }, []);
 
+  const value: AuthContextType = {
+    user,
+    isLoading,
+    isAuthenticated: !!user,
+    login,
+    logout,
+    refreshUser
+  };
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isLoading, 
-        isInitialized,
-        refreshUser 
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

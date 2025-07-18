@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
@@ -60,6 +61,24 @@ export default function Home() {
         </a>
         
         <div className="w-full flex flex-col gap-3">
+          {/* Enlaces a páginas públicas */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <Link 
+              href="/recetas"
+              className="w-full py-3 px-4 bg-[#8B0000] hover:bg-[#6B0000] text-white font-medium rounded-lg text-center flex items-center justify-center gap-2 transition-colors"
+            >
+              <span className="text-xl">🍽️</span>
+              Ver Recetas
+            </Link>
+            <Link 
+              href="/coaches"
+              className="w-full py-3 px-4 bg-[#8B0000] hover:bg-[#6B0000] text-white font-medium rounded-lg text-center flex items-center justify-center gap-2 transition-colors"
+            >
+              <span className="text-xl">💪</span>
+              Conocer Coaches
+            </Link>
+          </div>
+
           {!showOptions ? (
             <button 
               onClick={() => setShowOptions(true)}

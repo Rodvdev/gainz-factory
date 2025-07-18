@@ -33,6 +33,16 @@ model User {
   habits                Habit[]
   dailyScores           DailyScore[]
   challenges            Challenge[]
+  mediaProgress         MediaProgress[]
+  blogPosts             BlogPost[]
+  forumPosts            ForumPost[]
+  forumComments         ForumComment[]
+  workoutRoutines       WorkoutRoutine[]
+  tickets               Ticket[]
+  userGoals             UserGoal[]
+  journalEntries        JournalEntry[]
+  aiInteractions        AIInteraction[]
+  coach                 Coach?
   
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
@@ -66,40 +76,33 @@ enum HabitCategory {
 }
 
 enum TrackingType {
-  BINARY          // Sí/No, Completado/No completado
-  NUMERIC         // Número (repeticiones, peso, etc.)
-  DURATION        // Tiempo en minutos
-  RATING          // Escala 1-10
-  TEXT            // Nota libre
+  BINARY
+  NUMERIC
+  DURATION
+  RATING
+  TEXT
 }
 
 model Habit {
   id           String         @id @default(cuid())
   userId       String
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   name         String
   description  String?
   category     HabitCategory
   frequency    HabitFrequency
-  targetCount  Int            @default(1)
   trackingType TrackingType   @default(BINARY)
-  
-  // Metas específicas por tipo
-  targetValue  Float?         // Para NUMERIC, DURATION, RATING
-  targetUnit   String?        // ej: "kg", "min", "pages"
-  
-  // Gamificación
+  targetCount  Int            @default(1)
+  targetValue  Float?
+  targetUnit   String?
   points       Int            @default(1)
   color        String?        @default("#3B82F6")
   icon         String?
-  
   isActive     Boolean        @default(true)
   order        Int            @default(0)
 
   entries      HabitEntry[]
   streaks      HabitStreak[]
-
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
@@ -112,55 +115,38 @@ model HabitEntry {
   id          String      @id @default(cuid())
   habitId     String
   habit       Habit       @relation(fields: [habitId], references: [id], onDelete: Cascade)
-
   date        DateTime    @db.Date
   status      EntryStatus
-  
-  // Valores flexibles según el tipo de tracking
-  value       Float?      // Para NUMERIC, DURATION, RATING
-  textValue   String?     // Para TEXT
+  value       Float?
+  textValue   String?
   note        String?
-  
-  // Metadata adicional
-  timeSpent   Int?        // Minutos dedicados
-  difficulty  Int?        // 1-5 qué tan difícil fue
-  mood        Int?        // 1-10 cómo te sentiste
-  
+  timeSpent   Int?
+  difficulty  Int?
+  mood        Int?
   createdAt   DateTime    @default(now())
 
   @@unique([habitId, date])
-  @@index([habitId])
-  @@index([date])
 }
 
 model HabitStreak {
   id        String   @id @default(cuid())
   habitId   String
   habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
-  
   startDate DateTime @db.Date
   endDate   DateTime? @db.Date
   length    Int      @default(1)
   isActive  Boolean  @default(true)
-  
   createdAt DateTime @default(now())
-  
-  @@index([habitId])
-  @@index([isActive])
 }
 
-// Tablero de puntuación diaria por usuario
 model DailyScore {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  date          DateTime @db.Date
-  totalPoints   Int      @default(0)
-  completedHabits Int    @default(0)
-  totalHabits   Int      @default(0)
-  
-  // Puntuación por categoría
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime @db.Date
+  totalPoints     Int      @default(0)
+  completedHabits Int      @default(0)
+  totalHabits     Int      @default(0)
   morningScore     Int   @default(0)
   physicalScore    Int   @default(0)
   nutritionScore   Int   @default(0)
@@ -169,41 +155,231 @@ model DailyScore {
   socialScore      Int   @default(0)
   reflectionScore  Int   @default(0)
   sleepScore       Int   @default(0)
-  
-  // Rankings (pueden ser globales o relativos)
-  percentile    Float?   // Percentil vs otros días del usuario
-  rank          Int?     // Ranking del día (vs otros usuarios o histórico)
-  
-  createdAt     DateTime @default(now())
-  
+  percentile      Float?
+  rank            Int?
+  createdAt       DateTime @default(now())
+
   @@unique([userId, date])
   @@index([userId])
   @@index([date])
   @@index([userId, date])
 }
 
-// Metas y desafíos por usuario
 model Challenge {
-  id          String         @id @default(cuid())
-  userId      String
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  name        String
-  description String?
-  category    HabitCategory?
-  
-  startDate   DateTime @db.Date
-  endDate     DateTime @db.Date
-  
-  targetValue Int      // Ej: 30 días, 50 repeticiones, etc.
-  currentValue Int     @default(0)
-  
-  isCompleted Boolean  @default(false)
-  reward      String?  // Descripción de la recompensa
-  
-  createdAt   DateTime @default(now())
-  
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  category      HabitCategory?
+  startDate     DateTime @db.Date
+  endDate       DateTime @db.Date
+  targetValue   Int
+  currentValue  Int      @default(0)
+  isCompleted   Boolean  @default(false)
+  reward        String?
+  createdAt     DateTime @default(now())
+
   @@index([userId])
   @@index([isCompleted])
   @@index([userId, isCompleted])
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  objective   String?
+  level       UserLevel?
+  isPremium   Boolean  @default(false)
+  imageUrl    String?
+  videoUrl    String?
+  createdAt   DateTime @default(now())
+}
+
+enum ServiceLevel {
+  LOW
+  HIGH
+}
+
+model Service {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  level       ServiceLevel
+  price       Float?
+  duration    Int?         // en minutos
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+}
+
+model MediaContent {
+  id        String   @id @default(cuid())
+  title     String
+  type      String       // video, pdf, ebook, audio
+  url       String
+  topic     String       // Mindset, Nutrición, Espiritualidad, Ejercicios
+  module    String?      // Para navegación por módulos
+  episode   Int?
+  isPremium Boolean      @default(false)
+  createdAt DateTime @default(now())
+  progress  MediaProgress[]
+}
+
+model MediaProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  mediaId     String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media       MediaContent @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  watchedAt   DateTime?
+  progress    Float    // 0 a 1
+}
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  tags      String[]
+  createdAt DateTime @default(now())
+}
+
+model ForumPost {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  content   String
+  category  String?
+  createdAt DateTime @default(now())
+  comments  ForumComment[]
+}
+
+model ForumComment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+}
+
+enum ExerciseType {
+  STRENGTH
+  CARDIO
+  MOBILITY
+  FLEXIBILITY
+}
+
+enum IntensityLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum UserLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model Exercise {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  type        ExerciseType
+  intensity   IntensityLevel
+  level       UserLevel
+  technique   String?
+  videoUrl    String?
+  imageUrl    String?
+  targetMuscles String[]
+  createdAt   DateTime        @default(now())
+  routines    RoutineExercise[]
+}
+
+model WorkoutRoutine {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  objective   String?
+  level       UserLevel
+  duration    Int?         // total en minutos
+  isPublic    Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  exercises   RoutineExercise[]
+}
+
+model RoutineExercise {
+  id             String   @id @default(cuid())
+  routineId      String
+  exerciseId     String
+  exercise       Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  routine        WorkoutRoutine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  order          Int
+  sets           Int
+  reps           Int
+  restSeconds    Int
+}
+
+model Ticket {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String   // acceso, rutina personalizada, asesoría, etc.
+  expiresAt   DateTime?
+  isUsed      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+// Metas y objetivos del usuario para tracking de progreso
+model UserGoal {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal       String   // ganar músculo, perder grasa, mejorar fuerza, etc.
+  targetDate DateTime?
+  createdAt  DateTime @default(now())
+}
+
+// Entradas de diario para reflexión y mindset
+model JournalEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  prompt    String?  // Pregunta o tema para reflexionar
+  content   String
+  mood      Int?     // escala 1–10
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+// Entrenadores y staff con privilegios especiales
+model Coach {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialty   String?  // especialidad: fuerza, cardio, nutrición, etc.
+  bio         String?
+  isVisible   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+// Interacciones con IA para rutinas, mindset, nutrición
+model AIInteraction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // rutinas, mindset, nutrición, espiritualidad
+  prompt    String
+  response  String
+  createdAt DateTime @default(now())
+
+  @@index([userId, type])
 }

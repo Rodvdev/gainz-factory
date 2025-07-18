@@ -2,13 +2,15 @@ import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { NextRequest } from 'next/server';
 import { typeDefs, resolvers } from '@/lib/graphql/growth/queries';
+import { PUBLIC_SCHEMA } from '@/lib/graphql/public-schema';
+import { publicResolvers } from '@/lib/graphql/public-resolvers';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { GraphQLContext } from '@/lib/graphql/growth/types';
 
 const server = new ApolloServer<GraphQLContext>({
-  typeDefs,
-  resolvers,
+  typeDefs: [typeDefs, PUBLIC_SCHEMA],
+  resolvers: [resolvers, publicResolvers],
 });
 
 const handler = startServerAndCreateNextHandler(server, {
