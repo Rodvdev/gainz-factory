@@ -22,23 +22,36 @@ const handler = startServerAndCreateNextHandler(server, {
       if (currentUser) {
         return {
           db,
-          user: currentUser,
+          user: {
+            ...currentUser,
+            bio: currentUser.bio || undefined,
+            phoneNumber: currentUser.phoneNumber || undefined,
+            profileImageUrl: currentUser.profileImageUrl || undefined,
+          },
         };
       }
       
       // For development and public queries, use demo user
       console.log('No authenticated user found, using demo user for GraphQL context');
       
+      const demoUser = createDemoUser();
       return {
         db,
-        user: createDemoUser(),
+        user: {
+          ...demoUser,
+          profileImageUrl: demoUser.profileImageUrl || undefined,
+        },
       };
     } catch (error) {
       console.warn('Error in GraphQL context creation, using demo user:', error);
       
+      const demoUser = createDemoUser();
       return {
         db,
-        user: createDemoUser(),
+        user: {
+          ...demoUser,
+          profileImageUrl: demoUser.profileImageUrl || undefined,
+        },
       };
     }
   },
