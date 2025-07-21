@@ -39,7 +39,7 @@ export default function Home() {
       id: "vibenfly",
       title: "Vibenfly",
       subtitle: "2do Drop - Remember Who You Are",
-      description: "Nueva colección de ropa deportiva",
+      description: "Nueva colección de hoodies y oversize",
       icon: "👕",
       color: "#8B5CF6",
       link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly, qué modelos y tallas tienes disponibles?",
