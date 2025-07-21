@@ -953,6 +953,227 @@ const recipes: Recipe[] = [
       "Conservar en refrigerador hasta por 2 días",
       "Perfecto para el desayuno o como postre"
     ]
+  },
+  {
+    id: "batido-proteina-definicion",
+    name: "Batido Proteína (definición)",
+    emoji: "🍌🍓",
+    category: "snacks",
+    time: "5 min",
+    portions: "1 porción",
+    ingredients: [
+      "1/2 plátano 🍌",
+      "100g fresas 🍓",
+      "1 scoop Iso Xp @muscleshopperu 🤤",
+      "100g yogur griego",
+      "Canela",
+      "Agua"
+    ],
+    instructions: [
+      "En una licuadora, agregar el plátano cortado",
+      "Agregar las fresas lavadas",
+      "Incorporar el scoop de proteína Iso Xp",
+      "Agregar el yogur griego",
+      "Espolvorear canela al gusto",
+      "Agregar agua según la consistencia deseada",
+      "Licuar hasta obtener una mezcla suave",
+      "Servir inmediatamente"
+    ],
+    macros: {
+      protein: "32g",
+      carbs: "33g",
+      fats: "1g",
+      calories: "252 kcal"
+    },
+    tips: [
+      "🚨Macros: 252 cals (p:32 ch:33 g:1)",
+      "Perfecto para definición muscular",
+      "Puedes usar leche de almendras en lugar de agua",
+      "Agregar hielo para un batido más refrescante",
+      "Usar diferentes frutas según tu preferencia",
+      "Ideal para post-entreno",
+      "Consumir inmediatamente para mejor sabor"
+    ]
+  },
+  {
+    id: "batido-proteina-volumen",
+    name: "Batido Proteína (volumen)",
+    emoji: "🍌🫐",
+    category: "snacks",
+    time: "5 min",
+    portions: "1 porción",
+    ingredients: [
+      "1 plátano 🍌",
+      "100g arándanos 🫐",
+      "60g avena",
+      "1 scoop Levro Iso Whey @muscleshopperu 💪🏻",
+      "20g mantequilla de maní @poderfitmonster 🤩",
+      "Agua"
+    ],
+    instructions: [
+      "En una licuadora, agregar el plátano cortado",
+      "Agregar los arándanos lavados",
+      "Incorporar la avena",
+      "Agregar el scoop de proteína Levro Iso Whey",
+      "Incorporar la mantequilla de maní",
+      "Agregar agua según la consistencia deseada",
+      "Licuar hasta obtener una mezcla suave",
+      "Servir inmediatamente"
+    ],
+    macros: {
+      protein: "38g",
+      carbs: "87g",
+      fats: "16g",
+      calories: "607 kcal"
+    },
+    tips: [
+      "🚨Macros: 607 cals (p:38 ch:87 g:16)",
+      "Perfecto para ganar volumen muscular",
+      "Puedes usar leche en lugar de agua para más calorías",
+      "Agregar más avena si quieres más carbohidratos",
+      "Usar diferentes frutas según tu preferencia",
+      "Ideal para post-entreno o como reemplazo de comida",
+      "Consumir inmediatamente para mejor sabor"
+    ]
+  },
+  {
+    id: "mayonesa-palta",
+    name: "Mayonesa de Palta",
+    emoji: "🥑",
+    category: "salsas",
+    time: "10 min",
+    portions: "4 porciones",
+    ingredients: [
+      "1 palta 🥑",
+      "2 🥚's",
+      "1 cucharada yogurt griego",
+      "Aceite de oliva",
+      "Sal y pimienta",
+      "1/2 limón"
+    ],
+    instructions: [
+      "Cocinar los huevos hasta que estén duros",
+      "En un bowl, mash la palta hasta obtener una pasta suave",
+      "Picar finamente los huevos duros",
+      "Agregar los huevos picados a la palta",
+      "Incorporar el yogurt griego y mezclar bien",
+      "Agregar aceite de oliva gradualmente mientras mezclas",
+      "Sazonar con sal y pimienta al gusto",
+      "Agregar el zumo del medio limón",
+      "Mezclar hasta obtener una consistencia cremosa",
+      "Refrigerar por 10 minutos antes de servir"
+    ],
+    macros: {
+      protein: "6g",
+      carbs: "8g",
+      fats: "15g",
+      calories: "180 kcal"
+    },
+    tips: [
+      "DISFRUTA SIN CULPA VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Perfecta para sándwiches y wraps",
+      "Puedes agregar más limón si quieres más acidez",
+      "Usar más o menos aceite según la consistencia deseada",
+      "Agregar ajo picado para más sabor",
+      "Conservar en refrigerador hasta por 3 días",
+      "Ideal para acompañar carnes o pescados"
+    ]
+  },
+  {
+    id: "cookie-dough-30g-proteina",
+    name: "Cookie Dough +30g de proteína",
+    emoji: "🤤",
+    category: "dulces",
+    time: "10 min",
+    portions: "1 porción",
+    ingredients: [
+      "80g avena (recomiendo hacerla harina)",
+      "1 scoop de proteína @muscleshopperu 💪🏻",
+      "1 cucharada mantequilla de maní @poderfitmonster 🤩",
+      "Chorrito leche de almendras 🥛",
+      "Vainilla",
+      "Canela",
+      "Chips de chocolate 🍫 (de preferencia dark 0 azúcar)",
+      "Una galleta oreo o max 25g (opcional)"
+    ],
+    instructions: [
+      "En un procesador, triturar la avena hasta obtener harina fina",
+      "En un bowl, mezclar la harina de avena con el scoop de proteína",
+      "Agregar la mantequilla de maní y mezclar bien",
+      "Incorporar la leche de almendras gradualmente",
+      "Agregar vainilla y canela al gusto",
+      "Mezclar hasta obtener una masa consistente",
+      "Agregar los chips de chocolate y mezclar suavemente",
+      "Si usas galleta oreo, picarla y agregar",
+      "Formar bolitas o comer directamente como cookie dough",
+      "Refrigerar por 10 minutos para mejor textura"
+    ],
+    macros: {
+      protein: "32g",
+      carbs: "45g",
+      fats: "12g",
+      calories: "420 kcal"
+    },
+    tips: [
+      "Perfecto para satisfacer el antojo de cookie dough de manera saludable",
+      "Puedes agregar más proteína si quieres más",
+      "Usar diferentes sabores de proteína para variar",
+      "Agregar más chips de chocolate si prefieres",
+      "Conservar en refrigerador hasta por 2 días",
+      "Ideal para post-entreno o como snack",
+      "Puedes formar galletas y hornear si prefieres"
+    ]
+  },
+  {
+    id: "poke-anabolico",
+    name: "POKE ANABÓLICO",
+    emoji: "🤤🦍",
+    category: "saladas",
+    time: "20 min",
+    portions: "1 porción",
+    ingredients: [
+      "200g arroz 🍚 (pueden usar la porción que deseen)",
+      "100g pollo 🍗 (pueden usar pescado como trucha o salmón y la porción que deseen)",
+      "Lechuga 🥬",
+      "Tomate 🍅",
+      "Pepino 🥒",
+      "Pimentón rojo",
+      "Cebolla blanca 🧅",
+      "Zanahoria 🥕",
+      "50g palta 🥑",
+      "Sillao",
+      "Stevia",
+      "Ajonjolí"
+    ],
+    instructions: [
+      "Cocinar el arroz según las instrucciones del paquete",
+      "Cocinar el pollo (o pescado) hasta que esté bien cocido",
+      "Cortar el pollo en cubos pequeños",
+      "Lavar y cortar todos los vegetales en trozos pequeños",
+      "En un bowl grande, agregar el arroz cocido",
+      "Agregar el pollo cortado",
+      "Incorporar todos los vegetales: lechuga, tomate, pepino, pimentón, cebolla, zanahoria",
+      "Agregar la palta cortada en cubos",
+      "Sazonar con sillao y stevia al gusto",
+      "Mezclar todo suavemente",
+      "Espolvorear ajonjolí por encima",
+      "Servir y disfrutar"
+    ],
+    macros: {
+      protein: "35g",
+      carbs: "55g",
+      fats: "12g",
+      calories: "480 kcal"
+    },
+    tips: [
+      "Puedes ajustar las porciones según tus necesidades",
+      "Usar pescado crudo (salmón, atún) si prefieres poke tradicional",
+      "Agregar más vegetales según tu preferencia",
+      "Usar arroz integral para más fibra",
+      "Agregar más proteína si necesitas más",
+      "Conservar en refrigerador hasta por 1 día",
+      "Perfecto para meal prep"
+    ]
   }
 ];
 
