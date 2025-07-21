@@ -1,4 +1,3 @@
-import { NextAuthOptions } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
@@ -9,7 +8,15 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 import { User } from "@prisma/client"
 import { Session } from "next-auth"
 
-export const authOptions: NextAuthOptions = {
+// Define JWT token type
+interface JwtToken extends JwtPayload {
+  firstName?: string;
+  lastName?: string;
+  sub?: string;
+}
+
+// Auth configuration for NextAuth v4
+export const authConfig = {
   adapter: PrismaAdapter(db),
   providers: [
     CredentialsProvider({
@@ -84,7 +91,7 @@ export const authOptions: NextAuthOptions = {
 // Get current user from session (for GraphQL context)
 export async function getCurrentUser() {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession() as Session
     if (!session?.user?.id) {
       return null
     }
@@ -166,5 +173,73 @@ export function createDemoUser() {
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date()
+  }
+}
+
+// Get all users (for development/testing purposes)
+export async function getAllUsers() {
+  try {
+    const users = await db.user.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        bio: true,
+        profileImageUrl: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+    
+    // Convert null values to undefined for TypeScript compatibility
+    return users.map(user => ({
+      ...user,
+      bio: user.bio || undefined,
+      profileImageUrl: user.profileImageUrl || undefined
+    }))
+  } catch (error) {
+    console.error('Error getting all users:', error)
+    return []
+  }
+}
+
+// Switch user function (for development/testing purposes)
+export async function switchUser(userId: string) {
+  try {
+    // This is a placeholder for user switching functionality
+    // In a real implementation, this would handle session switching
+    console.log(`Switching to user: ${userId}`)
+    
+    // For now, we'll just return the user data
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        bio: true,
+        profileImageUrl: true,
+        isActive: true
+      }
+    })
+    
+    if (!user || !user.isActive) {
+      throw new Error('User not found or inactive')
+    }
+    
+    // Convert null values to undefined for TypeScript compatibility
+    return {
+      ...user,
+      bio: user.bio || undefined,
+      profileImageUrl: user.profileImageUrl || undefined
+    }
+  } catch (error) {
+    console.error('Error switching user:', error)
+    throw error
   }
 } 

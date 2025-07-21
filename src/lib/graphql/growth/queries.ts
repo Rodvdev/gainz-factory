@@ -1,4 +1,4 @@
-import { GraphQLContext, HabitCategory, HabitEntryInput, NewChallengeInput, NewHabitInput, UpdateHabitInput, UpdateUserProfileInput } from './types';
+import { GraphQLContext, Habit, HabitCategory, HabitEntryInput, NewChallengeInput, NewHabitInput, UpdateHabitInput, UpdateUserProfileInput } from './types';
 
 // growth/queries.ts
 export const typeDefs = `#graphql
@@ -288,7 +288,7 @@ export const typeDefs = `#graphql
 export const resolvers = {
   // Resolvers de campos para tipos complejos
   Habit: {
-    entries: async (parent: any, args: { limit?: number }, ctx: GraphQLContext) => {
+    entries: async (parent: Habit, args: { limit?: number }, ctx: GraphQLContext) => {
       const habits = await ctx.db.habitEntry.findMany({
         where: { habitId: parent.id },
         orderBy: { date: 'desc' },
@@ -296,8 +296,8 @@ export const resolvers = {
       });
       return habits;
     },
-    streaks: async (parent: any, args: { active?: boolean }, ctx: GraphQLContext) => {
-      const where: any = { habitId: parent.id };
+    streaks: async (parent: Habit, args: { active?: boolean }, ctx: GraphQLContext) => {
+      const where: { habitId: string; isActive?: boolean } = { habitId: parent.id };
       if (args.active !== undefined) {
         where.isActive = args.active;
       }
@@ -306,7 +306,7 @@ export const resolvers = {
         orderBy: { startDate: 'desc' }
       });
     },
-    currentStreak: async (parent: any, _args: unknown, ctx: GraphQLContext) => {
+    currentStreak: async (parent: Habit, _args: unknown, ctx: GraphQLContext) => {
       const activeStreak = await ctx.db.habitStreak.findFirst({
         where: { habitId: parent.id, isActive: true },
         orderBy: { startDate: 'desc' }

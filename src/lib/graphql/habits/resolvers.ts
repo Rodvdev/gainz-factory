@@ -205,7 +205,7 @@ class HabitService {
 export const habitResolvers = {
   Query: {
     // Habit queries
-    userHabits: async (_: any, { userId }: { userId: string }) => {
+    userHabits: async (_: unknown, { userId }: { userId: string }) => {
       return await db.habit.findMany({
         where: { userId },
         orderBy: { order: 'asc' },
@@ -221,21 +221,21 @@ export const habitResolvers = {
       });
     },
 
-    activeHabits: async (_: any, { userId }: { userId: string }) => {
+    activeHabits: async (_: unknown, { userId }: { userId: string }) => {
       return await db.habit.findMany({
         where: { userId, isActive: true },
         orderBy: { order: 'asc' }
       });
     },
 
-    habitsByCategory: async (_: any, { userId, category }: { userId: string; category: HabitCategory }) => {
+    habitsByCategory: async (_: unknown, { userId, category }: { userId: string; category: HabitCategory }) => {
       return await db.habit.findMany({
         where: { userId, category, isActive: true },
         orderBy: { order: 'asc' }
       });
     },
 
-    habit: async (_: any, { id }: { id: string }) => {
+    habit: async (_: unknown, { id }: { id: string }) => {
       return await db.habit.findUnique({
         where: { id },
         include: {
@@ -246,7 +246,7 @@ export const habitResolvers = {
     },
 
     // Entry queries
-    habitEntries: async (_: any, { habitId, startDate, endDate }: { habitId: string; startDate?: string; endDate?: string }) => {
+    habitEntries: async (_: unknown, { habitId, startDate, endDate }: { habitId: string; startDate?: string; endDate?: string }) => {
       const where: Prisma.HabitEntryWhereInput = { habitId };
       
       if (startDate && endDate) {
@@ -263,7 +263,7 @@ export const habitResolvers = {
       });
     },
 
-    dailyEntries: async (_: any, { userId, date }: { userId: string; date: string }) => {
+    dailyEntries: async (_: unknown, { userId, date }: { userId: string; date: string }) => {
       return await db.habitEntry.findMany({
         where: {
           habit: { userId },
@@ -274,7 +274,7 @@ export const habitResolvers = {
       });
     },
 
-    entryById: async (_: any, { id }: { id: string }) => {
+    entryById: async (_: unknown, { id }: { id: string }) => {
       return await db.habitEntry.findUnique({
         where: { id },
         include: { habit: true }
@@ -282,7 +282,7 @@ export const habitResolvers = {
     },
 
     // Streak queries
-    habitStreaks: async (_: any, { habitId }: { habitId: string }) => {
+    habitStreaks: async (_: unknown, { habitId }: { habitId: string }) => {
       return await db.habitStreak.findMany({
         where: { habitId },
         include: { habit: true },
@@ -290,7 +290,7 @@ export const habitResolvers = {
       });
     },
 
-    activeStreaks: async (_: any, { userId }: { userId: string }) => {
+    activeStreaks: async (_: unknown, { userId }: { userId: string }) => {
       return await db.habitStreak.findMany({
         where: { 
           habit: { userId },
@@ -301,7 +301,7 @@ export const habitResolvers = {
       });
     },
 
-    longestStreaks: async (_: any, { userId }: { userId: string }) => {
+    longestStreaks: async (_: unknown, { userId }: { userId: string }) => {
       return await db.habitStreak.findMany({
         where: { habit: { userId } },
         include: { habit: true },
@@ -311,7 +311,7 @@ export const habitResolvers = {
     },
 
     // Score queries
-    dailyScore: async (_: any, { userId, date }: { userId: string; date: string }) => {
+        dailyScore: async (_: unknown, { userId, date }: { userId: string; date: string }) => {
       return await db.dailyScore.findUnique({
         where: { 
           userId_date: { userId, date: new Date(date) }
@@ -319,7 +319,7 @@ export const habitResolvers = {
       });
     },
 
-    weeklyScores: async (_: any, { userId, startDate }: { userId: string; startDate: string }) => {
+    weeklyScores: async (_: unknown, { userId, startDate }: { userId: string; startDate: string }) => {
       const start = new Date(startDate);
       const end = new Date(start);
       end.setDate(start.getDate() + 6);
@@ -333,7 +333,7 @@ export const habitResolvers = {
       });
     },
 
-    monthlyScores: async (_: any, { userId, month }: { userId: string; month: string }) => {
+    monthlyScores: async (_: unknown, { userId, month }: { userId: string; month: string }) => {
       const monthStart = new Date(month + '-01');
       const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
 
@@ -347,7 +347,7 @@ export const habitResolvers = {
     },
 
     // Dashboard query
-    userDashboard: async (_: any, { userId, date }: { userId: string; date: string }) => {
+    userDashboard: async (_: unknown, { userId, date }: { userId: string; date: string }) => {
       const targetDate = new Date(date);
       
       const [user, habits, dailyEntries, dailyScore, activeStreaks, weeklyProgress] = await Promise.all([
@@ -401,7 +401,7 @@ export const habitResolvers = {
 
   Mutation: {
     // Habit mutations
-    createHabit: async (_: any, { userId, input }: { userId: string; input: CreateHabitInput }) => {
+    createHabit: async (_: unknown, { userId, input }: { userId: string; input: CreateHabitInput }) => {
       const maxOrder = await db.habit.aggregate({
         where: { userId },
         _max: { order: true }
@@ -418,14 +418,14 @@ export const habitResolvers = {
       });
     },
 
-    updateHabit: async (_: any, { id, input }: { id: string; input: UpdateHabitInput }) => {
+    updateHabit: async (_: unknown, { id, input }: { id: string; input: UpdateHabitInput }) => {
       return await db.habit.update({
         where: { id },
         data: input
       });
     },
 
-    deleteHabit: async (_: any, { id }: { id: string }) => {
+    deleteHabit: async (_: unknown, { id }: { id: string }) => {
       try {
         await db.habit.delete({ where: { id } });
         return true;
@@ -435,7 +435,7 @@ export const habitResolvers = {
       }
     },
 
-    reorderHabits: async (_: any, { userId, habitIds }: { userId: string; habitIds: string[] }) => {
+    reorderHabits: async (_: unknown, { userId, habitIds }: { userId: string; habitIds: string[] }) => {
       const updates = habitIds.map((habitId, index) => 
         db.habit.update({
           where: { id: habitId, userId },
@@ -452,7 +452,7 @@ export const habitResolvers = {
     },
 
     // Entry mutations
-    logHabitEntry: async (_: any, { input }: { input: LogHabitEntryInput }) => {
+    logHabitEntry: async (_: unknown, { input }: { input: LogHabitEntryInput }) => {
       const entry = await db.habitEntry.upsert({
         where: {
           habitId_date: {
@@ -495,7 +495,7 @@ export const habitResolvers = {
       return entry;
     },
 
-    updateHabitEntry: async (_: any, { id, input }: { id: string; input: LogHabitEntryInput }) => {
+    updateHabitEntry: async (_: unknown, { id, input }: { id: string; input: LogHabitEntryInput }) => {
       const entry = await db.habitEntry.update({
         where: { id },
         data: {
@@ -517,7 +517,7 @@ export const habitResolvers = {
       return entry;
     },
 
-    deleteHabitEntry: async (_: any, { id }: { id: string }) => {
+    deleteHabitEntry: async (_: unknown, { id }: { id: string }) => {
       try {
         const entry = await db.habitEntry.findUnique({
           where: { id },
@@ -540,7 +540,7 @@ export const habitResolvers = {
     },
 
     // Batch operations
-    logMultipleEntries: async (_: any, { entries }: { entries: LogHabitEntryInput[] }) => {
+      logMultipleEntries: async (_: unknown, { entries }: { entries: LogHabitEntryInput[] }) => {
       const results = [];
 
       for (const entryInput of entries) {
@@ -595,7 +595,7 @@ export const habitResolvers = {
       return results;
     },
 
-    calculateDailyScore: async (_: any, { userId, date }: { userId: string; date: string }) => {
+    calculateDailyScore: async (_: unknown, { userId, date }: { userId: string; date: string }) => {
       return await HabitService.calculateDailyScore(userId, date);
     }
   }

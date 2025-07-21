@@ -1,6 +1,23 @@
 import { gql } from '@apollo/client';
 
 // Profile queries
+export const GET_CURRENT_USER = gql`
+  query GetCurrentUser {
+    currentUser {
+      id
+      email
+      firstName
+      lastName
+      bio
+      phoneNumber
+      profileImageUrl
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const GET_USER_PROFILE = gql`
   query GetUserProfile {
     userProfile {
