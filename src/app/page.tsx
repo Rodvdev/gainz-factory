@@ -48,7 +48,7 @@ export default function Home() {
     {
       id: "interleague",
       title: "Interleague Sub30",
-      subtitle: "Inscripcciones abiertas / Inicio 30/08",
+      subtitle: "Inscripcciones abiertas / Inicio 30 de agosto",
       description: "Torneo Fútbol 7, Depor Plaza Jockey Club, 8k premio",
       icon: "🏆",
       color: "#3B82F6",
