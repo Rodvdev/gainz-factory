@@ -2,40 +2,64 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function Home() {
-  const [showOptions, setShowOptions] = useState(false);
-  
-  const contactOptions = [
+  const products = [
     {
-      id: "1a1",
-      title: "Asesoría uno a uno",
-      message: "Hola Chepa, estoy interesado en una asesoría 1 a 1 contigo.",
-      icon: "👤"
-    },
-    {
-      id: "planes",
-      title: "Información sobre planes",
-      message: "Hola Chepa, me gustaría saber cuáles son tus planes de asesoría disponibles.",
-      icon: "📋"
+      id: "transformacion",
+      title: "Transformación de VIDA",
+      subtitle: "Asesoría 1 a 1 x 3 meses mínimo",
+      description: "Programa personalizado de transformación integral",
+      icon: "💪",
+      color: "#DC2626",
+      link: "https://wa.me/51978381334?text=Hola Chepa, estoy interesado en el programa de Transformación de VIDA (Asesoría 1 a 1 x 3 meses mínimo)."
     },
     {
       id: "ebook",
-      title: "eBook de recetas",
-      message: "Hola Chepa, me interesa adquirir tu eBook de recetas fit.",
-      icon: "📚"
+      title: "Ebook Recetas",
+      subtitle: "Recetas Fit & Bodybuilding",
+      description: "Colección completa de recetas para tu transformación",
+      icon: "📚",
+      color: "#F59E0B",
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa adquirir tu eBook de recetas fit."
+    },
+    {
+      id: "tmx",
+      title: "TMX",
+      subtitle: "Toda mi suplementación con descuento",
+      description: "Suplementos premium con precios especiales",
+      icon: "💊",
+      color: "#10B981",
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa TMX - toda tu suplementación con descuento."
+    },
+    {
+      id: "vibenfly",
+      title: "Vibenfly",
+      subtitle: "2do Drop - Remember Who You Are",
+      description: "Nueva colección de ropa deportiva",
+      icon: "👕",
+      color: "#8B5CF6",
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly - 2do Drop Remember Who You Are."
+    },
+    {
+      id: "interleague",
+      title: "Interleague SUB30",
+      subtitle: "Inscripciones abiertas / Inicio 30 descuento agosto",
+      description: "Programa de entrenamiento grupal",
+      icon: "🏆",
+      color: "#3B82F6",
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Interleague SUB30 - inscripciones abiertas con descuento agosto."
     }
   ];
-  
-  const handleWhatsAppRedirect = (message: string) => {
-    window.open(`https://wa.me/51978381334?text=${encodeURIComponent(message)}`, '_blank');
+
+  const handleWhatsAppRedirect = (link: string) => {
+    window.open(link, '_blank');
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-white">
-      <main className="flex flex-col gap-6 items-center w-full max-w-md">
-        <div className="flex flex-col items-center gap-4 mb-4">
+      <main className="flex flex-col gap-6 items-center w-full max-w-2xl">
+        <div className="flex flex-col items-center gap-4 mb-8">
           <Image
             src="/logo.jpeg"
             alt="Gainz Factory Logo"
@@ -60,74 +84,41 @@ export default function Home() {
           Instagram: @elchepaaa
         </a>
         
-        <div className="w-full flex flex-col gap-3">
-          {/* Enlaces a páginas públicas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-            <Link 
-              href="/recetas"
-              className="w-full py-3 px-4 bg-[#8B0000] hover:bg-[#6B0000] text-white font-medium rounded-lg text-center flex items-center justify-center gap-2 transition-colors"
-            >
-              <span className="text-xl">🍽️</span>
-              Ver Recetas
-            </Link>
-            <Link 
-              href="/coaches"
-              className="w-full py-3 px-4 bg-[#8B0000] hover:bg-[#6B0000] text-white font-medium rounded-lg text-center flex items-center justify-center gap-2 transition-colors"
-            >
-              <span className="text-xl">💪</span>
-              Conocer Coaches
-            </Link>
+        <div className="w-full">
+          <h2 className="text-2xl font-bold text-center mb-6 text-white">Productos y Servicios</h2>
+          
+          <div className="grid grid-cols-1 gap-4">
+            {products.map((product) => (
+              <button
+                key={product.id}
+                onClick={() => handleWhatsAppRedirect(product.link)}
+                className="w-full p-6 bg-black border-2 border-[#8B0000] hover:bg-[#200000] text-white rounded-xl text-left transition-all duration-300 hover:scale-[1.02]"
+                style={{ borderColor: product.color }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-3xl">{product.icon}</div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-1">{product.title}</h3>
+                    <p className="text-sm font-medium mb-2" style={{ color: product.color }}>
+                      {product.subtitle}
+                    </p>
+                    <p className="text-gray-300 text-sm">{product.description}</p>
+                  </div>
+                  <div className="text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
-
-          {!showOptions ? (
-            <button 
-              onClick={() => setShowOptions(true)}
-              className="w-full py-3 px-4 bg-[#8B0000] hover:bg-[#6B0000] text-white font-medium rounded-lg text-center flex items-center justify-center gap-2 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-              </svg>
-              Contactar por WhatsApp
-            </button>
-          ) : (
-            <>
-              <h3 className="text-center text-lg font-medium mb-1">¿En qué estás interesado?</h3>
-              <div className="flex flex-col gap-3">
-                {contactOptions.map(option => (
-                  <button
-                    key={option.id}
-                    onClick={() => handleWhatsAppRedirect(option.message)}
-                    className="w-full p-4 bg-black border-2 border-[#8B0000] hover:bg-[#200000] text-white font-medium rounded-lg text-left flex items-center gap-3 transition-colors"
-                  >
-                    <div className="text-2xl">{option.icon}</div>
-                    <div>
-                      <h4 className="font-bold">{option.title}</h4>
-                    </div>
-                  </button>
-                ))}
-                <button 
-                  onClick={() => setShowOptions(false)}
-                  className="text-gray-400 hover:text-white text-sm mt-2"
-                >
-                  Volver
-                </button>
-              </div>
-            </>
-          )}
         </div>
       </main>
       
       <footer className="mt-16 text-center text-sm text-gray-400">
         <p>© 2024 Gainz Factory - Todos los derechos reservados</p>
         <div className="mt-2 space-y-1">
-          {/* <a 
-            href="https://rodrigovdev.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-block hover:text-gray-300 transition-colors"
-          >
-            Desarrollado por VdeV Digital Solutions
-          </a> */}
           <br />
           <Link 
             href="/signin"
