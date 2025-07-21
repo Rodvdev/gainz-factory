@@ -341,6 +341,618 @@ const recipes: Recipe[] = [
       "Usar proteína de chocolate para más sabor",
       "Las galletas quedan mejor si las dejas reposar 10 minutos antes de hornear"
     ]
+  },
+  {
+    id: "salsa-mango-picante",
+    name: "Salsa de MANGO PICANTE",
+    emoji: "🌶️🥵🥭",
+    category: "salsas",
+    time: "15 min",
+    portions: "4 porciones",
+    ingredients: [
+      "1-2 mangos 🥭",
+      "Ajo 🧄",
+      "Kion 🫚 (una buena porción picada/aprox 2 🥄's)",
+      "3 ají limos 🌶️",
+      "1-2 cucharadas de miel 🍯 @goxa_pe 🔝",
+      "1 limón grande 🍋",
+      "2-3 🥄's de maicena diluida en agua 💧",
+      "1 chorrito aceite de ajonjolí"
+    ],
+    instructions: [
+      "Pelar y cortar los mangos en trozos pequeños",
+      "Picar finamente el ajo y el kion",
+      "Cortar los ajíes limos (quitar semillas si quieres menos picante)",
+      "En una sartén, calentar un poco de aceite de ajonjolí",
+      "Sofreír el ajo y kion hasta que estén dorados",
+      "Agregar los mangos y cocinar por 2-3 minutos",
+      "Incorporar los ajíes limos y cocinar 1 minuto más",
+      "Agregar la miel y el jugo del limón",
+      "Diluir la maicena en agua y agregar para espesar",
+      "Cocinar hasta que la salsa tenga la consistencia deseada",
+      "Dejar enfriar antes de servir"
+    ],
+    macros: {
+      protein: "2g",
+      carbs: "25g",
+      fats: "3g",
+      calories: "130 kcal"
+    },
+    tips: [
+      "✍🏻 IDEAL para acompañar y darle un toque agridulce a tus comidas 🤤",
+      "🚨 COMENTA la palabra ATÚN 🍣 y te envío la receta al privado de las Bolitas Crispys (facilitas de hacer y ESPECTACULARES) 🤩",
+      "DISFRUTA SIN CULPA ‼️ VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Puedes ajustar el picante agregando más o menos ajíes",
+      "Agregar cilantro picado para más sabor",
+      "Conservar en refrigerador hasta por 1 semana"
+    ]
+  },
+  {
+    id: "crema-aji-amarillo-huancaina",
+    name: "Crema de AJÍ AMARILLO FIT y PROTEICA (salsa a la huancaína)",
+    emoji: "🤤",
+    category: "salsas",
+    time: "20 min",
+    portions: "6 porciones",
+    ingredients: [
+      "Cebolla roja",
+      "3-4 ajíes amarillos (con venas si la quieres picante) 🌶️",
+      "Ajo 🧄",
+      "Sal",
+      "Pimienta",
+      "Leche de almendras (aprox 150ml) 🥛",
+      "Quinua cocida (2 cucharadas)",
+      "Queso fresco light (150g)",
+      "2 huevos 🥚"
+    ],
+    instructions: [
+      "Cocinar los huevos hasta que estén duros",
+      "En una sartén, sofreír la cebolla roja picada hasta que esté transparente",
+      "Agregar el ajo picado y cocinar por 1 minuto",
+      "Incorporar los ajíes amarillos picados (con o sin venas según el picante deseado)",
+      "Cocinar los ajíes hasta que estén suaves",
+      "En una licuadora, agregar todos los ingredientes: cebolla, ajo, ajíes, huevos, quinua",
+      "Agregar la leche de almendras gradualmente mientras licúas",
+      "Incorporar el queso fresco light y licuar hasta obtener una crema suave",
+      "Sazonar con sal y pimienta al gusto",
+      "Si está muy espesa, agregar más leche de almendras",
+      "Servir fría o a temperatura ambiente"
+    ],
+    macros: {
+      protein: "12g",
+      carbs: "8g",
+      fats: "6g",
+      calories: "140 kcal"
+    },
+    tips: [
+      "DISFRUTA SIN CULPA, VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Puedes ajustar el picante quitando las venas de los ajíes",
+      "Agregar más quinua para más proteína",
+      "Usar queso cottage en lugar de queso fresco para menos calorías",
+      "Perfecta para acompañar papas, arroz o como dip",
+      "Conservar en refrigerador hasta por 5 días"
+    ]
+  },
+  {
+    id: "crema-aji-huacatay-ocopa",
+    name: "Crema de AJÍ con HUACATAY FIT y PROTEICA (ocopa)",
+    emoji: "🌿🤤",
+    category: "salsas",
+    time: "25 min",
+    portions: "6 porciones",
+    ingredients: [
+      "Aceite en spray pam",
+      "Cebolla Roja",
+      "3-4 ajíes amarillos (con venas si la quieres picante) 🌶️",
+      "Ajo 🧄",
+      "Sal",
+      "Pimienta",
+      "Leche de almendras | o la que gustes (150ml) 🥛",
+      "Quinua cocida 2-3 cucharadas",
+      "Queso fresco light (150g)",
+      "2 huevos 🥚",
+      "1 BUENA cucharada de mantequilla de maní @poderfitmonster (vienen con prote y tienen 4 sabores)🤤 cod CHEPA 👉🏻 10% dcto"
+    ],
+    instructions: [
+      "Cocinar los huevos hasta que estén duros",
+      "En una sartén con aceite en spray, sofreír la cebolla roja picada hasta que esté transparente",
+      "Agregar el ajo picado y cocinar por 1 minuto",
+      "Incorporar los ajíes amarillos picados (con o sin venas según el picante deseado)",
+      "Cocinar los ajíes hasta que estén suaves",
+      "En una licuadora, agregar todos los ingredientes: cebolla, ajo, ajíes, huevos, quinua",
+      "Agregar la leche de almendras gradualmente mientras licúas",
+      "Incorporar el queso fresco light y la mantequilla de maní",
+      "Licuar hasta obtener una crema suave y homogénea",
+      "Sazonar con sal y pimienta al gusto",
+      "Si está muy espesa, agregar más leche de almendras",
+      "Servir fría o a temperatura ambiente"
+    ],
+    macros: {
+      protein: "15g",
+      carbs: "10g",
+      fats: "8g",
+      calories: "160 kcal"
+    },
+    tips: [
+      "DISFRUTA SIN CULPA, VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "La mantequilla de maní @poderfitmonster le da un sabor único y más proteína",
+      "Puedes ajustar el picante quitando las venas de los ajíes",
+      "Agregar más quinua para más proteína",
+      "Usar queso cottage en lugar de queso fresco para menos calorías",
+      "Perfecta para acompañar papas, arroz o como dip",
+      "Conservar en refrigerador hasta por 5 días"
+    ]
+  },
+  {
+    id: "brownie-avocado",
+    name: "BROWNIE DE AVOCADO",
+    emoji: "🥑",
+    category: "dulces",
+    time: "35 min",
+    portions: "6 porciones",
+    ingredients: [
+      "1 plátano 🍌",
+      "1 PALTA 🥑",
+      "2 cucharadas de miel (o lo que gustes) 🍯",
+      "3 huevos 🥚",
+      "1/2 taza de cacao 🍫",
+      "1/2 taza de avena 🥣",
+      "Vainilla",
+      "Canela",
+      "1 cucharada bicarbonato de sodio",
+      "Sal",
+      "Aceite en spray pam (para el pirex)",
+      "Pecanas"
+    ],
+    instructions: [
+      "Precalentar el horno a 180°C",
+      "En un bowl, mash el plátano y la palta hasta obtener una pasta suave",
+      "Agregar la miel y mezclar bien",
+      "Incorporar los huevos uno por uno, batiendo después de cada uno",
+      "Agregar el cacao, avena, vainilla, canela, bicarbonato y sal",
+      "Mezclar hasta integrar todos los ingredientes",
+      "Agregar las pecanas picadas y mezclar suavemente",
+      "Engrasar un molde pirex con aceite en spray",
+      "Verter la mezcla en el molde",
+      "Hornear por 25-30 minutos hasta que esté firme al tacto",
+      "Dejar enfriar antes de cortar"
+    ],
+    macros: {
+      protein: "8g",
+      carbs: "22g",
+      fats: "12g",
+      calories: "220 kcal"
+    },
+    tips: [
+      "Toppings: Fresas 🍓 y Manjar de PURA PROTEÍNA de @poderfitmonster 🤤 cod CHEPA 10% de dcto",
+      "La palta le da una textura cremosa y grasas saludables",
+      "Puedes usar stevia en lugar de miel para menos calorías",
+      "Agregar más cacao si quieres más sabor a chocolate",
+      "Servir con fresas y el manjar de proteína para un postre completo",
+      "Conservar en refrigerador hasta por 3 días"
+    ]
+  },
+  {
+    id: "salsa-bbq-fit",
+    name: "Salsa BBQ FIT",
+    emoji: "🤤",
+    category: "salsas",
+    time: "20 min",
+    portions: "4 porciones",
+    ingredients: [
+      "1 cebolla 🧅",
+      "Ajo 🧄",
+      "Sal",
+      "Pimienta",
+      "2 tomates licuados 🍅",
+      "Paprika 🌶️",
+      "Mostaza",
+      "Sillao",
+      "Miel 🍯",
+      "Aceite en spray pam"
+    ],
+    instructions: [
+      "En una sartén con aceite en spray, sofreír la cebolla picada hasta que esté transparente",
+      "Agregar el ajo picado y cocinar por 1 minuto",
+      "Incorporar los tomates licuados y cocinar por 5 minutos",
+      "Agregar paprika, mostaza, sillao y miel",
+      "Sazonar con sal y pimienta al gusto",
+      "Cocinar a fuego medio-bajo por 10-15 minutos hasta que espese",
+      "Revolver ocasionalmente para evitar que se pegue",
+      "Dejar enfriar antes de servir",
+      "Licuar si quieres una textura más suave"
+    ],
+    macros: {
+      protein: "2g",
+      carbs: "18g",
+      fats: "1g",
+      calories: "85 kcal"
+    },
+    tips: [
+      "DISFRUTA SIN CULPA, VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Puedes ajustar el dulzor agregando más o menos miel",
+      "Agregar más paprika para más sabor ahumado",
+      "Usar stevia en lugar de miel para menos calorías",
+      "Perfecta para acompañar pollo, pescado o hamburguesas",
+      "Conservar en refrigerador hasta por 1 semana",
+      "Agregar un poco de vinagre de manzana para más acidez"
+    ]
+  },
+  {
+    id: "nuggets-fit",
+    name: "NUGGETS FIT (mejores que los de mcdonalds)",
+    emoji: "🤤👀",
+    category: "saladas",
+    time: "25 min",
+    portions: "2 porciones",
+    ingredients: [
+      "1 pechuga de pollo 🍗",
+      "2 cucharadas yogur griego",
+      "1 huevo 🥚",
+      "Almendras",
+      "3 galletas de arroz",
+      "Mostaza",
+      "Sal 🧂",
+      "Ajo 🧄",
+      "Páprika 🌶️",
+      "Pimienta",
+      "Sasonador de tu elección",
+      "Aceite de oliva 🫒"
+    ],
+    instructions: [
+      "Cortar la pechuga de pollo en trozos pequeños (nuggets)",
+      "En un bowl, mezclar el yogur griego, huevo, mostaza y especias",
+      "Agregar los trozos de pollo y marinar por 10 minutos",
+      "En otro bowl, triturar las galletas de arroz y almendras hasta obtener migas",
+      "Agregar paprika, sal, pimienta y sazonador a las migas",
+      "Precalentar el horno a 200°C",
+      "Pasar cada nugget por la mezcla de migas, presionando para que se adhiera",
+      "Colocar en una bandeja engrasada con aceite de oliva",
+      "Hornear por 15-20 minutos hasta que estén dorados y crujientes",
+      "Voltear a la mitad del tiempo para que se doren por ambos lados"
+    ],
+    macros: {
+      protein: "35g",
+      carbs: "12g",
+      fats: "8g",
+      calories: "280 kcal"
+    },
+    tips: [
+      "DISFRUTA SIN CULPA, VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Puedes usar air fryer en lugar de horno para más crujiente",
+      "Agregar más especias según tu preferencia",
+      "Usar avena en lugar de galletas de arroz para más fibra",
+      "Servir con la salsa BBQ FIT que ya tienes en el ebook",
+      "Conservar en refrigerador hasta por 3 días",
+      "Perfectos para meal prep"
+    ]
+  },
+  {
+    id: "cuchareable-mini-pie-limon",
+    name: "CUCHAREABLE MINI sabor PIE de LIMÓN",
+    emoji: "🍋‍🟩🤤",
+    category: "dulces",
+    time: "10 min",
+    portions: "1 porción",
+    ingredients: [
+      "2 cucharadas avena",
+      "1 clara 🥚",
+      "1 cucharada yogur griego",
+      "1 limón 🍋 (zumo y rayadura)",
+      "1 cucharada mantequilla de maní @poderfitmonster 🤩 cod CHEPA 👉🏻 10% dcto",
+      "Stevia"
+    ],
+    instructions: [
+      "En un bowl pequeño, mezclar la avena con la clara de huevo",
+      "Agregar el yogur griego y mezclar bien",
+      "Incorporar el zumo y rayadura del limón",
+      "Agregar la mantequilla de maní y stevia al gusto",
+      "Mezclar hasta obtener una masa consistente",
+      "Formar una pequeña base en un recipiente",
+      "Refrigerar por 5 minutos para que se asiente",
+      "Preparar el frosting mezclando yogur griego, stevia y rayadura de limón",
+      "Servir el frosting sobre la base y disfrutar"
+    ],
+    macros: {
+      protein: "12g",
+      carbs: "18g",
+      fats: "8g",
+      calories: "180 kcal"
+    },
+    tips: [
+      "DISFRUTA SIN CULPA, VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Frosting: 1 cucharada yogur griego, Stevia, Rayadura de un limón 🍋‍🟩",
+      "Puedes agregar más rayadura de limón para más sabor",
+      "Usar mantequilla de almendras como alternativa",
+      "Agregar un poco de canela para más sabor",
+      "Perfecto para un postre rápido y saludable",
+      "Conservar en refrigerador hasta por 1 día"
+    ]
+  },
+  {
+    id: "maki-cuchareable-economico",
+    name: "Maki Cuchareable (versión económica)",
+    emoji: "🤤💵",
+    category: "saladas",
+    time: "20 min",
+    portions: "2 porciones",
+    ingredients: [
+      "Salsa Acevichada Fit:",
+      "2 huevos 🥚",
+      "200g yogur griego",
+      "1 cucharadita mostaza",
+      "1 limón 🍋 (sumo)",
+      "Sal 🧂",
+      "Pimienta",
+      "Tapita aceite de oliva 🫒",
+      "Para volverla acevichada:",
+      "Doña gusta sabor pescado 🐟 (diluido en 40ml de agua)",
+      "Sillao al gusto",
+      "1 cucharadita aceite de ajonjolí",
+      "3 limones 🍋 (sumo)",
+      "Maki cuchareable:",
+      "Arroz 🍚 (entre 150-250g)",
+      "Yuyo al gusto",
+      "Atún 🍣",
+      "Palta 🥑",
+      "Salsa acevichada",
+      "Ajonjolí"
+    ],
+    instructions: [
+      "Preparar la Salsa Acevichada Fit:",
+      "Cocinar los huevos hasta que estén duros",
+      "En un bowl, mezclar el yogur griego con la mostaza",
+      "Agregar el zumo del limón, sal y pimienta",
+      "Picar los huevos duros y agregar a la mezcla",
+      "Agregar una tapita de aceite de oliva y mezclar",
+      "Para volverla acevichada:",
+      "Diluir Doña gusta sabor pescado en 40ml de agua",
+      "Agregar sillao, aceite de ajonjolí y zumo de 3 limones",
+      "Mezclar todo con la salsa base",
+      "Preparar el Maki cuchareable:",
+      "Cocinar el arroz según las instrucciones del paquete",
+      "En un bowl, mezclar el arroz con yuyo al gusto",
+      "Agregar el atún desmenuzado y la palta cortada",
+      "Incorporar la salsa acevichada y mezclar bien",
+      "Espolvorear ajonjolí por encima",
+      "Servir y disfrutar"
+    ],
+    macros: {
+      protein: "28g",
+      carbs: "45g",
+      fats: "12g",
+      calories: "380 kcal"
+    },
+    tips: [
+      "Versión económica y fácil de hacer en casa",
+      "Puedes usar arroz integral para más fibra",
+      "Agregar más vegetales como pepino o zanahoria",
+      "Usar salmón en lugar de atún si prefieres",
+      "La salsa acevichada es perfecta para otros platos también",
+      "Conservar en refrigerador hasta por 2 días",
+      "Perfecto para meal prep"
+    ]
+  },
+  {
+    id: "huevos-anabolicos",
+    name: "Huevos Anabólicos",
+    emoji: "🥚💪🏻🤤",
+    category: "desayunos",
+    time: "10 min",
+    portions: "1 porción",
+    ingredients: [
+      "5 huevos (2 enteros 3 claras) 🥚",
+      "15g de mostaza",
+      "1 cucharada SKYR (o el yogur griego de tu preferencia) ✅",
+      "Perejil 🌿",
+      "Sal 🧂",
+      "Pimienta"
+    ],
+    instructions: [
+      "En un bowl, batir los huevos hasta que estén espumosos",
+      "Agregar la mostaza y mezclar bien",
+      "Incorporar el SKYR o yogur griego",
+      "Picar finamente el perejil y agregar",
+      "Sazonar con sal y pimienta al gusto",
+      "En una sartén antiadherente, verter la mezcla",
+      "Cocinar a fuego medio-bajo, revolviendo constantemente",
+      "Cocinar hasta que estén cremosos pero no secos",
+      "Servir inmediatamente"
+    ],
+    macros: {
+      protein: "32g",
+      carbs: "4g",
+      fats: "18g",
+      calories: "280 kcal"
+    },
+    tips: [
+      "Perfecto para el desayuno con mucha proteína",
+      "Puedes agregar más claras para más proteína y menos calorías",
+      "Agregar queso rallado para más sabor",
+      "Usar diferentes hierbas como albahaca o cilantro",
+      "Servir con tostadas integrales o avena",
+      "Conservar en refrigerador hasta por 1 día",
+      "Ideal para post-entreno"
+    ]
+  },
+  {
+    id: "vinagreta-fit-honey-mustard",
+    name: "Vinagreta FIT (Honey Mustard)",
+    emoji: "🤤",
+    category: "salsas",
+    time: "5 min",
+    portions: "4 porciones",
+    ingredients: [
+      "2 cucharadas yogur griego",
+      "1 cucharada mostaza",
+      "1 naranja 🍊 (zumo)",
+      "1 cdta vinagre de manzana 🍎",
+      "Stevia",
+      "Sal",
+      "Pimienta",
+      "Especias (eneldo de preferencia) 🌿",
+      "Goma de xantan (opcional si la deseas mas espesa)"
+    ],
+    instructions: [
+      "En un bowl pequeño, mezclar el yogur griego con la mostaza",
+      "Agregar el zumo de naranja y mezclar bien",
+      "Incorporar el vinagre de manzana",
+      "Agregar stevia al gusto para endulzar",
+      "Sazonar con sal y pimienta",
+      "Picar finamente el eneldo y agregar",
+      "Si deseas una textura más espesa, agregar goma de xantan",
+      "Mezclar todo hasta obtener una vinagreta homogénea",
+      "Refrigerar por 10 minutos antes de servir"
+    ],
+    macros: {
+      protein: "2g",
+      carbs: "8g",
+      fats: "1g",
+      calories: "45 kcal"
+    },
+    tips: [
+      "Perfecta para ensaladas y como dip",
+      "Puedes ajustar el dulzor agregando más o menos stevia",
+      "Usar diferentes hierbas como albahaca o cilantro",
+      "Agregar más mostaza si quieres más sabor",
+      "Conservar en refrigerador hasta por 1 semana",
+      "Ideal para acompañar pollo o pescado",
+      "Puedes usar limón en lugar de naranja para variar el sabor"
+    ]
+  },
+  {
+    id: "chips-saludables",
+    name: "CHIPS SALUDABLES",
+    emoji: "🍠🤤",
+    category: "snacks",
+    time: "30 min",
+    portions: "4 porciones",
+    ingredients: [
+      "1 papa 🥔",
+      "1 beterraga 🍆",
+      "1 zanahoria 🥕",
+      "1 camote 🍠",
+      "Aceite de oliva 🫒",
+      "Especias de tu elección (yo utilicé sal, ajo y paprika)"
+    ],
+    instructions: [
+      "Lavar y pelar todos los vegetales",
+      "Cortar en rodajas muy finas (aproximadamente 2-3mm)",
+      "En un bowl, mezclar las rodajas con aceite de oliva",
+      "Agregar las especias de tu elección (sal, ajo, paprika)",
+      "Mezclar bien para que todas las rodajas estén cubiertas",
+      "Precalentar el air fryer a 180°C o el horno a 200°C",
+      "Colocar las rodajas en una sola capa en la bandeja",
+      "Cocinar en air fryer por 25-30 min (mover cada 10 minutos)",
+      "O en horno por 35-40 min hasta que estén crujientes",
+      "Dejar enfriar antes de servir"
+    ],
+    macros: {
+      protein: "3g",
+      carbs: "25g",
+      fats: "4g",
+      calories: "140 kcal"
+    },
+    tips: [
+      "Ideales para comer viendo una película sin salirte de la dieta 😋",
+      "DISFRUTA SIN CULPA, VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Puedes usar diferentes vegetales como berenjena o calabacín",
+      "Agregar más especias según tu preferencia",
+      "Usar air fryer para menos aceite y más crujiente",
+      "Conservar en un recipiente hermético hasta por 3 días",
+      "Perfectas para acompañar con las salsas del ebook"
+    ]
+  },
+  {
+    id: "pastel-manzana-fit-proteico",
+    name: "Pastel de MANZANA FIT y PROTEICO",
+    emoji: "🍎🤤",
+    category: "dulces",
+    time: "45 min",
+    portions: "6 porciones",
+    ingredients: [
+      "3 manzanas (peladas y cortadas finamente) 🍎",
+      "1 limón 🍋‍🟩",
+      "4 huevos 🥚",
+      "3 cucharadas yogurt griego",
+      "1/2 taza de avena 🥣",
+      "Stevia",
+      "Canela",
+      "Vainilla"
+    ],
+    instructions: [
+      "Precalentar el horno a 180°C",
+      "Pelar y cortar finamente las manzanas",
+      "En un bowl, batir los huevos hasta que estén espumosos",
+      "Agregar el yogurt griego y mezclar bien",
+      "Incorporar la avena y mezclar",
+      "Agregar el zumo y rayadura del limón",
+      "Sazonar con stevia, canela y vainilla al gusto",
+      "Agregar las manzanas cortadas y mezclar suavemente",
+      "Verter en un molde engrasado",
+      "Hornear por aproximadamente 40 minutos hasta que esté dorado",
+      "Dejar enfriar antes de cortar"
+    ],
+    macros: {
+      protein: "8g",
+      carbs: "20g",
+      fats: "6g",
+      calories: "160 kcal"
+    },
+    tips: [
+      "DISFRUTA SIN CULPA, VAMOS POR ESOS GAINZ ❤️‍🔥",
+      "Puedes agregar más canela para más sabor",
+      "Usar diferentes tipos de manzanas para variar el sabor",
+      "Agregar nueces picadas para más crunch",
+      "Servir con yogur griego por encima",
+      "Conservar en refrigerador hasta por 3 días",
+      "Perfecto para el desayuno o como postre"
+    ]
+  },
+  {
+    id: "tiramisu-quinua-olla",
+    name: "TIRAMISÚ de QUINUA a la OLLA",
+    emoji: "🤤",
+    category: "dulces",
+    time: "25 min",
+    portions: "2 porciones",
+    ingredients: [
+      "1 taza de quinua (para que no te salga amarga cambia el agua del hervor unas 3 veces) ✍🏻",
+      "Canela",
+      "Clavo",
+      "1 cucharada cacao en polvo (o lo que gustes) 🍫",
+      "Stevia",
+      "1 cucharada café (o lo que gustes) ☕️",
+      "2 chorritos de leche de almendras (o la de tu preferencia) 🥛"
+    ],
+    instructions: [
+      "Enjuagar la quinua 3 veces para quitar el sabor amargo",
+      "En una olla, hervir agua y agregar la quinua",
+      "Al primer hervor, cambiar el agua y volver a hervir",
+      "Repetir el proceso 3 veces en total",
+      "En la última vez, agregar canela, clavo y stevia",
+      "Cocinar hasta que la quinua esté suave",
+      "Agregar el cacao en polvo y mezclar bien",
+      "Incorporar el café y mezclar",
+      "Agregar la leche de almendras gradualmente",
+      "Cocinar hasta obtener una consistencia cremosa",
+      "Dejar enfriar antes de servir"
+    ],
+    macros: {
+      protein: "12g",
+      carbs: "35g",
+      fats: "4g",
+      calories: "220 kcal"
+    },
+    tips: [
+      "Toppings: Fresas 🍓, Ajonjolí, Manjar PROTEICO cero azúcar @poderfitmonster 🤤 cod CHEPA 👉🏻 10% de dcto",
+      "Cambiar el agua del hervor 3 veces para que no salga amarga ✍🏻",
+      "Puedes usar diferentes tipos de leche vegetal",
+      "Agregar más cacao si quieres más sabor a chocolate",
+      "Usar café descafeinado si prefieres",
+      "Conservar en refrigerador hasta por 2 días",
+      "Perfecto para el desayuno o como postre"
+    ]
   }
 ];
 
