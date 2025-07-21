@@ -5,11 +5,12 @@ import { verifyAuth } from "@/lib/auth"
 // GET /api/blog/[id] - Get specific blog post
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const blogPost = await db.blogPost.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         author: {
           select: {
@@ -43,8 +44,9 @@ export async function GET(
 // PUT /api/blog/[id] - Update blog post
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const user = await verifyAuth(request)
     if (!user) {
@@ -56,7 +58,7 @@ export async function PUT(
 
     // Check if user owns the blog post or is admin
     const existingPost = await db.blogPost.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { authorId: true }
     })
 
@@ -81,7 +83,7 @@ export async function PUT(
     const validatedTags = Array.isArray(tags) ? tags.filter(tag => typeof tag === 'string') : undefined
 
     const blogPost = await db.blogPost.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title && { title }),
         ...(content && { content }),
@@ -112,8 +114,9 @@ export async function PUT(
 // DELETE /api/blog/[id] - Delete blog post
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const user = await verifyAuth(request)
     if (!user) {
@@ -125,7 +128,7 @@ export async function DELETE(
 
     // Check if user owns the blog post
     const existingPost = await db.blogPost.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { authorId: true }
     })
 
@@ -144,7 +147,7 @@ export async function DELETE(
     }
 
     await db.blogPost.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Blog post deleted successfully' })

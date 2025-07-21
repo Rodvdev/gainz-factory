@@ -1,14 +1,24 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { verifyAuth } from "@/lib/auth"
 
 // GET /api/recipes/[id] - Get single recipe
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
+    const user = await verifyAuth(request)
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const recipe = await db.recipe.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!recipe) {
@@ -31,14 +41,15 @@ export async function GET(
 // PUT /api/recipes/[id] - Update recipe
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const body = await request.json()
     const { title, description, objective, level, isPremium, imageUrl, videoUrl } = body
 
     const recipe = await db.recipe.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         description,
@@ -63,11 +74,12 @@ export async function PUT(
 // DELETE /api/recipes/[id] - Delete recipe
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await db.recipe.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Recipe deleted successfully' })

@@ -5,8 +5,9 @@ import { verifyAuth } from "@/lib/auth"
 // GET /api/media/[id]/progress - Get user progress for specific media
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const user = await verifyAuth(request)
     if (!user) {
@@ -18,7 +19,7 @@ export async function GET(
 
     const progress = await db.mediaProgress.findFirst({
       where: {
-        mediaId: params.id,
+        mediaId: id,
         userId: user.id
       },
       include: {
@@ -47,8 +48,9 @@ export async function GET(
 // POST /api/media/[id]/progress - Update user progress for specific media
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const user = await verifyAuth(request)
     if (!user) {
@@ -70,7 +72,7 @@ export async function POST(
 
     // Check if media content exists
     const mediaContent = await db.mediaContent.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!mediaContent) {
@@ -84,7 +86,7 @@ export async function POST(
     const existingProgress = await db.mediaProgress.findFirst({
       where: {
         userId: user.id,
-        mediaId: params.id
+        mediaId: id
       }
     })
 
@@ -111,7 +113,7 @@ export async function POST(
       : await db.mediaProgress.create({
           data: {
             userId: user.id,
-            mediaId: params.id,
+            mediaId: id,
             progress: progressValue,
             watchedAt: progressValue > 0 ? new Date() : null
           },

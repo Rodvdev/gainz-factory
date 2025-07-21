@@ -4,11 +4,12 @@ import { db } from "@/lib/db"
 // GET /api/media/[id] - Get specific media content
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const mediaContent = await db.mediaContent.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         progress: {
           select: {
@@ -41,8 +42,9 @@ export async function GET(
 // PUT /api/media/[id] - Update media content
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const body = await request.json()
     const { title, type, url, topic, module, episode, isPremium } = body
@@ -70,7 +72,7 @@ export async function PUT(
     }
 
     const mediaContent = await db.mediaContent.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title && { title }),
         ...(type && { type }),
@@ -95,11 +97,12 @@ export async function PUT(
 // DELETE /api/media/[id] - Delete media content
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await db.mediaContent.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Media content deleted successfully' })
