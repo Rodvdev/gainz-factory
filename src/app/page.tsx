@@ -17,7 +17,7 @@ export default function Home() {
     },
     {
       id: "ebook",
-      title: "Ebook Recetas",
+      title: "Ebook de recetas",
       subtitle: "Recetas Fit & Bodybuilding",
       description: "Colección completa de recetas para tu transformación",
       icon: "📚",
@@ -39,7 +39,7 @@ export default function Home() {
       id: "tmx",
       title: "TMX",
       subtitle: "Toda mi suplementación con descuento",
-      description: "Suplementos premium con precios especiales",
+      description: "MyProtein, DY Nutrition, Pescience con precios especiales",
       icon: "💊",
       color: "#10B981",
       link: "https://wa.me/51978381334?text=Hola Chepa, me interesa TMX - toda tu suplementación con descuento.",
@@ -52,7 +52,7 @@ export default function Home() {
       description: "Nueva colección de ropa deportiva",
       icon: "👕",
       color: "#8B5CF6",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly - 2do Drop Remember Who You Are.",
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly, qué modelos y tallas tienes disponibles?",
       type: "whatsapp"
     },
     {
