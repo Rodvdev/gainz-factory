@@ -79,7 +79,7 @@ export default function Home() {
             priority
           />
           <h1 className="text-4xl font-bold text-[#8B0000]">GAINZ FACTORY</h1>
-          <p className="text-lg text-center">@elchepaaa | Juntos lograremos el cambio, VAMOS POR ESOS GAINZ!</p>
+          <p className="text-lg text-center">Juntos lograremos el cambio, VAMOS POR ESOS GAINZ!</p>
         </div>
         
         <a 
