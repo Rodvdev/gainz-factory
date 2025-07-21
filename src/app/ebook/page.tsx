@@ -1500,6 +1500,363 @@ const recipes: Recipe[] = [
       "IDEAL como desayuno o snack FACILITA de hacer",
       "Ya no tienes excusa de saltarte tu primera comida del día"
     ]
+  },
+  {
+    id: "cheesecake-chocolate-3-ingredientes",
+    name: "Cheesecake de Chocolate FIT y PROTEICO",
+    emoji: "🍫🤤",
+    category: "dulces",
+    time: "20 min",
+    portions: "2 porciones",
+    ingredients: [
+      "200g yogurt griego (yo utilicé skyr) 😋",
+      "2 huevos 🥚",
+      "Chocolate Bitter (de preferencia sin azúcar) ✅"
+    ],
+    instructions: [
+      "Derretir el chocolate bitter en baño maría",
+      "Para el baño maría: hervir agua en una olla y cuando esté burbujeando colocar encima una más pequeña donde colocarás el chocolate",
+      "Mover constantemente hasta tener la textura deseada",
+      "En un bowl, mezclar el yogurt griego con los 2 huevos",
+      "Agregar el chocolate derretido al bowl",
+      "Mezclar todo hasta obtener una mezcla homogénea",
+      "Verter en un molde pequeño (recomendado para mejor forma)",
+      "Refrigerar por al menos 4 horas",
+      "Servir frío y disfrutar"
+    ],
+    macros: {
+      protein: "24g",
+      carbs: "16g",
+      fats: "18g",
+      calories: "320 kcal"
+    },
+    tips: [
+      "Usar chocolate bitter sin azúcar para menos calorías",
+      "Utilizar un molde más pequeño para darle mejor forma",
+      "Puedes agregar más chocolate si prefieres más sabor",
+      "Agregar frutos secos como topping",
+      "Conservar en refrigerador hasta por 3 días",
+      "Perfecto como snack, postre o cuando estés antojado de algo dulce",
+      "La textura y sabor es ESPECTACULAR",
+      "IDEAL para DISFRUTAR SIN CULPA"
+    ]
+  },
+  {
+    id: "tostadas-atun-mayonesa-fit",
+    name: "Tostadas de Atún con mayonesa FIT y PROTEICA",
+    emoji: "🤤",
+    category: "saladas",
+    time: "15 min",
+    portions: "1 porción",
+    ingredients: [
+      "1 lata de atún 🍣",
+      "1/2 palta 🥑",
+      "1 🥄da yogur griego",
+      "Tomate 🍅",
+      "Cebolla 🧅",
+      "Sal y pimienta",
+      "2 panes de molde 🍞"
+    ],
+    instructions: [
+      "En un bowl, mezclar el atún escurrido con la palta triturada",
+      "Agregar el yogur griego y mezclar bien",
+      "Picar finamente el tomate y la cebolla",
+      "Incorporar el tomate y cebolla picados al bowl",
+      "Sazonar con sal y pimienta al gusto",
+      "Mezclar todo hasta obtener una pasta homogénea",
+      "Tostar los 2 panes de molde",
+      "Untar la mezcla de atún en cada tostada",
+      "Servir y disfrutar"
+    ],
+    macros: {
+      protein: "32g",
+      carbs: "28g",
+      fats: "16g",
+      calories: "380 kcal"
+    },
+    tips: [
+      "Usar atún en agua para menos grasa",
+      "Puedes agregar más vegetales según tu preferencia",
+      "Agregar más yogur griego si prefieres más cremosidad",
+      "Puedes agregar especias como orégano o albahaca",
+      "Conservar en refrigerador hasta por 1 día",
+      "Perfecto para desayuno, almuerzo o snack",
+      "Agregar más palta si prefieres más sabor",
+      "Usar pan integral para más fibra"
+    ]
+  },
+  {
+    id: "bombon-helado-proteico",
+    name: "Bombón helado PROTEICO cuchareable",
+    emoji: "🍫🤤🍓",
+    category: "dulces",
+    time: "15 min + congelado",
+    portions: "1 porción",
+    ingredients: [
+      "2 buenas 🥄's de yogurt griego",
+      "1 scoop de proteína sabor vainilla @ivernprotein.pe 🤩",
+      "Fresas 🍓",
+      "Chocolate bitter (de preferencia sin azúcar) 🍫"
+    ],
+    instructions: [
+      "En un bowl, mezclar el yogurt griego con el scoop de proteína",
+      "Mezclar hasta obtener una mezcla homogénea",
+      "Derretir el chocolate bitter en baño maría",
+      "Para el baño maría: hervir agua en una olla y colocar encima una pequeña donde pondrás el chocolate",
+      "Mover constantemente hasta que el chocolate esté derretido",
+      "Cortar las fresas en trozos pequeños",
+      "Agregar las fresas a la mezcla de yogurt y proteína",
+      "Mezclar suavemente",
+      "Verter en un recipiente apto para congelador",
+      "Congelar por al menos 4 horas",
+      "Servir frío y disfrutar"
+    ],
+    macros: {
+      protein: "26g",
+      carbs: "12g",
+      fats: "8g",
+      calories: "220 kcal"
+    },
+    tips: [
+      "Usar chocolate bitter sin azúcar para menos calorías",
+      "Puedes agregar más fresas si prefieres más sabor",
+      "Agregar más proteína si necesitas más",
+      "Puedes agregar otros frutos rojos como arándanos",
+      "Conservar en congelador hasta por 1 semana",
+      "Perfecto como snack saludable",
+      "Ideal cuando estés antojado de algo dulce",
+      "No te saldrás de la dieta con esta opción"
+    ]
+  },
+  {
+    id: "bolitas-crispy-atun",
+    name: "Bolitas CRISPY de ATÚN",
+    emoji: "🍣🤤",
+    category: "saladas",
+    time: "20 min",
+    portions: "2 porciones",
+    ingredients: [
+      "2 latas de atún 🍣",
+      "2 huevos 🥚",
+      "40g corn flakes sin azúcar ✅",
+      "Sal 🧂",
+      "Tongarashi o paprika 🌶️"
+    ],
+    instructions: [
+      "En un bowl, mezclar las 2 latas de atún escurridas",
+      "Agregar los 2 huevos y mezclar bien",
+      "Incorporar los 40g de corn flakes sin azúcar",
+      "Sazonar con sal al gusto",
+      "Agregar tongarashi o paprika según tu preferencia",
+      "Mezclar todo hasta obtener una masa homogénea",
+      "Formar bolitas del tamaño deseado",
+      "Calentar una sartén antiadherente a fuego medio",
+      "Cocinar las bolitas por 3-4 minutos por lado hasta que estén doradas",
+      "Servir caliente"
+    ],
+    macros: {
+      protein: "38g",
+      carbs: "16g",
+      fats: "12g",
+      calories: "320 kcal"
+    },
+    tips: [
+      "Usar atún en agua para menos grasa",
+      "Puedes agregar más especias según tu preferencia",
+      "Agregar más huevos si necesitas más proteína",
+      "Puedes agregar vegetales picados como cebolla",
+      "Conservar en refrigerador hasta por 2 días",
+      "Perfecto para snack o almuerzo",
+      "Agregar más corn flakes si prefieres más crujiente",
+      "Usar diferentes tipos de especias para variar el sabor"
+    ]
+  },
+  {
+    id: "arroz-arabe",
+    name: "ARROZ ÁRABE",
+    emoji: "🇦🇪🤤",
+    category: "saladas",
+    time: "35 min",
+    portions: "4 porciones",
+    ingredients: [
+      "Cebolla 🧅",
+      "Ají amarillo",
+      "Ajo 🧄",
+      "Sal 🧂",
+      "2 tazas de arroz 🍚",
+      "Tocino 🥓 (el que gustes, de preferencia bajo en grasas)",
+      "2 🥄's crema de aceituna 🫒",
+      "Pasas (si gustas)",
+      "Agüita de aceituna",
+      "1 cubito caldo de carne 🥩",
+      "Coca cola (al gusto, de preferencia sin azúcar)",
+      "Fideos 🍜",
+      "Almendras o pecanas (si gustas) 🥜"
+    ],
+    instructions: [
+      "Picar finamente la cebolla, ají amarillo y ajo",
+      "En una olla grande, cocinar el tocino hasta que esté dorado",
+      "Agregar la cebolla, ají y ajo picados",
+      "Saltear hasta que estén transparentes",
+      "Agregar las 2 tazas de arroz y saltear por 2 minutos",
+      "Incorporar la crema de aceituna y mezclar",
+      "Agregar el cubito de caldo de carne disuelto en agua",
+      "Incorporar la agüita de aceituna",
+      "Agregar coca cola al gusto",
+      "Cocinar el arroz según las instrucciones del paquete",
+      "Agregar los fideos y cocinar hasta que estén listos",
+      "Incorporar las pasas y almendras/pecanas si las usas",
+      "Servir caliente"
+    ],
+    macros: {
+      protein: "18g",
+      carbs: "75g",
+      fats: "22g",
+      calories: "520 kcal"
+    },
+    tips: [
+      "Usar tocino bajo en grasas para menos calorías",
+      "Puedes agregar más vegetales según tu preferencia",
+      "Usar coca cola sin azúcar para menos calorías",
+      "Puedes agregar más proteína como pollo o res",
+      "Conservar en refrigerador hasta por 3 días",
+      "Perfecto para ocasiones especiales",
+      "Una recetita que había grabado para Navidad",
+      "Ideal para compartir en familia"
+    ]
+  },
+  {
+    id: "tostadas-francesas-40g-proteina",
+    name: "Tostadas Francesas +40g proteína",
+    emoji: "🤤💪🏻",
+    category: "desayunos",
+    time: "15 min",
+    portions: "2 porciones",
+    ingredients: [
+      "2 🥚's",
+      "1 chorrito de leche 🥛 (la de tu preferencia)",
+      "Canela",
+      "Stevia",
+      "2-4 panes de molde 🍞",
+      "1 scoop proteína 🍫 @ivernprotein.pe"
+    ],
+    instructions: [
+      "En un bowl, batir los 2 huevos",
+      "Agregar el chorrito de leche de tu preferencia",
+      "Incorporar canela al gusto",
+      "Agregar stevia al gusto",
+      "Incorporar el scoop de proteína y mezclar bien",
+      "Calentar una sartén antiadherente a fuego medio",
+      "Sumergir cada pan de molde en la mezcla de huevos",
+      "Cocinar las tostadas por 2-3 minutos por lado hasta que estén doradas",
+      "Servir caliente"
+    ],
+    macros: {
+      protein: "42g",
+      carbs: "32g",
+      fats: "14g",
+      calories: "420 kcal"
+    },
+    tips: [
+      "Puedes agregar más proteína si necesitas más",
+      "Usar diferentes tipos de pan (integral, de avena, sin gluten)",
+      "Agregar más canela para más sabor",
+      "Puedes agregar miel o stevia para más dulzor",
+      "Conservar en refrigerador hasta por 1 día",
+      "Perfecto para desayuno o post-entreno",
+      "Saben a Donuts y son ideales para cualquier momento",
+      "Ideal cuando estés antojado de algo dulce y no quieres pecar"
+    ]
+  },
+  {
+    id: "bombones-fit",
+    name: "Bombones Fit",
+    emoji: "🍨🍫🫐🍓",
+    category: "dulces",
+    time: "20 min + congelado",
+    portions: "4 porciones",
+    ingredients: [
+      "100g arándanos 🫐's",
+      "100g fresas 🍓's",
+      "3 buenas 🥄's de yogur griego 🍨",
+      "20g mantequilla de maní sabor chocolate blanco 🤤 de @poderfitmonster 🤩 código CHEPA 👉🏻 10% de dcto",
+      "3 barras de cobertura de 🍫 (sin azúcar de preferencia / igual puedes usar el de tu elección 🤝🏻)"
+    ],
+    instructions: [
+      "En un bowl, mezclar el yogur griego con la mantequilla de maní",
+      "Agregar los arándanos y fresas picados",
+      "Mezclar todo hasta obtener una mezcla homogénea",
+      "Derretir las 3 barras de chocolate en baño maría",
+      "Para el baño maría: hervir agua en una olla y colocar encima una más pequeña donde pondrás el chocolate",
+      "Mover constantemente hasta que el chocolate esté derretido",
+      "Formar pequeñas bolitas con la mezcla de frutas y yogur",
+      "Sumergir cada bolita en el chocolate derretido",
+      "Colocar en una bandeja con papel encerado",
+      "Refrigerar por al menos 2 horas",
+      "Servir frío y disfrutar"
+    ],
+    macros: {
+      protein: "8g",
+      carbs: "18g",
+      fats: "12g",
+      calories: "200 kcal"
+    },
+    tips: [
+      "Usar chocolate sin azúcar para menos calorías",
+      "Puedes agregar más frutas según tu preferencia",
+      "Agregar más yogur griego si prefieres más cremosidad",
+      "Puedes agregar frutos secos como topping",
+      "Conservar en refrigerador hasta por 1 semana",
+      "Perfecto como snack saludable",
+      "Ideal cuando estés antojado de algo dulce",
+      "Usar diferentes tipos de chocolate para variar"
+    ]
+  },
+  {
+    id: "flan-cafe-fit-2-minutos",
+    name: "Flan de Café Fit (en 2 minutos)",
+    emoji: "☕️🤤",
+    category: "dulces",
+    time: "2 min",
+    portions: "1 porción",
+    ingredients: [
+      "1 huevo 🥚",
+      "40 ml leche 🥛",
+      "Vainilla",
+      "3 cucharaditas de café ☕️",
+      "Bicarbonato de sodio",
+      "Stevia",
+      "Manjar Blanco de PURA PROTEÍNA @poderfitmonster 🤩 cod CHEPA 👉🏻 10% dcto"
+    ],
+    instructions: [
+      "En un bowl, batir el huevo",
+      "Agregar la leche y mezclar",
+      "Incorporar la vainilla al gusto",
+      "Agregar las 3 cucharaditas de café",
+      "Incorporar una pizca de bicarbonato de sodio",
+      "Agregar stevia al gusto",
+      "Mezclar todo hasta obtener una mezcla homogénea",
+      "Verter en un recipiente apto para microondas",
+      "Cocinar en microondas por 2 minutos",
+      "Servir con manjar blanco de pura proteína",
+      "Disfrutar caliente"
+    ],
+    macros: {
+      protein: "12g",
+      carbs: "8g",
+      fats: "8g",
+      calories: "160 kcal"
+    },
+    tips: [
+      "Puedes agregar más café si prefieres más sabor",
+      "Usar leche de almendras para menos calorías",
+      "Agregar más stevia si prefieres más dulzor",
+      "Puedes agregar canela para más sabor",
+      "Conservar en refrigerador hasta por 1 día",
+      "Perfecto como postre rápido",
+      "Ideal cuando estés antojado de algo dulce",
+      "Súper rápido de preparar en solo 2 minutos"
+    ]
   }
 ];
 
