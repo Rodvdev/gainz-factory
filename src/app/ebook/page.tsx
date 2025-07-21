@@ -1174,6 +1174,332 @@ const recipes: Recipe[] = [
       "Conservar en refrigerador hasta por 1 día",
       "Perfecto para meal prep"
     ]
+  },
+  {
+    id: "helado-50g-proteina",
+    name: "HELADO CON +50G DE PROTEÍNA",
+    emoji: "🍦🤩",
+    category: "dulces",
+    time: "15 min + congelado",
+    portions: "2 porciones",
+    ingredients: [
+      "Yogurt Griego 250g",
+      "Queso Crema 150g",
+      "Proteína-Iso Xp 2 scoops @muscleshopperu 💪🏻",
+      "Stevia",
+      "Vainilla",
+      "Canela",
+      "1 cucharada mantequilla de maní @poderfitmonster | @fitmonsterfactory 🤤",
+      "Leche de almendras"
+    ],
+    instructions: [
+      "En un bowl grande, mezclar el yogurt griego con el queso crema",
+      "Agregar los 2 scoops de proteína Iso Xp",
+      "Incorporar stevia al gusto",
+      "Agregar vainilla y canela",
+      "Mezclar la mantequilla de maní con un poco de leche de almendras",
+      "Incorporar la mezcla de mantequilla de maní al bowl principal",
+      "Agregar leche de almendras gradualmente hasta obtener la consistencia deseada",
+      "Mezclar todo hasta que esté homogéneo",
+      "Verter en un recipiente apto para congelador",
+      "Congelar por al menos 4 horas",
+      "Remover cada hora para evitar cristales grandes",
+      "Servir y disfrutar"
+    ],
+    macros: {
+      protein: "52g",
+      carbs: "18g",
+      fats: "22g",
+      calories: "420 kcal"
+    },
+    tips: [
+      "Puedes agregar más proteína si necesitas más",
+      "Usar diferentes sabores de proteína para variar",
+      "Agregar frutas congeladas para más sabor",
+      "Remover frecuentemente durante el congelado para textura cremosa",
+      "Puedes agregar chips de chocolate sin azúcar",
+      "Conservar en congelador hasta por 1 semana",
+      "Perfecto para post-entreno o como postre saludable",
+      "Agregar más mantequilla de maní si prefieres más sabor"
+    ]
+  },
+  {
+    id: "chaufa-anabolico",
+    name: "CHAUFA ANABÓLICO",
+    emoji: "🦍",
+    category: "saladas",
+    time: "25 min",
+    portions: "1 porción",
+    ingredients: [
+      "Pimentón rojo",
+      "Kion",
+      "Espinaca",
+      "Cebolla blanca 🧅",
+      "Brócoli 🥦",
+      "Ajo 🧄",
+      "Ají amarillo",
+      "Espárragos",
+      "2 🥚's",
+      "Pollo 150g 🍗",
+      "Arroz (150-200g) 🍚",
+      "Sillao",
+      "Aceite de ajonjolí"
+    ],
+    instructions: [
+      "Cocinar el arroz según las instrucciones del paquete",
+      "Cortar el pollo en trozos pequeños",
+      "Cocinar el pollo en una sartén con aceite de ajonjolí hasta que esté dorado",
+      "Retirar el pollo y reservar",
+      "En la misma sartén, agregar ajo picado y kion",
+      "Agregar la cebolla blanca picada y saltear",
+      "Incorporar el pimentón rojo y ají amarillo picados",
+      "Agregar el brócoli y espárragos cortados",
+      "Saltear los vegetales hasta que estén tiernos",
+      "Agregar las espinacas y saltear brevemente",
+      "Hacer espacio en la sartén y agregar los huevos",
+      "Revolver los huevos hasta que estén cocidos",
+      "Agregar el arroz cocido y el pollo reservado",
+      "Sazonar con sillao al gusto",
+      "Mezclar todo y saltear por 2-3 minutos",
+      "Servir caliente"
+    ],
+    macros: {
+      protein: "45g",
+      carbs: "65g",
+      fats: "15g",
+      calories: "580 kcal"
+    },
+    tips: [
+      "Usar arroz integral para más fibra y nutrientes",
+      "Puedes agregar más vegetales según tu preferencia",
+      "Agregar más proteína si necesitas más",
+      "Usar diferentes tipos de carne (res, cerdo, pescado)",
+      "Agregar más huevos para más proteína",
+      "Conservar en refrigerador hasta por 2 días",
+      "Perfecto para meal prep",
+      "Agregar más sillao si prefieres más sabor"
+    ]
+  },
+  {
+    id: "panqueques-protein",
+    name: "Panqueques Proteicos",
+    emoji: "🥞",
+    category: "desayunos",
+    time: "15 min",
+    portions: "2 porciones",
+    ingredients: [
+      "5 🥚's (2 enteros 3 claras)",
+      "70g Avena Protein Frutos Rojos @nutrico.io 🤤",
+      "1 🍌",
+      "10g chía",
+      "Café ☕️",
+      "Canela",
+      "Stevia",
+      "Toppings:",
+      "Mantequilla de maní 🥜",
+      "Yogurt griego",
+      "Fresas 🍓"
+    ],
+    instructions: [
+      "En un bowl, mezclar los huevos (2 enteros y 3 claras)",
+      "Agregar la avena protein de frutos rojos",
+      "Triturar la banana y agregar al bowl",
+      "Incorporar las semillas de chía",
+      "Agregar café al gusto",
+      "Sazonar con canela y stevia",
+      "Mezclar todo hasta obtener una masa homogénea",
+      "Dejar reposar por 5 minutos para que la chía se hidrate",
+      "Calentar una sartén antiadherente a fuego medio",
+      "Verter pequeñas porciones de la masa para formar panqueques",
+      "Cocinar por 2-3 minutos por lado hasta que estén dorados",
+      "Servir con los toppings:",
+      "Mantequilla de maní",
+      "Yogurt griego",
+      "Fresas frescas"
+    ],
+    macros: {
+      protein: "38g",
+      carbs: "42g",
+      fats: "18g",
+      calories: "480 kcal"
+    },
+    tips: [
+      "Puedes agregar más proteína si necesitas más",
+      "Usar diferentes sabores de avena protein",
+      "Agregar más frutas como topping",
+      "Puedes hacer la masa la noche anterior",
+      "Conservar en refrigerador hasta por 2 días",
+      "Perfecto para desayuno o post-entreno",
+      "Agregar más chía para más fibra",
+      "Usar diferentes tipos de mantequilla de frutos secos"
+    ]
+  },
+  {
+    id: "tostadas-francesas-roca",
+    name: "TOSTADAS FRANCESAS DE LA ROCA",
+    emoji: "🦍",
+    category: "desayunos",
+    time: "20 min",
+    portions: "2 porciones",
+    ingredients: [
+      "2 huevos",
+      "Leche de tu preferencia",
+      "Canela",
+      "4 slides de pan integral o el que prefieras",
+      "1 plátano",
+      "Mantequilla de maní",
+      "1 scoop de proteína (de preferencia ISO TECH de @energynutritionperu)"
+    ],
+    instructions: [
+      "En un bowl, batir los 2 huevos",
+      "Agregar la leche de tu preferencia",
+      "Incorporar canela al gusto",
+      "Agregar el scoop de proteína ISO TECH y mezclar bien",
+      "Cortar el plátano en rodajas",
+      "Calentar una sartén antiadherente a fuego medio",
+      "Sumergir cada slide de pan en la mezcla de huevos",
+      "Cocinar las tostadas por 2-3 minutos por lado hasta que estén doradas",
+      "Untar mantequilla de maní en cada tostada",
+      "Agregar las rodajas de plátano",
+      "Servir caliente"
+    ],
+    macros: {
+      protein: "32g",
+      carbs: "48g",
+      fats: "16g",
+      calories: "460 kcal"
+    },
+    tips: [
+      "Puedes agregar más proteína si necesitas más",
+      "Usar diferentes tipos de pan (integral, de avena, sin gluten)",
+      "Agregar más frutas como topping",
+      "Puedes agregar miel o stevia para más dulzor",
+      "Conservar en refrigerador hasta por 1 día",
+      "Perfecto para desayuno o brunch",
+      "Agregar más canela para más sabor",
+      "Usar diferentes tipos de mantequilla de frutos secos"
+    ]
+  },
+  {
+    id: "panqueques-espinaca",
+    name: "Panqueques de Espinaca",
+    emoji: "🥬",
+    category: "saladas",
+    time: "20 min",
+    portions: "2 porciones",
+    ingredients: [
+      "120g avena",
+      "3 huevos",
+      "1 lata atún",
+      "Cebolla blanca",
+      "Tomate",
+      "Limón"
+    ],
+    instructions: [
+      "En un bowl, mezclar la avena con los 3 huevos",
+      "Agregar la lata de atún escurrida",
+      "Picar finamente la cebolla blanca y agregar",
+      "Picar el tomate y agregar al bowl",
+      "Exprimir limón al gusto",
+      "Mezclar todo hasta obtener una masa homogénea",
+      "Calentar una sartén antiadherente a fuego medio",
+      "Verter pequeñas porciones de la masa para formar panqueques",
+      "Cocinar por 3-4 minutos por lado hasta que estén dorados",
+      "Servir caliente"
+    ],
+    macros: {
+      protein: "42g",
+      carbs: "35g",
+      fats: "18g",
+      calories: "480 kcal"
+    },
+    tips: [
+      "Puedes agregar más proteína si necesitas más",
+      "Usar atún en agua para menos grasa",
+      "Agregar más vegetales según tu preferencia",
+      "Puedes agregar especias como orégano o albahaca",
+      "Conservar en refrigerador hasta por 2 días",
+      "Perfecto para desayuno o almuerzo",
+      "Agregar más limón para más sabor",
+      "Usar diferentes tipos de pescado enlatado"
+    ]
+  },
+  {
+    id: "mousse-2-ingredientes",
+    name: "Mousse con SOLO 2 ingredientes",
+    emoji: "🍫🤩",
+    category: "dulces",
+    time: "10 min",
+    portions: "2 porciones",
+    ingredients: [
+      "3 manzanas 🍎's",
+      "Chocolate Bitter (de preferencia sin azúcar) ✅"
+    ],
+    instructions: [
+      "Pelar y cortar las 3 manzanas en trozos pequeños",
+      "Derretir el chocolate bitter en baño maría o microondas",
+      "En un procesador o licuadora, triturar las manzanas hasta obtener un puré",
+      "Agregar el chocolate derretido al puré de manzanas",
+      "Procesar todo hasta obtener una mezcla homogénea y cremosa",
+      "Verter en copas o recipientes individuales",
+      "Refrigerar por al menos 2 horas",
+      "Servir frío y disfrutar"
+    ],
+    macros: {
+      protein: "4g",
+      carbs: "28g",
+      fats: "12g",
+      calories: "220 kcal"
+    },
+    tips: [
+      "Usar chocolate bitter sin azúcar para menos calorías",
+      "Puedes agregar más manzanas si prefieres más dulzor natural",
+      "Agregar canela para más sabor",
+      "Puedes agregar frutos secos como topping",
+      "Conservar en refrigerador hasta por 3 días",
+      "Perfecto para postre saludable",
+      "La textura es increíblemente suave y cremosa",
+      "Ideal para satisfacer el antojo de chocolate de manera saludable"
+    ]
+  },
+  {
+    id: "arepa-3-ingredientes",
+    name: "AREPA SOLO 3 INGREDIENTES",
+    emoji: "🥟🤤",
+    category: "desayunos",
+    time: "10 min",
+    portions: "1 porción",
+    ingredients: [
+      "3 láminas de queso 🧀 (el que gustes, de preferencia si es bajo en grasas)",
+      "Zanahoria rayada 🥕",
+      "2 huevos 🥚"
+    ],
+    instructions: [
+      "En un bowl, mezclar las 3 láminas de queso picadas",
+      "Agregar la zanahoria rayada",
+      "Incorporar los 2 huevos",
+      "Mezclar todo hasta obtener una masa homogénea",
+      "Calentar una sartén antiadherente a fuego medio",
+      "Formar una arepa con la masa",
+      "Cocinar por 3-4 minutos por lado hasta que esté dorada",
+      "Servir caliente"
+    ],
+    macros: {
+      protein: "28g",
+      carbs: "8g",
+      fats: "22g",
+      calories: "320 kcal"
+    },
+    tips: [
+      "Usar queso bajo en grasas para menos calorías",
+      "Puedes agregar más vegetales según tu preferencia",
+      "Agregar más huevos para más proteína",
+      "Puedes agregar especias como orégano o albahaca",
+      "Conservar en refrigerador hasta por 1 día",
+      "Perfecto para desayuno o snack",
+      "IDEAL como desayuno o snack FACILITA de hacer",
+      "Ya no tienes excusa de saltarte tu primera comida del día"
+    ]
   }
 ];
 
@@ -1384,10 +1710,10 @@ export default function EbookPage() {
               height={120}
               className="rounded-full border-4 border-[#8B0000] mx-auto mb-6"
             />
-            <h1 className="text-5xl md:text-6xl font-bold text-[#8B0000] mb-4">
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
               Ebook de Recetas FIT
             </h1>
-            <h2 className="text-2xl md:text-3xl text-gray-300 mb-6">
+            <h2 className="text-2xl md:text-3xl text-gray-100 mb-6 drop-shadow-md">
               Recetas nutritivas para cuerpo y mente
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
@@ -1425,7 +1751,7 @@ export default function EbookPage() {
 
       {/* Table of Contents */}
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold text-center mb-8 text-[#8B0000]">
+        <h2 className="text-3xl font-bold text-center mb-8 text-white drop-shadow-lg">
           📚 Índice
         </h2>
         
@@ -1465,7 +1791,7 @@ export default function EbookPage() {
               className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:bg-gray-700 transition-colors border border-gray-700 hover:border-[#8B0000]"
             >
               <div className="text-4xl mb-4">{recipe.emoji}</div>
-              <h3 className="text-xl font-bold mb-2 text-[#8B0000]">{recipe.name}</h3>
+              <h3 className="text-xl font-bold mb-2 text-white drop-shadow-md">{recipe.name}</h3>
               <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
                 <span>⏱️ {recipe.time}</span>
                 <span>👥 {recipe.portions}</span>
@@ -1498,7 +1824,7 @@ export default function EbookPage() {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <div className="text-4xl mb-2">{selectedRecipe.emoji}</div>
-                  <h2 className="text-2xl font-bold text-[#8B0000] mb-2">{selectedRecipe.name}</h2>
+                  <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-md">{selectedRecipe.name}</h2>
                   <div className="flex items-center gap-4 text-sm text-gray-400">
                     <span>⏱️ {selectedRecipe.time}</span>
                     <span>👥 {selectedRecipe.portions}</span>
@@ -1514,7 +1840,7 @@ export default function EbookPage() {
 
               {/* Macros */}
               <div className="bg-gray-800 rounded-lg p-4 mb-6">
-                <h3 className="font-bold mb-3 text-[#8B0000]">📊 Información Nutricional</h3>
+                <h3 className="font-bold mb-3 text-white">📊 Información Nutricional</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-400">{selectedRecipe.macros.protein}</div>
@@ -1537,7 +1863,7 @@ export default function EbookPage() {
 
               {/* Ingredients */}
               <div className="mb-6">
-                <h3 className="font-bold mb-3 text-[#8B0000]">🥘 Ingredientes</h3>
+                <h3 className="font-bold mb-3 text-white">🥘 Ingredientes</h3>
                 <ul className="space-y-2">
                   {selectedRecipe.ingredients.map((ingredient, index) => (
                     <li key={index} className="flex items-start gap-2">
@@ -1550,7 +1876,7 @@ export default function EbookPage() {
 
               {/* Instructions */}
               <div className="mb-6">
-                <h3 className="font-bold mb-3 text-[#8B0000]">👨‍🍳 Instrucciones</h3>
+                <h3 className="font-bold mb-3 text-white">👨‍🍳 Instrucciones</h3>
                 <ol className="space-y-3">
                   {selectedRecipe.instructions.map((instruction, index) => (
                     <li key={index} className="flex items-start gap-3">
@@ -1566,7 +1892,7 @@ export default function EbookPage() {
               {/* Tips */}
               {selectedRecipe.tips && selectedRecipe.tips.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-bold mb-3 text-[#8B0000]">💡 Tips</h3>
+                  <h3 className="font-bold mb-3 text-white">💡 Tips</h3>
                   <ul className="space-y-2">
                     {selectedRecipe.tips.map((tip, index) => (
                       <li key={index} className="flex items-start gap-2">
@@ -1605,7 +1931,7 @@ export default function EbookPage() {
       {/* Footer */}
       <footer className="bg-gray-900 py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 className="text-2xl font-bold text-[#8B0000] mb-4">
+          <h3 className="text-2xl font-bold text-white mb-4 drop-shadow-lg">
             ¿Te gustó lo que viste?
           </h3>
           <p className="text-gray-400 mb-6">
