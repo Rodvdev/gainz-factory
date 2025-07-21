@@ -16,16 +16,6 @@ export default function Home() {
       type: "whatsapp"
     },
     {
-      id: "ebook",
-      title: "Ebook de recetas",
-      subtitle: "Recetas Fit & Bodybuilding",
-      description: "Colección completa de recetas para tu transformación",
-      icon: "📚",
-      color: "#F59E0B",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa adquirir tu eBook de recetas fit.",
-      type: "whatsapp"
-    },
-    {
       id: "recetas",
       title: "Ebook Recetas",
       subtitle: "Disfruta sin culpa",

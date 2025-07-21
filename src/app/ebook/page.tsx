@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface Recipe {
   id: string;
@@ -161,6 +163,8 @@ const categories = [
 export default function EbookPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const filteredRecipes = selectedCategory === "all" 
     ? recipes 
@@ -168,6 +172,45 @@ export default function EbookPage() {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const generatePDF = async () => {
+    if (!contentRef.current) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      const canvas = await html2canvas(contentRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#000000'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save('Gainz-Factory-Ebook-Recetas.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error al generar el PDF. Intenta nuevamente.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   return (
@@ -194,8 +237,21 @@ export default function EbookPage() {
               Desde desayunos energéticos hasta postres proteicos, todo pensado para tu estilo de vida fitness.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-[#8B0000] hover:bg-[#6B0000] text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-                📥 Descargar PDF
+              <button 
+                onClick={generatePDF}
+                disabled={isGeneratingPDF}
+                className="bg-[#8B0000] hover:bg-[#6B0000] disabled:bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+              >
+                {isGeneratingPDF ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Generando PDF...
+                  </>
+                ) : (
+                  <>
+                    📥 Descargar PDF
+                  </>
+                )}
               </button>
               <button className="border-2 border-[#8B0000] text-[#8B0000] hover:bg-[#8B0000] hover:text-white px-8 py-3 rounded-lg font-semibold transition-colors">
                 👁️ Ver Online
@@ -203,6 +259,10 @@ export default function EbookPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Content for PDF */}
+      <div ref={contentRef} className="max-w-4xl mx-auto px-4 py-12">
       </div>
 
       {/* Table of Contents */}
@@ -395,8 +455,21 @@ export default function EbookPage() {
             tips de nutrición y guías de preparación.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#8B0000] hover:bg-[#6B0000] text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-              📥 Descargar Ebook Completo
+            <button 
+              onClick={generatePDF}
+              disabled={isGeneratingPDF}
+              className="bg-[#8B0000] hover:bg-[#6B0000] disabled:bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+            >
+              {isGeneratingPDF ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Generando PDF...
+                </>
+              ) : (
+                <>
+                  📥 Descargar Ebook Completo
+                </>
+              )}
             </button>
             <Link
               href="https://wa.me/51978381334?text=Hola Chepa, me interesa adquirir tu Ebook de recetas completo. ¿Cómo puedo obtenerlo?"
