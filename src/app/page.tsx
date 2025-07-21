@@ -47,9 +47,9 @@ export default function Home() {
     },
     {
       id: "interleague",
-      title: "Interleague SUB30",
-      subtitle: "Inscripciones abiertas / Inicio 30 descuento agosto",
-      description: "Programa de entrenamiento grupal",
+      title: "Interleague Sub30",
+      subtitle: "Inscripcciones abiertas / Inicio 30/08",
+      description: "Torneo Fútbol 7, Depor Plaza Jockey Club, 8k premio",
       icon: "🏆",
       color: "#3B82F6",
       link: "https://wa.me/51978381334?text=Hola Chepa, info Interleague SUB30 - para el 30 de Agosto, quiero separar mi cupo.",
