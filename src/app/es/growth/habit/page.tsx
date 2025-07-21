@@ -99,7 +99,15 @@ function UserSwitcher() {
           getCurrentUser()
         ]);
         setUsers(allUsers);
-        setCurrentUser(current);
+        if (current) {
+          setCurrentUser({
+            ...current,
+            bio: current.bio || undefined,
+            profileImageUrl: current.profileImageUrl || undefined,
+          });
+        } else {
+          setCurrentUser(null);
+        }
       } catch (error) {
         console.error('Error loading users:', error);
       }

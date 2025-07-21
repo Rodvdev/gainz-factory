@@ -318,7 +318,7 @@ export const resolvers = {
   Query: {
     currentUser: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.user.findUnique({
-        where: { id: ctx.user.id },
+        where: { id: ctx.user?.id },
         include: {
           habits: { where: { isActive: true } },
           dailyScores: { take: 30, orderBy: { date: 'desc' } },
@@ -329,7 +329,7 @@ export const resolvers = {
 
     userProfile: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.user.findUnique({
-        where: { id: ctx.user.id },
+        where: { id: ctx.user?.id },
       });
     },
 
@@ -339,7 +339,7 @@ export const resolvers = {
 
       const dailyScores = await ctx.db.dailyScore.findMany({
         where: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id,
           date: { gte: thirtyDaysAgo }
         },
         orderBy: { date: 'desc' }
@@ -347,14 +347,14 @@ export const resolvers = {
 
       const completedHabits = await ctx.db.habitEntry.count({
         where: {
-          habit: { userId: ctx.user.id },
+          habit: { userId: ctx.user?.id },
           status: 'COMPLETED',
           date: { gte: thirtyDaysAgo }
         }
       });
 
       const allStreaks = await ctx.db.habitStreak.findMany({
-        where: { habit: { userId: ctx.user.id } },
+        where: { habit: { userId: ctx.user?.id } },
         orderBy: { length: 'desc' }
       });
 
@@ -384,7 +384,7 @@ export const resolvers = {
       
       const dailyScores = await ctx.db.dailyScore.findMany({
         where: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id,
           date: {
             gte: startDate,
             lte: endDate
@@ -457,14 +457,14 @@ export const resolvers = {
       
       const dailyScore = await ctx.db.dailyScore.findFirst({
         where: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id,
           date: targetDate
         }
       });
 
       const entries = await ctx.db.habitEntry.findMany({
         where: {
-          habit: { userId: ctx.user.id },
+          habit: { userId: ctx.user?.id },
           date: targetDate
         },
         include: {
@@ -505,7 +505,7 @@ export const resolvers = {
       
       const dailyScores = await ctx.db.dailyScore.findMany({
         where: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id,
           date: {
             gte: startDate,
             lte: endDate
@@ -583,7 +583,7 @@ export const resolvers = {
 
     myHabits: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.habit.findMany({
-        where: { userId: ctx.user.id, isActive: true },
+        where: { userId: ctx.user?.id, isActive: true },
         include: {
           entries: { take: 7, orderBy: { date: 'desc' } },
           streaks: { where: { isActive: true } },
@@ -594,7 +594,7 @@ export const resolvers = {
 
     habitsByCategory: async (_parent: unknown, { category }: { category: HabitCategory }, ctx: GraphQLContext) => {
       return ctx.db.habit.findMany({
-        where: { userId: ctx.user.id, category, isActive: true },
+        where: { userId: ctx.user?.id, category, isActive: true },
         include: {
           entries: { take: 7, orderBy: { date: 'desc' } },
           streaks: { where: { isActive: true } },
@@ -625,7 +625,7 @@ export const resolvers = {
       const today = new Date();
       return ctx.db.dailyScore.findFirst({
         where: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id,
           date: today,
         },
         include: { user: true },
@@ -638,7 +638,7 @@ export const resolvers = {
       
       return ctx.db.dailyScore.findMany({
         where: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id,
           date: { gte: weekAgo },
         },
         include: { user: true },
@@ -652,7 +652,7 @@ export const resolvers = {
       
       return ctx.db.dailyScore.findMany({
         where: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id,
           date: { gte: monthAgo },
         },
         include: { user: true },
@@ -662,7 +662,7 @@ export const resolvers = {
 
     activeChallenges: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.challenge.findMany({
-        where: { userId: ctx.user.id, isCompleted: false },
+        where: { userId: ctx.user?.id, isCompleted: false },
         include: { user: true },
         orderBy: { createdAt: 'desc' },
       });
@@ -670,7 +670,7 @@ export const resolvers = {
 
     completedChallenges: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.challenge.findMany({
-        where: { userId: ctx.user.id, isCompleted: true },
+        where: { userId: ctx.user?.id, isCompleted: true },
         include: { user: true },
         orderBy: { createdAt: 'desc' },
       });
@@ -693,12 +693,12 @@ export const resolvers = {
       
       for (const category of categories) {
         const totalHabits = await ctx.db.habit.count({
-          where: { userId: ctx.user.id, category, isActive: true }
+          where: { userId: ctx.user?.id, category, isActive: true }
         });
 
         const completedToday = await ctx.db.habitEntry.count({
           where: {
-            habit: { userId: ctx.user.id, category },
+            habit: { userId: ctx.user?.id, category },
             date: today,
             status: 'COMPLETED'
           }
@@ -718,7 +718,7 @@ export const resolvers = {
 
     longestStreaks: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       return ctx.db.habitStreak.findMany({
-        where: { habit: { userId: ctx.user.id } },
+        where: { habit: { userId: ctx.user?.id } },
         include: { habit: true },
         orderBy: { length: 'desc' },
         take: 10,
@@ -729,7 +729,7 @@ export const resolvers = {
   Mutation: {
     updateUserProfile: async (_parent: unknown, { input }: { input: UpdateUserProfileInput }, ctx: GraphQLContext) => {
       return ctx.db.user.update({
-        where: { id: ctx.user.id },
+        where: { id: ctx.user?.id },
         data: {
           firstName: input.firstName,
           lastName: input.lastName,
@@ -744,7 +744,7 @@ export const resolvers = {
     createHabit: async (_parent: unknown, { input }: { input: NewHabitInput }, ctx: GraphQLContext) => {
       return ctx.db.habit.create({
         data: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id || '',
           name: input.name,
           description: input.description,
           category: input.category,
@@ -804,7 +804,7 @@ export const resolvers = {
       });
 
       // Update or create daily score
-      await updateDailyScore(ctx, ctx.user.id, new Date(input.date));
+      await updateDailyScore(ctx, ctx.user?.id || '', new Date(input.date));
 
       return entry;
     },
@@ -813,7 +813,7 @@ export const resolvers = {
       const entry = await ctx.db.habitEntry.findUnique({ where: { id } });
       if (entry) {
         await ctx.db.habitEntry.delete({ where: { id } });
-        await updateDailyScore(ctx, ctx.user.id, entry.date);
+        await updateDailyScore(ctx, ctx.user?.id || '', entry.date);
       }
       return true;
     },
@@ -821,7 +821,7 @@ export const resolvers = {
     createChallenge: async (_parent: unknown, { input }: { input: NewChallengeInput }, ctx: GraphQLContext) => {
       return ctx.db.challenge.create({
         data: {
-          userId: ctx.user.id,
+          userId: ctx.user?.id || '',
           name: input.name,
           description: input.description,
           category: input.category,
@@ -852,19 +852,19 @@ export const resolvers = {
 
     recalculateDailyScore: async (_parent: unknown, { date }: { date: string }, ctx: GraphQLContext) => {
       const targetDate = new Date(date);
-      return updateDailyScore(ctx, ctx.user.id, targetDate);
+      return updateDailyScore(ctx, ctx.user?.id || '', targetDate);
     },
 
     resetTodayProgress: async (_parent: unknown, _args: unknown, ctx: GraphQLContext) => {
       const today = new Date();
       const deleted = await ctx.db.habitEntry.deleteMany({
         where: {
-          habit: { userId: ctx.user.id },
+          habit: { userId: ctx.user?.id },
           date: today,
         },
       });
 
-      await updateDailyScore(ctx, ctx.user.id, today);
+      await updateDailyScore(ctx, ctx.user?.id || '', today);
 
       return {
         success: true,

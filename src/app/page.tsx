@@ -119,14 +119,23 @@ export default function Home() {
       
       <footer className="mt-16 text-center text-sm text-gray-400">
         <p>© 2024 Gainz Factory - Todos los derechos reservados</p>
-        <a 
-          href="https://rodrigovdev.com" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="mt-2 inline-block hover:text-gray-300 transition-colors"
-        >
-          Desarrollado por VdeV Digital Solutions
-        </a>
+        <div className="mt-2 space-y-1">
+          <a 
+            href="https://rodrigovdev.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block hover:text-gray-300 transition-colors"
+          >
+            Desarrollado por VdeV Digital Solutions
+          </a>
+          <br />
+          <Link 
+            href="/signin"
+            className="inline-block underline hover:text-gray-300 transition-colors"
+          >
+            Iniciar sesión
+          </Link>
+        </div>
       </footer>
     </div>
   );
