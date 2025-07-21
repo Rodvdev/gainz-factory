@@ -120,14 +120,14 @@ export default function Home() {
       <footer className="mt-16 text-center text-sm text-gray-400">
         <p>© 2024 Gainz Factory - Todos los derechos reservados</p>
         <div className="mt-2 space-y-1">
-          <a 
+          {/* <a 
             href="https://rodrigovdev.com" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-block hover:text-gray-300 transition-colors"
           >
             Desarrollado por VdeV Digital Solutions
-          </a>
+          </a> */}
           <br />
           <Link 
             href="/signin"

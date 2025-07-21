@@ -243,14 +243,14 @@ export default function CoachesPage() {
       <footer className="py-8 border-t border-gray-800">
         <div className="container mx-auto px-4 text-center text-gray-400">
           <p>© 2024 Gainz Factory - Todos los derechos reservados</p>
-          <a 
+          {/* <a 
             href="https://rodrigovdev.com" 
             target="_blank" 
             rel="noopener noreferrer"
             className="mt-2 inline-block hover:text-gray-300 transition-colors"
           >
             Desarrollado por VdeV Digital Solutions
-          </a>
+          </a> */}
         </div>
       </footer>
     </div>
