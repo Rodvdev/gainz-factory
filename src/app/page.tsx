@@ -62,7 +62,7 @@ export default function Home() {
       description: "Programa de entrenamiento grupal",
       icon: "🏆",
       color: "#3B82F6",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Interleague SUB30 - inscripciones abiertas con descuento agosto.",
+      link: "https://wa.me/51978381334?text=Hola Chepa, info Interleague SUB30 - para el 30 de Agosto, quiero separar mi cupo.",
       type: "whatsapp"
     }
   ];
