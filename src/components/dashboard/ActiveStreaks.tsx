@@ -63,14 +63,6 @@ export default function ActiveStreaks({ streaks }: ActiveStreaksProps) {
     return names[category] || category
   }
 
-  const getDaysAgo = (dateString: string) => {
-    const startDate = new Date(dateString)
-    const today = new Date()
-    const diffTime = today.getTime() - startDate.getTime()
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
-
   return (
     <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
       {/* Header */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   CalendarIcon, 
   ChevronLeftIcon, 
@@ -37,12 +37,7 @@ export default function CalendarPage() {
   const [monthStats, setMonthStats] = useState<MonthStats | null>(null);
   const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
 
-  useEffect(() => {
-    generateCalendarData();
-    calculateMonthStats();
-  }, [currentDate]);
-
-  const generateCalendarData = () => {
+  const generateCalendarData = useCallback(() => {
     const data = new Map<string, DayData>();
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -74,9 +69,9 @@ export default function CalendarPage() {
     }
     
     setCalendarData(data);
-  };
+  }, [currentDate]);
 
-  const calculateMonthStats = () => {
+  const calculateMonthStats = useCallback(() => {
     let totalDays = 0;
     let completedDays = 0;
     let totalCompletion = 0;
@@ -112,7 +107,12 @@ export default function CalendarPage() {
       longestStreak,
       totalPoints
     });
-  };
+  }, [calendarData]);
+
+  useEffect(() => {
+    generateCalendarData();
+    calculateMonthStats();
+  }, [generateCalendarData, calculateMonthStats]);
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { 
   UserIcon, 
   PencilIcon, 
@@ -183,9 +184,11 @@ export default function ProfilePage() {
               <div className="relative">
                 <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
                   {user?.profileImageUrl ? (
-                    <img
+                    <Image
                       src={user.profileImageUrl}
                       alt="Profile"
+                      width={96}
+                      height={96}
                       className="h-24 w-24 rounded-full object-cover"
                     />
                   ) : (

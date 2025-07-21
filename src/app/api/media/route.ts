@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
     const topic = searchParams.get('topic')
-    const module = searchParams.get('module')
+    const moduleParam = searchParams.get('module')
     const isPremium = searchParams.get('isPremium')
     const search = searchParams.get('search')
 
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     
     if (type) where.type = type
     if (topic) where.topic = { contains: topic, mode: 'insensitive' }
-    if (module) where.module = { contains: module, mode: 'insensitive' }
+    if (moduleParam) where.module = { contains: moduleParam, mode: 'insensitive' }
     if (isPremium !== null && isPremium !== undefined) where.isPremium = isPremium === 'true'
     if (search) {
       where.OR = [
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { title, type, url, topic, module, episode, isPremium } = body
+    const { title, type, url, topic, module: moduleParam, episode, isPremium } = body
 
     if (!title || !type || !url || !topic) {
       return NextResponse.json(
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         type,
         url,
         topic,
-        module,
+        module: moduleParam,
         episode: episode ? parseInt(episode) : null,
         isPremium: isPremium || false
       }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   PlayIcon, 
   DocumentTextIcon, 
@@ -39,10 +39,6 @@ export default function MediaPage() {
     fetchMediaContent();
   }, []);
 
-  useEffect(() => {
-    filterContent();
-  }, [mediaContent, selectedType, selectedTopic, searchTerm]);
-
   const fetchMediaContent = async () => {
     try {
       const response = await fetch('/api/media');
@@ -55,7 +51,7 @@ export default function MediaPage() {
     }
   };
 
-  const filterContent = () => {
+  const filterContent = useCallback(() => {
     let filtered = [...mediaContent];
 
     if (selectedType !== 'all') {
@@ -73,7 +69,11 @@ export default function MediaPage() {
     }
 
     setFilteredContent(filtered);
-  };
+  }, [mediaContent, selectedType, selectedTopic, searchTerm]);
+
+  useEffect(() => {
+    filterContent();
+  }, [filterContent]);
 
   const getTypeIcon = (type: string) => {
     switch (type) {

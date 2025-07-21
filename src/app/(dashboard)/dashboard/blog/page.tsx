@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -11,6 +11,7 @@ import {
   CalendarIcon,
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 interface BlogPost {
   id: string;
@@ -44,13 +45,6 @@ export default function BlogPage() {
   });
   const [newTag, setNewTag] = useState('');
 
-  useEffect(() => {
-    fetchBlogPosts();
-  }, []);
-
-  useEffect(() => {
-    filterPosts();
-  }, [blogPosts, selectedTag, searchTerm]);
 
   const fetchBlogPosts = async () => {
     try {
@@ -65,7 +59,7 @@ export default function BlogPage() {
     }
   };
 
-  const filterPosts = () => {
+  const filterPosts = useCallback(() => {
     let filtered = [...blogPosts];
 
     if (selectedTag !== 'all') {
@@ -80,7 +74,15 @@ export default function BlogPage() {
     }
 
     setFilteredPosts(filtered);
-  };
+  }, [blogPosts, selectedTag, searchTerm]);
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  useEffect(() => {
+    filterPosts();
+  }, [filterPosts]);
 
   const handleCreatePost = async () => {
     try {
@@ -443,9 +445,11 @@ export default function BlogPage() {
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                   <div className="flex items-center gap-2">
                     {post.author.profileImageUrl ? (
-                      <img
+                      <Image
                         src={post.author.profileImageUrl}
                         alt={`${post.author.firstName} ${post.author.lastName}`}
+                        width={24}
+                        height={24}
                         className="h-6 w-6 rounded-full"
                       />
                     ) : (
