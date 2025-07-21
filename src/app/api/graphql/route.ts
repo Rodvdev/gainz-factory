@@ -5,7 +5,7 @@ import { typeDefs, resolvers } from '@/lib/graphql/growth/queries';
 import { PUBLIC_SCHEMA } from '@/lib/graphql/public-schema';
 import { publicResolvers } from '@/lib/graphql/public-resolvers';
 import { db } from '@/lib/db';
-import { getCurrentUser, createDemoUser } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import { GraphQLContext } from '@/lib/graphql/growth/types';
 
 const server = new ApolloServer<GraphQLContext>({
@@ -16,7 +16,7 @@ const server = new ApolloServer<GraphQLContext>({
 const handler = startServerAndCreateNextHandler(server, {
   context: async (): Promise<GraphQLContext> => {
     try {
-      // Try to get the current authenticated user
+      // Get the current authenticated user from the request
       const currentUser = await getCurrentUser();
       
       if (currentUser) {
@@ -31,27 +31,19 @@ const handler = startServerAndCreateNextHandler(server, {
         };
       }
       
-      // For development and public queries, use demo user
-      console.log('No authenticated user found, using demo user for GraphQL context');
+      // If no authenticated user, return context without user
+      console.log('No authenticated user found for GraphQL context');
       
-      const demoUser = createDemoUser();
       return {
         db,
-        user: {
-          ...demoUser,
-          profileImageUrl: demoUser.profileImageUrl || undefined,
-        },
+        user: null,
       };
     } catch (error) {
-      console.warn('Error in GraphQL context creation, using demo user:', error);
+      console.warn('Error in GraphQL context creation:', error);
       
-      const demoUser = createDemoUser();
       return {
         db,
-        user: {
-          ...demoUser,
-          profileImageUrl: demoUser.profileImageUrl || undefined,
-        },
+        user: null,
       };
     }
   },

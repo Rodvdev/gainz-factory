@@ -14,7 +14,7 @@ export interface GraphQLContext {
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
-  };
+  } | null;
 }
 
 // Enums
