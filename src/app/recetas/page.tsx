@@ -1,68 +1,54 @@
 "use client";
 
-import { useQuery } from '@apollo/client';
-import { PUBLIC_QUERIES } from '@/lib/graphql/public-schema';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-import { Recipe } from '@/lib/graphql/public-types';
 
 export default function RecetasPage() {
-  const [selectedLevel, setSelectedLevel] = useState<string>('all');
-  const [selectedObjective, setSelectedObjective] = useState<string>('all');
-
-  const { loading, error, data } = useQuery(PUBLIC_QUERIES.GET_ALL_RECIPES);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#8B0000] mx-auto mb-4"></div>
-          <p className="text-white text-lg">Cargando recetas...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Error al cargar las recetas</h2>
-          <p className="text-gray-400">Por favor, intenta de nuevo más tarde.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const recipes = data?.allRecipes || [];
-
-  // Filtrar recetas
-  const filteredRecipes = recipes.filter((recipe: Recipe) => {
-    const levelMatch = selectedLevel === 'all' || recipe.level === selectedLevel;
-    const objectiveMatch = selectedObjective === 'all' || recipe.objective === selectedObjective;
-    return levelMatch && objectiveMatch;
-  });
-
-  // Obtener objetivos únicos
-  const objectives = [...new Set(recipes.map((recipe: Recipe) => recipe.objective).filter(Boolean))] as string[];
-
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'BEGINNER': return 'bg-green-600';
-      case 'INTERMEDIATE': return 'bg-yellow-600';
-      case 'ADVANCED': return 'bg-red-600';
-      default: return 'bg-gray-600';
+  const upcomingContent = [
+    {
+      id: "ebook",
+      title: "Ebook Recetas",
+      subtitle: "Recetas Fit & Bodybuilding",
+      description: "Colección completa de recetas para tu transformación. Más de 50 recetas premium con macros detallados.",
+      icon: "📚",
+      color: "#F59E0B",
+      status: "Próximamente",
+      features: ["50+ recetas premium", "Macros detallados", "Plan de 30 días", "Tips de cocina"]
+    },
+    {
+      id: "videos",
+      title: "Recetas Grabadas",
+      subtitle: "Tutoriales en Video",
+      description: "Aprende a cocinar paso a paso con videos detallados de cada receta. Desde básico hasta avanzado.",
+      icon: "🎥",
+      color: "#DC2626",
+      status: "Próximamente",
+      features: ["Tutoriales paso a paso", "Técnicas de cocina", "Substituciones", "Tips de presentación"]
+    },
+    {
+      id: "mealplan",
+      title: "Plan de Comidas",
+      subtitle: "Personalizado por Objetivos",
+      description: "Planes de alimentación completos adaptados a tus objetivos: pérdida de grasa, ganancia muscular, mantenimiento.",
+      icon: "📋",
+      color: "#10B981",
+      status: "Próximamente",
+      features: ["Planes personalizados", "Seguimiento de macros", "Lista de compras", "Prep semanal"]
+    },
+    {
+      id: "community",
+      title: "Comunidad Premium",
+      subtitle: "Grupo Exclusivo",
+      description: "Acceso a grupo privado donde compartimos recetas, tips, y respondemos todas tus dudas de nutrición.",
+      icon: "👥",
+      color: "#8B5CF6",
+      status: "Próximamente",
+      features: ["Grupo privado", "Q&A semanal", "Recetas exclusivas", "Soporte directo"]
     }
-  };
+  ];
 
-  const getLevelText = (level: string) => {
-    switch (level) {
-      case 'BEGINNER': return 'Principiante';
-      case 'INTERMEDIATE': return 'Intermedio';
-      case 'ADVANCED': return 'Avanzado';
-      default: return 'Todos los niveles';
-    }
+  const handleWhatsAppContact = () => {
+    window.open('https://wa.me/51978381334?text=Hola Chepa, me interesa estar al tanto de cuando lances el Ebook de recetas y contenido premium de nutrición!', '_blank');
   };
 
   return (
@@ -97,163 +83,132 @@ export default function RecetasPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-b from-[#8B0000]/20 to-black">
+      <section className="py-20 bg-gradient-to-b from-[#8B0000]/20 to-black">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">
-            Recetas <span className="text-[#8B0000]">Fit</span> & Bodybuilding
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
-            Descubre recetas deliciosas y nutritivas diseñadas para ayudarte a alcanzar tus objetivos fitness
-          </p>
-          
-          {/* Filtros */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {/* Filtro por nivel */}
-            <div className="flex flex-col items-center">
-              <label className="text-sm text-gray-400 mb-2">Nivel</label>
-              <select
-                value={selectedLevel}
-                onChange={(e) => setSelectedLevel(e.target.value)}
-                className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-[#8B0000] focus:outline-none"
-              >
-                <option value="all">Todos los niveles</option>
-                <option value="BEGINNER">Principiante</option>
-                <option value="INTERMEDIATE">Intermedio</option>
-                <option value="ADVANCED">Avanzado</option>
-              </select>
-            </div>
-
-            {/* Filtro por objetivo */}
-            <div className="flex flex-col items-center">
-              <label className="text-sm text-gray-400 mb-2">Objetivo</label>
-              <select
-                value={selectedObjective}
-                onChange={(e) => setSelectedObjective(e.target.value)}
-                className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-[#8B0000] focus:outline-none"
-              >
-                <option value="all">Todos los objetivos</option>
-                {objectives.map((objective: string) => (
-                  <option key={objective} value={objective}>
-                    {objective}
-                  </option>
-                ))}
-              </select>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Image
+              src="/logo.jpeg"
+              alt="Gainz Factory Logo"
+              width={80}
+              height={80}
+              className="rounded-full border-4 border-[#8B0000]"
+            />
+            <div>
+              <h1 className="text-4xl font-bold text-[#8B0000]">@elchepaaa</h1>
+              <p className="text-lg text-gray-300">Recetas Fit & Bodybuilding</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Recetas Grid */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          {filteredRecipes.length === 0 ? (
-            <div className="text-center py-16">
-              <h3 className="text-2xl font-bold mb-4">No se encontraron recetas</h3>
-              <p className="text-gray-400">Intenta ajustar los filtros para ver más opciones.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRecipes.map((recipe: Recipe) => (
-                <div
-                  key={recipe.id}
-                  className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl hover:shadow-[#8B0000]/20 transition-all duration-300 hover:scale-105"
-                >
-                  {/* Imagen */}
-                  <div className="relative h-48 bg-gray-800">
-                    {recipe.imageUrl ? (
-                      <Image
-                        src={recipe.imageUrl}
-                        alt={recipe.title}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-4xl">🍽️</span>
-                      </div>
-                    )}
-                    
-                    {/* Badges */}
-                    <div className="absolute top-4 left-4 flex gap-2">
-                      {recipe.isPremium && (
-                        <span className="bg-yellow-600 text-black px-3 py-1 rounded-full text-sm font-bold">
-                          PREMIUM
-                        </span>
-                      )}
-                      <span className={`${getLevelColor(recipe.level || '')} text-white px-3 py-1 rounded-full text-sm font-bold`}>
-                        {getLevelText(recipe.level || '')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Contenido */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-2 line-clamp-2">{recipe.title}</h3>
-                    
-                    {recipe.description && (
-                      <p className="text-gray-400 mb-4 line-clamp-3">{recipe.description}</p>
-                    )}
-                    
-                    {recipe.objective && (
-                      <div className="mb-4">
-                        <span className="text-sm text-gray-500">Objetivo:</span>
-                        <p className="text-[#8B0000] font-semibold">{recipe.objective}</p>
-                      </div>
-                    )}
-
-                    {/* Botones */}
-                    <div className="flex gap-3">
-                      {recipe.videoUrl && (
-                        <a
-                          href={recipe.videoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-[#8B0000] hover:bg-[#6B0000] text-white py-2 px-4 rounded-lg text-center font-medium transition-colors"
-                        >
-                          Ver Video
-                        </a>
-                      )}
-                      
-                      {recipe.isPremium ? (
-                        <button className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-black py-2 px-4 rounded-lg font-medium transition-colors">
-                          Acceso Premium
-                        </button>
-                      ) : (
-                        <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
-                          Ver Receta
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-[#8B0000] to-[#6B0000]">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">¿Quieres acceso a todas las recetas premium?</h2>
-          <p className="text-xl mb-8 text-gray-200">
-            Únete a Gainz Factory y obtén acceso exclusivo a recetas avanzadas, rutinas personalizadas y coaching 1 a 1
+          
+          <h2 className="text-5xl font-bold mb-6">
+            Contenido <span className="text-[#8B0000]">Premium</span> Próximamente
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+            Estoy preparando contenido exclusivo para ayudarte a transformar tu nutrición y alcanzar tus objetivos fitness. 
+            Ebooks, videos, planes de comidas y mucho más.
           </p>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="https://wa.me/51978381334?text=Hola%20Chepa,%20me%20interesa%20obtener%20acceso%20premium%20a%20Gainz%20Factory"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white text-[#8B0000] hover:bg-gray-100 py-3 px-8 rounded-lg font-bold transition-colors"
+            <button
+              onClick={handleWhatsAppContact}
+              className="bg-[#8B0000] hover:bg-[#6B0000] text-white py-3 px-8 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
             >
-              Contactar por WhatsApp
-            </a>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+              </svg>
+              Ser Notificado
+            </button>
             <a
               href="https://www.instagram.com/elchepaaa/"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-black text-white hover:bg-gray-800 py-3 px-8 rounded-lg font-bold transition-colors"
+              className="bg-black border-2 border-[#8B0000] text-white hover:bg-[#8B0000] py-3 px-8 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"/>
+              </svg>
+              Seguir en Instagram
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Coming Soon Content */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-16">
+            Lo que está <span className="text-[#8B0000]">por venir</span>
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {upcomingContent.map((content) => (
+              <div
+                key={content.id}
+                className="bg-gray-900 rounded-xl p-8 border-2 border-gray-800 hover:border-[#8B0000] transition-all duration-300 hover:scale-105"
+              >
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="text-4xl">{content.icon}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-2xl font-bold">{content.title}</h3>
+                      <span className="bg-[#8B0000] text-white px-3 py-1 rounded-full text-sm font-bold">
+                        {content.status}
+                      </span>
+                    </div>
+                    <p className="text-lg font-medium mb-2" style={{ color: content.color }}>
+                      {content.subtitle}
+                    </p>
+                  </div>
+                </div>
+                
+                <p className="text-gray-300 mb-6 leading-relaxed">
+                  {content.description}
+                </p>
+                
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-white mb-3">Incluye:</h4>
+                  <ul className="space-y-2">
+                    {content.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2 text-gray-300">
+                        <span className="text-[#8B0000]">✓</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-[#8B0000] to-[#6B0000]">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-6">¿Quieres adquirir las recetas premium?</h2>
+          <p className="text-xl mb-8 text-gray-200 max-w-2xl mx-auto">
+            Únete a la lista de espera para ser el primero en obtener acceso al Ebook de recetas premium 
+            con más de 50 recetas fit y bodybuilding con macros detallados.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => window.open('https://wa.me/51978381334?text=Hola Chepa, me interesa adquirir el Ebook de recetas premium! Quiero estar en la lista de espera.', '_blank')}
+              className="bg-white text-[#8B0000] hover:bg-gray-100 py-4 px-8 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+              </svg>
+              Adquirir Ebook Premium
+            </button>
+            <a
+              href="https://www.instagram.com/elchepaaa/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-black text-white hover:bg-gray-800 py-4 px-8 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"/>
+              </svg>
               Seguir en Instagram
             </a>
           </div>
@@ -264,14 +219,6 @@ export default function RecetasPage() {
       <footer className="py-8 border-t border-gray-800">
         <div className="container mx-auto px-4 text-center text-gray-400">
           <p>© 2024 Gainz Factory - Todos los derechos reservados</p>
-          {/* <a 
-            href="https://rodrigovdev.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="mt-2 inline-block hover:text-gray-300 transition-colors"
-          >
-            Desarrollado por VdeV Digital Solutions
-          </a> */}
         </div>
       </footer>
     </div>

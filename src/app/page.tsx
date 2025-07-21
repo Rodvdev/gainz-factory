@@ -12,7 +12,8 @@ export default function Home() {
       description: "Programa personalizado de transformación integral",
       icon: "💪",
       color: "#DC2626",
-      link: "https://wa.me/51978381334?text=Hola Chepa, estoy interesado en el programa de Transformación de VIDA (Asesoría 1 a 1 x 3 meses mínimo)."
+      link: "https://wa.me/51978381334?text=Hola Chepa, estoy interesado en el programa de Transformación de VIDA (Asesoría 1 a 1 x 3 meses mínimo).",
+      type: "whatsapp"
     },
     {
       id: "ebook",
@@ -21,7 +22,18 @@ export default function Home() {
       description: "Colección completa de recetas para tu transformación",
       icon: "📚",
       color: "#F59E0B",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa adquirir tu eBook de recetas fit."
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa adquirir tu eBook de recetas fit.",
+      type: "whatsapp"
+    },
+    {
+      id: "recetas",
+      title: "Recetas",
+      subtitle: "Ver recetas disponibles",
+      description: "Explora las recetas disponibles y únete a la lista de espera",
+      icon: "🍽️",
+      color: "#F59E0B",
+      link: "/recetas",
+      type: "page"
     },
     {
       id: "tmx",
@@ -30,7 +42,8 @@ export default function Home() {
       description: "Suplementos premium con precios especiales",
       icon: "💊",
       color: "#10B981",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa TMX - toda tu suplementación con descuento."
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa TMX - toda tu suplementación con descuento.",
+      type: "whatsapp"
     },
     {
       id: "vibenfly",
@@ -39,7 +52,8 @@ export default function Home() {
       description: "Nueva colección de ropa deportiva",
       icon: "👕",
       color: "#8B5CF6",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly - 2do Drop Remember Who You Are."
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly - 2do Drop Remember Who You Are.",
+      type: "whatsapp"
     },
     {
       id: "interleague",
@@ -48,12 +62,17 @@ export default function Home() {
       description: "Programa de entrenamiento grupal",
       icon: "🏆",
       color: "#3B82F6",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Interleague SUB30 - inscripciones abiertas con descuento agosto."
+      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Interleague SUB30 - inscripciones abiertas con descuento agosto.",
+      type: "whatsapp"
     }
   ];
 
-  const handleWhatsAppRedirect = (link: string) => {
-    window.open(link, '_blank');
+  const handleProductClick = (product: { type: string; link: string }) => {
+    if (product.type === "whatsapp") {
+      window.open(product.link, '_blank');
+    } else if (product.type === "page") {
+      window.location.href = product.link;
+    }
   };
 
   return (
@@ -91,7 +110,7 @@ export default function Home() {
             {products.map((product) => (
               <button
                 key={product.id}
-                onClick={() => handleWhatsAppRedirect(product.link)}
+                onClick={() => handleProductClick(product)}
                 className="w-full p-6 bg-black border-2 border-[#8B0000] hover:bg-[#200000] text-white rounded-xl text-left transition-all duration-300 hover:scale-[1.02]"
                 style={{ borderColor: product.color }}
               >
