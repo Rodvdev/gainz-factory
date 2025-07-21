@@ -29,7 +29,7 @@ export default function Home() {
       id: "tmx",
       title: "TMX",
       subtitle: "Toda mi suplementación con descuento",
-      description: "MyProtein, DY Nutrition, Pescience con precios especiales",
+      description: "MyProtein, DY Nutrition, PEScience con precios galácticos",
       icon: "💊",
       color: "#10B981",
       link: "https://wa.me/51978381334?text=Hola Chepa, me interesa TMX - toda tu suplementación con descuento.",
