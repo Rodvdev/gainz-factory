@@ -43,7 +43,8 @@ export default function Home() {
       icon: "👕",
       color: "#8B5CF6",
       link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly, qué modelos y tallas tienes disponibles?",
-      type: "whatsapp"
+      type: "whatsapp",
+      motivational: "Atrévete a ser realmente quien eres y muestra tu VIBRA ÚNICA."
     },
     {
       id: "interleague",
@@ -112,6 +113,9 @@ export default function Home() {
                       {product.subtitle}
                     </p>
                     <p className="text-gray-300 text-sm">{product.description}</p>
+                    {product.id === "vibenfly" && (
+                      <p className="text-violet-400 font-semibold italic mt-2">{product.motivational}</p>
+                    )}
                   </div>
                   <div className="text-gray-400">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
