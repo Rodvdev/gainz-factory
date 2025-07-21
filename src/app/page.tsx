@@ -27,12 +27,12 @@ export default function Home() {
     },
     {
       id: "recetas",
-      title: "Recetas",
-      subtitle: "Ver recetas disponibles",
-      description: "Explora las recetas disponibles y únete a la lista de espera",
+      title: "Ebook Recetas",
+      subtitle: "Disfruta sin culpa",
+      description: "Aprende a comer rico y saludable garantizándote resultados",
       icon: "🍽️",
       color: "#F59E0B",
-      link: "/recetas",
+      link: "/ebook",
       type: "page"
     },
     {
