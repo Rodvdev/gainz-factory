@@ -111,11 +111,15 @@ export async function GET(request: NextRequest) {
     const events: CalendarEventUnion[] = []
 
     // Eventos del calendario principal
-    calendarEvents.forEach(event => {
+    calendarEvents.forEach((event: any) => {
+      // Validar que el tipo sea uno de los tipos permitidos
+      const validTypes = ['workout', 'nutrition', 'mindset', 'session', 'meeting'] as const
+      const eventType = validTypes.includes(event.type as any) ? event.type as 'workout' | 'nutrition' | 'mindset' | 'session' | 'meeting' : 'workout'
+      
       events.push({
         id: event.id,
         title: event.title,
-        type: event.type,
+        type: eventType,
         startTime: event.startTime.toISOString(),
         endTime: event.endTime.toISOString(),
         location: event.location,
@@ -130,7 +134,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Entradas de hábitos
-    habitEntries.forEach(entry => {
+    habitEntries.forEach((entry: any) => {
       const eventDate = new Date(entry.date)
       eventDate.setHours(9, 0, 0, 0) // Hora por defecto 9:00 AM
       const endDate = new Date(eventDate)
@@ -151,7 +155,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Desafíos
-    challenges.forEach(challenge => {
+    challenges.forEach((challenge: any) => {
       const startDate = new Date(challenge.startDate)
       const endDate = new Date(challenge.endDate)
       
@@ -171,7 +175,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Envíos de tareas
-    taskSubmissions.forEach(submission => {
+    taskSubmissions.forEach((submission: any) => {
       events.push({
         id: `task-${submission.id}`,
         title: submission.task.title,
@@ -190,7 +194,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Métricas de progreso
-    progressMetrics.forEach(metric => {
+    progressMetrics.forEach((metric: any) => {
       const eventDate = new Date(metric.date)
       eventDate.setHours(8, 0, 0, 0) // Hora por defecto 8:00 AM
       const endDate = new Date(eventDate)
