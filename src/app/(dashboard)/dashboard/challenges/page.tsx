@@ -26,7 +26,7 @@ export default function ChallengesPage() {
   // Modal hook
   const { isOpen, modalType, loading: modalLoading, openModal, closeModal, setLoading: setModalLoading, getModalConfig } = useCreateModal()
 
-  const handleCreateChallenge = async (data: Record<string, string | number | boolean>) => {
+  const handleCreateChallenge = async (data: Record<string, string | number | boolean | File>) => {
     try {
       setModalLoading(true)
       const token = localStorage.getItem("authToken")
