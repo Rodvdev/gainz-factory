@@ -339,7 +339,7 @@ async function getBestStreak(userId: string): Promise<number> {
   }
 }
 
-function getFavoriteCategory(categoryStats: any[]): string {
+function getFavoriteCategory(categoryStats: { name: string; percentage: number }[]): string {
   if (categoryStats.length === 0) return "Ninguna"
   
   const favorite = categoryStats.reduce((best, current) => 

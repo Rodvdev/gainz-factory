@@ -11,13 +11,13 @@ export interface FormField {
   placeholder?: string
   required?: boolean
   options?: { value: string; label: string }[]
-  validation?: (value: any) => string | null
+  validation?: (value: string | number | boolean) => string | null
 }
 
 export interface CreateModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: Record<string, any>) => Promise<void>
+  onSubmit: (data: Record<string, string | number | boolean | File>) => Promise<void>
   title: string
   description?: string
   fields: FormField[]
@@ -37,13 +37,13 @@ export default function CreateModal({
   loading = false,
   icon
 }: CreateModalProps) {
-  const [formData, setFormData] = useState<Record<string, any>>({})
+  const [formData, setFormData] = useState<Record<string, string | number | boolean | File>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Initialize form data when modal opens
   useEffect(() => {
     if (isOpen) {
-      const initialData: Record<string, any> = {}
+      const initialData: Record<string, string | number | boolean | File> = {}
       fields.forEach(field => {
         initialData[field.name] = field.type === 'checkbox' ? false : 
                                  field.type === 'number' ? 0 : 
@@ -54,7 +54,7 @@ export default function CreateModal({
     }
   }, [isOpen, fields])
 
-  const handleInputChange = (name: string, value: any) => {
+  const handleInputChange = (name: string, value: string | number | boolean | File) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
