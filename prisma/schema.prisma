@@ -67,10 +67,18 @@ model User {
   // Nuevas relaciones para Programmes y Forms
   taskSubmissions       TaskSubmission[]
   formSubmissions       FormSubmission[]
+  userProgrammes        UserProgramme[]
+  userAssignments       UserAssignment[]
+  calendarEvents        CalendarEvent[]
+  progressMetrics       ProgressMetrics[]
   
   // Gamificación
   userLevel             UserLevelData?
   userAchievements      UserAchievement[]
+  
+  // Sistema de Equipos
+  teamMember            TeamMember?
+  clientAssignments     ClientAssignment[]
   
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
@@ -255,12 +263,16 @@ model Programme {
   duration    Int?            // duración en semanas
   isActive    Boolean         @default(true)
   isPublic    Boolean         @default(false)
+  autoStart   Boolean         @default(false) // Para programmes en cascada
   createdBy   String          // ID del usuario que crea el programa
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   
   // Relaciones
   weeklyPlans WeeklyPlan[]
+  sequences   ProgrammeSequence[]
+  userProgrammes UserProgramme[]
+  calendarEvents CalendarEvent[]
   
   @@index([isActive])
   @@index([category])
@@ -513,6 +525,14 @@ enum UserRole {
   USER
   ADMIN
   COACH
+}
+
+enum TeamRole {
+  TRAINER
+  NUTRITIONIST
+  YOGA_INSTRUCTOR
+  LIFE_COACH
+  CONTENT_CREATOR
 }
 
 // Categorías superiores para organizar el contenido
@@ -939,4 +959,167 @@ enum TestimonialStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+// Sistema de Asignación de Programmes a Usuarios
+model UserProgramme {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programmeId   String
+  programme     Programme @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+  assignedBy    String?   // Coach ID
+  startDate     DateTime
+  endDate       DateTime?
+  status        String    @default("active") // active, completed, paused
+  progress      Float     @default(0) // 0-100%
+  notes         String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@unique([userId, programmeId])
+  @@index([userId])
+  @@index([programmeId])
+  @@index([status])
+}
+
+// Sistema de Asignación de Contenido Personalizado
+model UserAssignment {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentType String    // "exercise", "nutrition", "mindset", "video", "document", "form"
+  contentId   String    // ID del contenido específico
+  assignedBy  String?   // Coach ID
+  assignedAt  DateTime  @default(now())
+  isActive    Boolean   @default(true)
+  notes       String?
+  dueDate     DateTime?
+  completedAt DateTime?
+  
+  @@index([userId])
+  @@index([contentType])
+  @@index([assignedBy])
+  @@index([isActive])
+}
+
+// Programmes en Cascada
+model ProgrammeSequence {
+  id              String    @id @default(cuid())
+  programmeId     String
+  programme       Programme @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+  nextProgrammeId String?   // ID del siguiente programa
+  autoStart       Boolean   @default(false)
+  delayDays       Int       @default(0) // Días de espera antes de iniciar
+  conditions      Json?     // Condiciones para activar el siguiente programa
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([programmeId])
+}
+
+// Sistema de Equipos
+model TeamMember {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        TeamRole
+  specialty   String[]  // Especialidades específicas
+  bio         String?
+  experience  Int       @default(0) // años de experiencia
+  rating      Float     @default(0)
+  hourlyRate  Float?    // Tarifa por hora
+  isActive    Boolean   @default(true)
+  isAvailable Boolean   @default(true)
+  
+  // Relaciones
+  schedules   Schedule[]
+  calendarEvents CalendarEvent[]
+  clientAssignments ClientAssignment[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([role])
+  @@index([isActive])
+  @@index([isAvailable])
+}
+
+// Horarios de Disponibilidad de Team Members
+model Schedule {
+  id            String      @id @default(cuid())
+  teamMemberId  String
+  teamMember    TeamMember  @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+  dayOfWeek     Int         // 0 = Domingo, 1 = Lunes, etc.
+  startTime     String      // "09:00"
+  endTime       String      // "17:00"
+  isAvailable   Boolean     @default(true)
+  
+  @@index([teamMemberId])
+  @@index([dayOfWeek])
+}
+
+// Sistema de Calendario Integrado
+model CalendarEvent {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String    // "workout", "nutrition", "mindset", "session", "meeting"
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  location    String?
+  programmeId String?
+  programme   Programme? @relation(fields: [programmeId], references: [id])
+  teamMemberId String?  // Coach asignado
+  teamMember  TeamMember? @relation(fields: [teamMemberId], references: [id])
+  isRecurring Boolean   @default(false)
+  recurrence  Json?     // Configuración de recurrencia
+  status      String    @default("scheduled") // scheduled, completed, cancelled
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([type])
+  @@index([startTime])
+  @@index([teamMemberId])
+}
+
+// Métricas de Progreso Personalizadas
+model ProgressMetrics {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metricType  String    // "weight", "body_fat", "muscle_mass", "measurements", etc.
+  value       Float
+  unit        String    // "kg", "%", "cm", etc.
+  date        DateTime
+  notes       String?
+  photoUrl    String?   // Foto de progreso
+  isPrivate   Boolean   @default(false)
+  
+  createdAt   DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([metricType])
+  @@index([date])
+}
+
+// Asignación de Clientes a Coaches
+model ClientAssignment {
+  id            String      @id @default(cuid())
+  clientId      String
+  client        User        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  teamMemberId  String
+  teamMember    TeamMember  @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+  assignedAt    DateTime    @default(now())
+  isActive      Boolean     @default(true)
+  notes         String?
+  
+  @@unique([clientId, teamMemberId])
+  @@index([clientId])
+  @@index([teamMemberId])
 }

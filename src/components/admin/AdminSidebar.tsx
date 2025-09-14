@@ -18,7 +18,9 @@ import {
   Shield,
   Activity,
   Calendar,
-  ClipboardList
+  ClipboardList,
+  Building2,
+  Users2
 } from "lucide-react"
 
 interface AdminSidebarProps {
@@ -35,6 +37,8 @@ const navigation = [
   { name: "Formularios", href: "/admin/forms", icon: ClipboardList },
   { name: "Recetas", href: "/admin/recipes", icon: ChefHat },
   { name: "Contenido", href: "/admin/content", icon: FileText },
+  { name: "Equipo", href: "/admin/team", icon: Users2 },
+  { name: "Business", href: "/admin/business", icon: Building2 },
   { name: "Blog", href: "/admin/blog", icon: BookOpen },
   { name: "Servicios", href: "/admin/services", icon: ShoppingCart },
   { name: "Foro", href: "/admin/forum", icon: MessageSquare },

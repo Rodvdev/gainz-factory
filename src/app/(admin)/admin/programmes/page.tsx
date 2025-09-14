@@ -82,6 +82,7 @@ export default function ProgrammesPage() {
     level: "BEGINNER" as UserLevel,
     duration: 4,
     isPublic: false,
+    autoStart: false,
     weeklyPlans: [] as Array<{
       weekNumber: number
       title: string
@@ -144,6 +145,7 @@ export default function ProgrammesPage() {
       level: "BEGINNER",
       duration: 4,
       isPublic: false,
+      autoStart: false,
       weeklyPlans: []
     })
     setShowProgrammeModal(true)
@@ -159,6 +161,7 @@ export default function ProgrammesPage() {
       level: programme.level || "BEGINNER",
       duration: programme.duration || 4,
       isPublic: programme.isPublic,
+      autoStart: (programme as any).autoStart || false,
       weeklyPlans: programme.weeklyPlans.map(plan => ({
         weekNumber: plan.weekNumber,
         title: plan.title || "",
@@ -551,6 +554,18 @@ export default function ProgrammesPage() {
                   />
                   <label htmlFor="isPublic" className="text-sm font-medium text-gray-700">
                     Programa público
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="autoStart"
+                    checked={formData.autoStart}
+                    onChange={(e) => setFormData({...formData, autoStart: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <label htmlFor="autoStart" className="text-sm font-medium text-gray-700">
+                    Inicio automático (programme en cascada)
                   </label>
                 </div>
               </div>
