@@ -101,7 +101,7 @@ export default function HabitsPage() {
     }
   }, [activeCategory])
 
-  const handleCreateHabit = async (data: Record<string, string | number | boolean | File>) => {
+  const handleCreateHabit = async (data: Record<string, string | number | boolean | File | null>) => {
     try {
       setModalLoading(true)
       const token = localStorage.getItem("authToken")

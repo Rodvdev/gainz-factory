@@ -95,7 +95,7 @@ export default function RecipesPage() {
     }
   }
 
-  const handleCreateRecipe = async (data: Record<string, string | number | boolean | File>) => {
+  const handleCreateRecipe = async (data: Record<string, string | number | boolean | File | null>) => {
     try {
       setModalLoading(true)
       const token = localStorage.getItem("authToken")

@@ -17,7 +17,7 @@ export interface FormField {
 export interface CreateModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: Record<string, string | number | boolean | File>) => Promise<void>
+  onSubmit: (data: Record<string, string | number | boolean | File | null>) => Promise<void>
   title: string
   description?: string
   fields: FormField[]
@@ -37,13 +37,13 @@ export default function CreateModal({
   loading = false,
   icon
 }: CreateModalProps) {
-  const [formData, setFormData] = useState<Record<string, string | number | boolean | File>>({})
+  const [formData, setFormData] = useState<Record<string, string | number | boolean | File | null>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Initialize form data when modal opens
   useEffect(() => {
     if (isOpen) {
-      const initialData: Record<string, string | number | boolean | File> = {}
+      const initialData: Record<string, string | number | boolean | File | null> = {}
       fields.forEach(field => {
         initialData[field.name] = field.type === 'checkbox' ? false : 
                                  field.type === 'number' ? 0 : 
@@ -54,7 +54,7 @@ export default function CreateModal({
     }
   }, [isOpen, fields])
 
-  const handleInputChange = (name: string, value: string | number | boolean | File) => {
+  const handleInputChange = (name: string, value: string | number | boolean | File | null) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -82,7 +82,7 @@ export default function CreateModal({
       }
       
       // Custom validation
-      if (field.validation && value && typeof value !== 'object') {
+      if (field.validation && value && typeof value !== 'object' && value !== null) {
         const error = field.validation(value as string | number | boolean)
         if (error) {
           newErrors[field.name] = error
@@ -109,6 +109,23 @@ export default function CreateModal({
     }
   }
 
+  const getStringValue = (value: string | number | boolean | File | null | undefined): string => {
+    if (typeof value === 'string') return value
+    if (typeof value === 'number') return value.toString()
+    return ''
+  }
+
+  const getNumberValue = (value: string | number | boolean | File | null | undefined): number => {
+    if (typeof value === 'number') return value
+    if (typeof value === 'string') return parseFloat(value) || 0
+    return 0
+  }
+
+  const getBooleanValue = (value: string | number | boolean | File | null | undefined): boolean => {
+    if (typeof value === 'boolean') return value
+    return false
+  }
+
   const renderField = (field: FormField) => {
     const hasError = errors[field.name]
     
@@ -117,7 +134,7 @@ export default function CreateModal({
         return (
           <input
             type="text"
-            value={formData[field.name] || ''}
+            value={getStringValue(formData[field.name])}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             placeholder={field.placeholder}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
@@ -129,7 +146,7 @@ export default function CreateModal({
       case 'textarea':
         return (
           <textarea
-            value={formData[field.name] || ''}
+            value={getStringValue(formData[field.name])}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             placeholder={field.placeholder}
             rows={4}
@@ -142,7 +159,7 @@ export default function CreateModal({
       case 'select':
         return (
           <select
-            value={formData[field.name] || ''}
+            value={getStringValue(formData[field.name])}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
               hasError ? 'border-red-500' : 'border-gray-300'
@@ -161,7 +178,7 @@ export default function CreateModal({
         return (
           <input
             type="number"
-            value={formData[field.name] || ''}
+            value={getNumberValue(formData[field.name])}
             onChange={(e) => handleInputChange(field.name, Number(e.target.value))}
             placeholder={field.placeholder}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
@@ -175,7 +192,7 @@ export default function CreateModal({
           <label className="flex items-center">
             <input
               type="checkbox"
-              checked={formData[field.name] || false}
+              checked={getBooleanValue(formData[field.name])}
               onChange={(e) => handleInputChange(field.name, e.target.checked)}
               className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
             />
@@ -187,7 +204,7 @@ export default function CreateModal({
         return (
           <input
             type="date"
-            value={formData[field.name] || ''}
+            value={getStringValue(formData[field.name])}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
               hasError ? 'border-red-500' : 'border-gray-300'
@@ -199,7 +216,7 @@ export default function CreateModal({
         return (
           <input
             type="file"
-            onChange={(e) => handleInputChange(field.name, e.target.files?.[0])}
+            onChange={(e) => handleInputChange(field.name, e.target.files?.[0] || null)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
               hasError ? 'border-red-500' : 'border-gray-300'
             }`}
