@@ -7,9 +7,7 @@ import {
   UsersIcon,
   EyeIcon,
   ClockIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
-  CalendarIcon,
+  ArrowTrendingUpIcon,
   ArrowUpIcon,
   ArrowDownIcon
 } from "@heroicons/react/24/outline"
@@ -38,7 +36,6 @@ interface ChartData {
 
 export default function AdminAnalyticsPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
-  const [chartData, setChartData] = useState<ChartData[]>([])
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState("30d")
 
@@ -58,7 +55,6 @@ export default function AdminAnalyticsPage() {
       if (response.ok) {
         const data = await response.json()
         setAnalytics(data.analytics)
-        setChartData(data.chartData || [])
       } else {
         // Mock data for development
         setAnalytics({
@@ -75,7 +71,6 @@ export default function AdminAnalyticsPage() {
           sessionGrowth: 8.3,
           revenueGrowth: 15.2
         })
-        setChartData(generateMockChartData())
       }
     } catch (error) {
       console.error("Error fetching analytics:", error)
@@ -84,25 +79,6 @@ export default function AdminAnalyticsPage() {
     }
   }
 
-  const generateMockChartData = (): ChartData[] => {
-    const data = []
-    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 365
-    const today = new Date()
-    
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        users: Math.floor(Math.random() * 50) + 20,
-        sessions: Math.floor(Math.random() * 100) + 40,
-        revenue: Math.floor(Math.random() * 500) + 100
-      })
-    }
-    
-    return data
-  }
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
@@ -144,7 +120,7 @@ export default function AdminAnalyticsPage() {
       title: "Nuevos Usuarios",
       value: analytics?.newUsers || 0,
       change: 15.3,
-      icon: TrendingUpIcon,
+      icon: ArrowTrendingUpIcon,
       color: "purple"
     },
     {
@@ -165,7 +141,7 @@ export default function AdminAnalyticsPage() {
       title: "Ingresos",
       value: analytics?.revenue || 0,
       change: analytics?.revenueGrowth || 0,
-      icon: TrendingUpIcon,
+      icon: ArrowTrendingUpIcon,
       color: "emerald",
       isCurrency: true
     }
@@ -259,7 +235,7 @@ export default function AdminAnalyticsPage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Ingresos</h3>
           <div className="h-64 flex items-center justify-center">
             <div className="text-center">
-              <TrendingUpIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+              <ArrowTrendingUpIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
               <p className="text-gray-600">Gráfico de ingresos próximamente</p>
             </div>
           </div>
