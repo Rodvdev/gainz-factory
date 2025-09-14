@@ -8,12 +8,10 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye,
   Star,
   Clock,
   DollarSign,
   UserCheck,
-  UserX,
   Calendar,
   X,
   Save
@@ -238,7 +236,7 @@ export default function TeamPage() {
     setFormData({ ...formData, schedules: updatedSchedules })
   }
 
-  const updateSchedule = (index: number, field: keyof Schedule, value: any) => {
+  const updateSchedule = (index: number, field: keyof Schedule, value: string | number | boolean) => {
     const updatedSchedules = [...formData.schedules]
     updatedSchedules[index] = { ...updatedSchedules[index], [field]: value }
     setFormData({ ...formData, schedules: updatedSchedules })
