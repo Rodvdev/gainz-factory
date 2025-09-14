@@ -36,6 +36,9 @@ export default function TopNavBar({
   subtitle 
 }: TopNavBarProps) {
   const [showUserMenu, setShowUserMenu] = useState(false)
+  
+  // Debug: Log user role
+  console.log('TopNavBar - User role:', user?.role)
 
   return (
     <div className="bg-white backdrop-blur-sm border-b-2 border-gray-200 shadow-lg">
@@ -183,6 +186,11 @@ export default function TopNavBar({
                       <CogIcon className="h-5 w-5" />
                       Configuración
                     </Link>
+                    {/* Debug: Show role info */}
+                    <div className="px-4 py-2 text-xs text-gray-500 border-b">
+                      Role: {user.role || 'undefined'}
+                    </div>
+                    
                     {user.role === 'ADMIN' && (
                       <Link
                         href="/admin"

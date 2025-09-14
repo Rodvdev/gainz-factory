@@ -59,21 +59,50 @@ export default function DashboardLayout({
   const pathname = usePathname()
 
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       const token = localStorage.getItem("authToken")
-      const userData = localStorage.getItem("user")
       
-      if (!token || !userData) {
+      if (!token) {
         router.push("/signin")
         return
       }
       
       try {
-        const parsedUser = JSON.parse(userData)
-        setUser(parsedUser)
+        // Fetch complete user data from API including role
+        const response = await fetch("/api/auth/me", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        })
+        
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData)
+        } else {
+          // If API fails, try localStorage as fallback
+          const userData = localStorage.getItem("user")
+          if (userData) {
+            const parsedUser = JSON.parse(userData)
+            setUser(parsedUser)
+          } else {
+            router.push("/signin")
+          }
+        }
       } catch (error) {
-        console.error("Error parsing user data:", error)
-        router.push("/signin")
+        console.error("Error fetching user data:", error)
+        // Fallback to localStorage
+        const userData = localStorage.getItem("user")
+        if (userData) {
+          try {
+            const parsedUser = JSON.parse(userData)
+            setUser(parsedUser)
+          } catch (parseError) {
+            console.error("Error parsing user data:", parseError)
+            router.push("/signin")
+          }
+        } else {
+          router.push("/signin")
+        }
       }
     }
     

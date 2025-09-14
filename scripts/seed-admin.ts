@@ -301,7 +301,7 @@ async function seedAdmin() {
     console.log('🧹 Cleared existing data')
 
     // Create admin user
-    const adminPassword = await bcrypt.hash('admin123', 12)
+    const adminPassword = await bcrypt.hash('Sedibol123', 12)
     const admin = await prisma.user.create({
       data: {
         email: 'bolligerfitness@gmail.com',
@@ -320,7 +320,7 @@ async function seedAdmin() {
     console.log('👑 Created admin user:', admin.email)
 
     // Create regular user
-    const userPassword = await bcrypt.hash('user123', 12)
+    const userPassword = await bcrypt.hash('1Ewe9920.', 12)
     const user = await prisma.user.create({
       data: {
         email: 'rodrigovdev01@gmail.com',
