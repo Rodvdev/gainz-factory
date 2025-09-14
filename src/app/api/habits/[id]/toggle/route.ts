@@ -4,9 +4,11 @@ import { getAuthenticatedUser } from "@/lib/auth-middleware"
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: habitId } = await params
+    
     // Get authenticated user
     const user = await getAuthenticatedUser(request)
     if (!user) {
@@ -16,7 +18,6 @@ export async function POST(
       )
     }
 
-    const habitId = params.id
     const body = await request.json()
     const { completed, value } = body
 
