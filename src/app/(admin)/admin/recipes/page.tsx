@@ -5,13 +5,10 @@ import { motion } from "framer-motion"
 import { 
   ChefHat, 
   Search, 
-  Filter, 
   Plus, 
   Edit, 
   Trash2, 
   Star,
-  Clock,
-  Users,
   Target,
   Crown,
   Eye,

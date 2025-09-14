@@ -5,12 +5,9 @@ import { motion } from "framer-motion"
 import { 
   FileText, 
   Search, 
-  Filter, 
   Plus, 
   Edit, 
   Trash2, 
-  Play,
-  Download,
   Eye,
   Crown,
   BookOpen,

@@ -46,7 +46,7 @@ export async function POST(
       }
     })
 
-    let habitEntry
+    let habitEntry: unknown
     let streakUpdate = null
 
     if (completed) {
@@ -102,7 +102,7 @@ export async function POST(
         await db.habitEntry.delete({
           where: { id: existingEntry.id }
         })
-        habitEntry = null // eslint-disable-line @typescript-eslint/no-unused-vars
+        habitEntry = null
       }
     }
 

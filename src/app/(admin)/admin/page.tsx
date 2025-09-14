@@ -7,11 +7,9 @@ import {
   Dumbbell, 
   ChefHat, 
   FileText, 
-  BarChart3, 
   TrendingUp,
   Activity,
   Clock,
-  Star,
   Target,
   DollarSign,
   Eye
@@ -213,7 +211,7 @@ export default function AdminDashboard() {
         <h2 className="text-xl font-semibold text-gray-900 mb-6">Actividad Reciente</h2>
         <div className="space-y-4">
           {recentActivity.length > 0 ? (
-            recentActivity.map((activity, index) => (
+            recentActivity.map((activity) => (
               <div key={activity.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <div className="flex-1">

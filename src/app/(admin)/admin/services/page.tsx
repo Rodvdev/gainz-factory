@@ -5,16 +5,13 @@ import { motion } from "framer-motion"
 import { 
   ShoppingCart, 
   Search, 
-  Filter, 
   Plus, 
   Edit, 
   Trash2, 
   DollarSign,
   Clock,
   Star,
-  Users,
   Target,
-  Zap,
   Crown
 } from "lucide-react"
 import { ServiceLevel } from "@prisma/client"

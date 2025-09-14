@@ -5,14 +5,11 @@ import { motion } from "framer-motion"
 import { 
   Dumbbell, 
   Search, 
-  Filter, 
   Plus, 
   Edit, 
   Trash2, 
-  Play,
   Target,
   Zap,
-  Clock,
   Users,
   Eye
 } from "lucide-react"

@@ -1,20 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
 import { 
   Users, 
   Search, 
-  Filter, 
   Plus, 
   Edit, 
-  Trash2, 
   Shield, 
   UserCheck,
-  UserX,
-  Mail,
-  Calendar,
-  MoreVertical
+  UserX
 } from "lucide-react"
 import { UserRole } from "@prisma/client"
 
