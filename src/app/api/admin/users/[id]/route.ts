@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get("authorization")
@@ -27,7 +27,7 @@ export async function PATCH(
     }
 
     const { firstName, lastName, email, role } = await request.json()
-    const userId = params.id
+    const { id: userId } = await params
 
     // Verificar si el email ya existe en otro usuario
     if (email) {
@@ -85,7 +85,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get("authorization")
@@ -106,7 +106,7 @@ export async function DELETE(
       return NextResponse.json({ error: "No autorizado" }, { status: 403 })
     }
 
-    const userId = params.id
+    const { id: userId } = await params
 
     // No permitir que un admin se elimine a sí mismo
     if (userId === token) {
