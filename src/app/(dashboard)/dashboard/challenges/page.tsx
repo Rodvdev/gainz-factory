@@ -3,6 +3,8 @@ import { useState } from "react"
 import { HabitCategory } from "@prisma/client"
 import { PlusIcon, TrophyIcon, CalendarIcon } from "@heroicons/react/24/outline"
 import ChallengeCard from "@/components/challenges/ChallengeCard"
+import CreateModal from "@/components/dashboard/CreateModal"
+import { useCreateModal } from "@/hooks/useCreateModal"
 
 interface Challenge {
   id: string
@@ -20,6 +22,45 @@ interface Challenge {
 
 export default function ChallengesPage() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'completed'>('active')
+  
+  // Modal hook
+  const { isOpen, modalType, loading: modalLoading, openModal, closeModal, setLoading: setModalLoading, getModalConfig } = useCreateModal()
+
+  const handleCreateChallenge = async (data: Record<string, string | number | boolean>) => {
+    try {
+      setModalLoading(true)
+      const token = localStorage.getItem("authToken")
+      
+      const response = await fetch("/api/challenges", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: data.name,
+          description: data.description,
+          targetValue: data.targetValue,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          reward: data.reward
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al crear el desafío")
+      }
+
+      // Refresh challenges list
+      window.location.reload()
+      closeModal()
+    } catch (error) {
+      console.error("Error creating challenge:", error)
+      throw error
+    } finally {
+      setModalLoading(false)
+    }
+  }
 
   // Sample data - will be replaced with real data
   const sampleChallenges: Challenge[] = [
@@ -278,7 +319,10 @@ export default function ChallengesPage() {
                     {activeFilter === 'completed' && "Completa algunos desafíos para ver tus logros aquí"}
                     {activeFilter === 'all' && "Crea tu primer desafío para empezar"}
                   </p>
-                  <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                  <button 
+                    onClick={() => openModal('challenge')}
+                    className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
                     Crear Desafío
                   </button>
                 </div>
@@ -338,6 +382,21 @@ export default function ChallengesPage() {
           </div>
         </div>
       </div>
+
+      {/* Create Modal */}
+      {modalType && getModalConfig && (
+        <CreateModal
+          isOpen={isOpen}
+          onClose={closeModal}
+          onSubmit={handleCreateChallenge}
+          title={getModalConfig.title}
+          description={getModalConfig.description}
+          fields={getModalConfig.fields}
+          submitText={getModalConfig.submitText}
+          loading={modalLoading}
+          icon={getModalConfig.icon}
+        />
+      )}
     </div>
   )
 } 

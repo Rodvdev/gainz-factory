@@ -15,6 +15,8 @@ import {
   Zap
 } from "lucide-react"
 import Link from "next/link"
+import CreateModal from "@/components/dashboard/CreateModal"
+import { useCreateModal } from "@/hooks/useCreateModal"
 
 interface Habit {
   id: string
@@ -54,6 +56,8 @@ export default function HabitsPage() {
   const [error, setError] = useState<string | null>(null)
   const [togglingHabits, setTogglingHabits] = useState<Set<string>>(new Set())
 
+  // Modal hook
+  const { isOpen, modalType, loading: modalLoading, openModal, closeModal, setLoading: setModalLoading, getModalConfig } = useCreateModal()
 
   const fetchHabits = useCallback(async () => {
     try {
@@ -97,6 +101,43 @@ export default function HabitsPage() {
     }
   }, [activeCategory])
 
+  const handleCreateHabit = async (data: Record<string, string | number | boolean>) => {
+    try {
+      setModalLoading(true)
+      const token = localStorage.getItem("authToken")
+      
+      const response = await fetch("/api/habits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: data.name,
+          description: data.description,
+          category: data.category,
+          frequency: data.frequency,
+          trackingType: "BINARY",
+          targetCount: data.targetValue,
+          points: data.points,
+          color: "#3B82F6"
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al crear el hábito")
+      }
+
+      // Refresh habits list
+      await fetchHabits()
+      closeModal()
+    } catch (error) {
+      console.error("Error creating habit:", error)
+      throw error
+    } finally {
+      setModalLoading(false)
+    }
+  }
   
   // Fetch habits data
   useEffect(() => {
@@ -469,14 +510,14 @@ export default function HabitsPage() {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Crear Nuevo Hábito</h3>
                 <p className="text-gray-600 text-sm mb-6">Añade un nuevo hábito a tu rutina</p>
-                <Link
-                  href="/dashboard/habits/new"
+                <button
+                  onClick={() => openModal('habit')}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200"
                 >
                   <Plus className="w-5 h-5" />
                   Crear Hábito
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </button>
               </div>
             </motion.div>
           </motion.div>
@@ -494,17 +535,32 @@ export default function HabitsPage() {
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
               Comienza creando tu primer hábito para transformar tu vida día a día
             </p>
-            <Link
-              href="/dashboard/habits/new"
+            <button
+              onClick={() => openModal('habit')}
               className="inline-flex items-center gap-2 px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
             >
               <Plus className="w-5 h-5" />
               Crear mi primer hábito
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </button>
           </motion.div>
         )}
       </div>
+
+      {/* Create Modal */}
+      {modalType && getModalConfig && (
+        <CreateModal
+          isOpen={isOpen}
+          onClose={closeModal}
+          onSubmit={handleCreateHabit}
+          title={getModalConfig.title}
+          description={getModalConfig.description}
+          fields={getModalConfig.fields}
+          submitText={getModalConfig.submitText}
+          loading={modalLoading}
+          icon={getModalConfig.icon}
+        />
+      )}
     </div>
   )
 }

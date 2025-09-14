@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7)
     
-    // Verificar que el usuario es admin
+    // Verificar que el usuario es admin - usar el token como ID por ahora
     const user = await prisma.user.findFirst({
       where: {
-        id: token // En un caso real, verificarías el token JWT
+        id: token
       }
     })
 

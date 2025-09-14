@@ -74,8 +74,39 @@ export default function UsersPage() {
   })
 
   const handleEditUser = (user: User) => {
-    setSelectedUser(user)
+    setSelectedUser({ ...user })
     setShowUserModal(true)
+  }
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return
+
+    try {
+      const token = localStorage.getItem("authToken")
+      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          firstName: selectedUser.firstName,
+          lastName: selectedUser.lastName,
+          email: selectedUser.email,
+          role: selectedUser.role
+        })
+      })
+
+      if (response.ok) {
+        setUsers(users.map(user => 
+          user.id === selectedUser.id ? selectedUser : user
+        ))
+        setShowUserModal(false)
+        setSelectedUser(null)
+      }
+    } catch (error) {
+      console.error("Error updating user:", error)
+    }
   }
 
   const handleToggleUserStatus = async (userId: string, currentStatus: boolean) => {
@@ -377,6 +408,7 @@ export default function UsersPage() {
                   <input
                     type="text"
                     value={selectedUser.firstName}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, firstName: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   />
                 </div>
@@ -387,6 +419,7 @@ export default function UsersPage() {
                   <input
                     type="text"
                     value={selectedUser.lastName}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, lastName: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   />
                 </div>
@@ -397,6 +430,7 @@ export default function UsersPage() {
                   <input
                     type="email"
                     value={selectedUser.email}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   />
                 </div>
@@ -406,6 +440,7 @@ export default function UsersPage() {
                   </label>
                   <select
                     value={selectedUser.role}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value as UserRole })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   >
                     <option value="USER">Usuario</option>
@@ -421,7 +456,10 @@ export default function UsersPage() {
                 >
                   Cancelar
                 </button>
-                <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
+                <button 
+                  onClick={handleUpdateUser}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                >
                   Guardar Cambios
                 </button>
               </div>

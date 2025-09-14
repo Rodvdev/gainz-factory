@@ -237,11 +237,9 @@ export default function CreateModal({
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <div className="flex items-center gap-3">
-                  {icon && (
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      {icon}
-                    </div>
-                  )}
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    {icon || <PlusIcon className="w-5 h-5 text-red-600" />}
+                  </div>
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
                     {description && (

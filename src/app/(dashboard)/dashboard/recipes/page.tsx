@@ -13,6 +13,8 @@ import {
   HeartIcon
 } from "@heroicons/react/24/outline"
 import Image from "next/image"
+import CreateModal from "@/components/dashboard/CreateModal"
+import { useCreateModal } from "@/hooks/useCreateModal"
 
 interface Recipe {
   id: string
@@ -33,7 +35,9 @@ export default function RecipesPage() {
   const [selectedLevel, setSelectedLevel] = useState<UserLevel | 'ALL'>('ALL')
   const [selectedObjective, setSelectedObjective] = useState<string>('all')
   const [showPremiumOnly, setShowPremiumOnly] = useState(false)
-  const [showCreateForm, setShowCreateForm] = useState(false)
+
+  // Modal hook
+  const { isOpen, modalType, loading: modalLoading, openModal, closeModal, setLoading: setModalLoading, getModalConfig } = useCreateModal()
 
   // Fetch recipes
   useEffect(() => {
@@ -91,6 +95,41 @@ export default function RecipesPage() {
     }
   }
 
+  const handleCreateRecipe = async (data: Record<string, string | number | boolean>) => {
+    try {
+      setModalLoading(true)
+      const token = localStorage.getItem("authToken")
+      
+      const response = await fetch("/api/recipes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          objective: data.objective,
+          level: data.level,
+          isPremium: data.isPremium || false
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al crear la receta")
+      }
+
+      // Refresh recipes list
+      window.location.reload()
+      closeModal()
+    } catch (error) {
+      console.error("Error creating recipe:", error)
+      throw error
+    } finally {
+      setModalLoading(false)
+    }
+  }
+
   const filteredRecipes = recipes.filter(recipe => {
     const matchesSearch = !searchTerm || 
       recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -128,7 +167,7 @@ export default function RecipesPage() {
             </p>
           </div>
           <button
-            onClick={() => setShowCreateForm(true)}
+            onClick={() => openModal('recipe')}
             className="group flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             <PlusIcon className="h-5 w-5 group-hover:rotate-90 transition-transform duration-200" />
@@ -362,7 +401,7 @@ export default function RecipesPage() {
                     }
                   </p>
                   <button
-                    onClick={() => setShowCreateForm(true)}
+                    onClick={() => openModal('recipe')}
                     className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
                     Crear Primera Receta
@@ -374,30 +413,19 @@ export default function RecipesPage() {
         )}
       </div>
 
-      {/* Create Recipe Modal - Placeholder */}
-      {showCreateForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 max-w-md w-full shadow-2xl">
-            <div className="text-center mb-6">
-              
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Crear Nueva Receta</h3>
-              <p className="text-gray-600 leading-relaxed">
-                El formulario de creación estará disponible en la próxima actualización.
-              </p>
-            </div>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setShowCreateForm(false)}
-                className="flex-1 border border-gray-300 hover:border-gray-400 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-              >
-                Cerrar
-              </button>
-              <button className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                Próximamente
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Create Modal */}
+      {modalType && getModalConfig && (
+        <CreateModal
+          isOpen={isOpen}
+          onClose={closeModal}
+          onSubmit={handleCreateRecipe}
+          title={getModalConfig.title}
+          description={getModalConfig.description}
+          fields={getModalConfig.fields}
+          submitText={getModalConfig.submitText}
+          loading={modalLoading}
+          icon={getModalConfig.icon}
+        />
       )}
     </div>
   )

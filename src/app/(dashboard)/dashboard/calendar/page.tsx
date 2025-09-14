@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   CalendarIcon, 
   ChevronLeftIcon, 
@@ -10,7 +10,9 @@ import {
   XCircleIcon,
   MinusCircleIcon,
   TrophyIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  PencilIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 interface DayData {
@@ -20,6 +22,12 @@ interface DayData {
   points: number;
   streak: boolean;
   hasData: boolean;
+  habits?: Array<{
+    id: string;
+    name: string;
+    completed: boolean;
+    points: number;
+  }>;
 }
 
 interface MonthStats {
@@ -36,6 +44,8 @@ export default function CalendarPage() {
   const [calendarData, setCalendarData] = useState<Map<string, DayData>>(new Map());
   const [monthStats, setMonthStats] = useState<MonthStats | null>(null);
   const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
+  const [editingDate, setEditingDate] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const generateCalendarData = useCallback(() => {
     const data = new Map<string, DayData>();
@@ -57,13 +67,26 @@ export default function CalendarPage() {
         const points = completedHabits * 10 + Math.floor(Math.random() * 20);
         const completion = completedHabits / totalHabits;
         
+        // Generate sample habits for this day
+        const habits = [
+          { id: '1', name: 'Despertar 5:00 AM', completed: Math.random() > 0.3, points: 15 },
+          { id: '2', name: 'Ejercicio 30 min', completed: Math.random() > 0.4, points: 20 },
+          { id: '3', name: 'Meditación 10 min', completed: Math.random() > 0.5, points: 10 },
+          { id: '4', name: 'Leer 30 min', completed: Math.random() > 0.6, points: 15 },
+          { id: '5', name: 'Escribir diario', completed: Math.random() > 0.7, points: 10 },
+          { id: '6', name: 'Sin redes sociales', completed: Math.random() > 0.2, points: 25 },
+          { id: '7', name: 'Agua 2L', completed: Math.random() > 0.1, points: 10 },
+          { id: '8', name: 'Dormir 8h', completed: Math.random() > 0.4, points: 20 }
+        ];
+
         data.set(dateKey, {
           date,
           completedHabits,
           totalHabits,
           points,
           streak: completion >= 0.7, // 70% or more completion counts as streak
-          hasData: true
+          hasData: true,
+          habits
         });
       }
     }
@@ -124,14 +147,14 @@ export default function CalendarPage() {
     setCurrentDate(newDate);
   };
 
-  const getDayCompletion = (date: Date): number => {
+  const getDayCompletion = useCallback((date: Date): number => {
     const dateKey = date.toISOString().split('T')[0];
     const dayData = calendarData.get(dateKey);
     if (!dayData) return 0;
     return dayData.completedHabits / dayData.totalHabits;
-  };
+  }, [calendarData]);
 
-  const getDayColor = (date: Date): string => {
+  const getDayColor = useCallback((date: Date): string => {
     const completion = getDayCompletion(date);
     const dateKey = date.toISOString().split('T')[0];
     const dayData = calendarData.get(dateKey);
@@ -143,9 +166,9 @@ export default function CalendarPage() {
     if (completion >= 0.5) return 'bg-yellow-400';
     if (completion >= 0.3) return 'bg-orange-400';
     return 'bg-red-400';
-  };
+  }, [calendarData, getDayCompletion]);
 
-  const getCalendarDays = () => {
+  const getCalendarDays = useCallback(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
@@ -162,26 +185,66 @@ export default function CalendarPage() {
     }
     
     return days;
-  };
+  }, [currentDate]);
 
-  const formatMonthYear = (date: Date) => {
+  const formatMonthYear = useCallback((date: Date) => {
     return date.toLocaleDateString('es-ES', { 
       month: 'long', 
       year: 'numeric' 
     });
-  };
+  }, []);
 
-  const isToday = (date: Date) => {
+  const isToday = useCallback((date: Date) => {
     const today = new Date();
     return date.toDateString() === today.toDateString();
-  };
+  }, []);
 
-  const isCurrentMonth = (date: Date) => {
+  const isCurrentMonth = useCallback((date: Date) => {
     return date.getMonth() === currentDate.getMonth();
+  }, [currentDate]);
+
+  const handleEditDate = (date: Date) => {
+    const dateKey = date.toISOString().split('T')[0];
+    setEditingDate(dateKey);
+    setIsEditModalOpen(true);
   };
 
-  const calendarDays = getCalendarDays();
-  const weekdays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingDate(null);
+  };
+
+  const handleToggleHabit = (habitId: string) => {
+    if (!editingDate) return;
+    
+    setCalendarData(prev => {
+      const newData = new Map(prev);
+      const dayData = newData.get(editingDate);
+      if (!dayData?.habits) return prev;
+      
+      const updatedHabits = dayData.habits.map(habit => 
+        habit.id === habitId ? { ...habit, completed: !habit.completed } : habit
+      );
+      
+      const completedCount = updatedHabits.filter(h => h.completed).length;
+      const totalPoints = updatedHabits
+        .filter(h => h.completed)
+        .reduce((sum, h) => sum + h.points, 0);
+      
+      newData.set(editingDate, {
+        ...dayData,
+        habits: updatedHabits,
+        completedHabits: completedCount,
+        points: totalPoints,
+        streak: (completedCount / dayData.totalHabits) >= 0.7
+      });
+      
+      return newData;
+    });
+  };
+
+  const calendarDays = useMemo(() => getCalendarDays(), [getCalendarDays]);
+  const weekdays = useMemo(() => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'], []);
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
@@ -308,40 +371,55 @@ export default function CalendarPage() {
               const completion = getDayCompletion(date);
               
               return (
-                <button
-                  key={index}
-                  onClick={() => setSelectedDate(date)}
-                  className={`
-                    relative p-2 h-12 rounded-lg border transition-all hover:scale-105
-                    ${isCurrentMonth(date) ? 'text-gray-900' : 'text-gray-400'}
-                    ${isToday(date) ? 'ring-2 ring-blue-500' : ''}
-                    ${selectedDate?.toDateString() === date.toDateString() ? 'ring-2 ring-blue-300' : ''}
-                    ${getDayColor(date)}
-                    ${dayData?.hasData ? 'text-white font-medium' : 'bg-gray-50 hover:bg-gray-100'}
-                  `}
-                >
-                  <span className="text-sm">{date.getDate()}</span>
+                <div key={index} className="relative group">
+                  <button
+                    onClick={() => setSelectedDate(date)}
+                    className={`
+                      relative p-2 h-12 w-full rounded-lg border transition-all hover:scale-105
+                      ${isCurrentMonth(date) ? 'text-gray-900' : 'text-gray-400'}
+                      ${isToday(date) ? 'ring-2 ring-blue-500' : ''}
+                      ${selectedDate?.toDateString() === date.toDateString() ? 'ring-2 ring-blue-300' : ''}
+                      ${getDayColor(date)}
+                      ${dayData?.hasData ? 'text-white font-medium' : 'bg-gray-50 hover:bg-gray-100'}
+                    `}
+                  >
+                    <span className="text-sm">{date.getDate()}</span>
+                    
+                    {/* Completion Indicator */}
+                    {dayData?.hasData && (
+                      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                        {completion >= 0.9 ? (
+                          <CheckCircleIcon className="h-3 w-3 text-white" />
+                        ) : completion >= 0.7 ? (
+                          <MinusCircleIcon className="h-3 w-3 text-white" />
+                        ) : completion > 0 ? (
+                          <XCircleIcon className="h-3 w-3 text-white" />
+                        ) : null}
+                      </div>
+                    )}
+                    
+                    {/* Streak Indicator */}
+                    {dayData?.streak && (
+                      <div className="absolute top-1 right-1">
+                        <FireIcon className="h-3 w-3 text-yellow-300" />
+                      </div>
+                    )}
+                  </button>
                   
-                  {/* Completion Indicator */}
+                  {/* Edit Button - Only show for days with data */}
                   {dayData?.hasData && (
-                    <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
-                      {completion >= 0.9 ? (
-                        <CheckCircleIcon className="h-3 w-3 text-white" />
-                      ) : completion >= 0.7 ? (
-                        <MinusCircleIcon className="h-3 w-3 text-white" />
-                      ) : completion > 0 ? (
-                        <XCircleIcon className="h-3 w-3 text-white" />
-                      ) : null}
-                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditDate(date);
+                      }}
+                      className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                      title="Editar hábitos del día"
+                    >
+                      <PencilIcon className="h-3 w-3 text-gray-600" />
+                    </button>
                   )}
-                  
-                  {/* Streak Indicator */}
-                  {dayData?.streak && (
-                    <div className="absolute top-1 right-1">
-                      <FireIcon className="h-3 w-3 text-yellow-300" />
-                    </div>
-                  )}
-                </button>
+                </div>
               );
             })}
           </div>
@@ -434,6 +512,94 @@ export default function CalendarPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && editingDate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Editar hábitos - {new Date(editingDate).toLocaleDateString('es-ES', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <XMarkIcon className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="p-4 max-h-96 overflow-y-auto">
+              {(() => {
+                const dayData = calendarData.get(editingDate);
+                if (!dayData?.habits) {
+                  return (
+                    <div className="text-center py-8 text-gray-500">
+                      <CalendarIcon className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                      <p>No hay hábitos para este día</p>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div className="space-y-3">
+                    {dayData.habits.map((habit) => (
+                      <div
+                        key={habit.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleToggleHabit(habit.id)}
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                              habit.completed
+                                ? 'bg-green-600 border-green-600 text-white'
+                                : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                            }`}
+                          >
+                            {habit.completed && <CheckCircleIcon className="h-4 w-4" />}
+                          </button>
+                          <div>
+                            <p className={`font-medium ${habit.completed ? 'text-gray-900' : 'text-gray-600'}`}>
+                              {habit.name}
+                            </p>
+                            <p className="text-sm text-gray-500">{habit.points} puntos</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-900">
+                            {habit.completed ? 'Completado' : 'Pendiente'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+            
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
+              <button
+                onClick={handleCloseEditModal}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCloseEditModal}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -41,6 +41,17 @@ export default function ExercisesPage() {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
   const [showExerciseModal, setShowExerciseModal] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    type: "STRENGTH" as ExerciseType,
+    intensity: "LOW" as IntensityLevel,
+    level: "BEGINNER" as UserLevel,
+    technique: "",
+    videoUrl: "",
+    imageUrl: "",
+    targetMuscles: ""
+  })
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -84,13 +95,75 @@ export default function ExercisesPage() {
   const handleCreateExercise = () => {
     setSelectedExercise(null)
     setIsEditing(false)
+    setFormData({
+      name: "",
+      description: "",
+      type: "STRENGTH",
+      intensity: "LOW",
+      level: "BEGINNER",
+      technique: "",
+      videoUrl: "",
+      imageUrl: "",
+      targetMuscles: ""
+    })
     setShowExerciseModal(true)
   }
 
   const handleEditExercise = (exercise: Exercise) => {
     setSelectedExercise(exercise)
     setIsEditing(true)
+    setFormData({
+      name: exercise.name,
+      description: exercise.description || "",
+      type: exercise.type,
+      intensity: exercise.intensity,
+      level: exercise.level,
+      technique: exercise.technique || "",
+      videoUrl: exercise.videoUrl || "",
+      imageUrl: exercise.imageUrl || "",
+      targetMuscles: exercise.targetMuscles.join(", ")
+    })
     setShowExerciseModal(true)
+  }
+
+  const handleUpdateExercise = async () => {
+    if (!formData.name.trim()) return
+
+    try {
+      const token = localStorage.getItem("authToken")
+      const exerciseData = {
+        ...formData,
+        targetMuscles: formData.targetMuscles.split(",").map(m => m.trim()).filter(m => m)
+      }
+
+      const url = isEditing 
+        ? `/api/admin/exercises/${selectedExercise?.id}`
+        : "/api/admin/exercises"
+      
+      const method = isEditing ? "PATCH" : "POST"
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(exerciseData)
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (isEditing) {
+          setExercises(exercises.map(ex => ex.id === selectedExercise?.id ? data.exercise : ex))
+        } else {
+          setExercises([data.exercise, ...exercises])
+        }
+        setShowExerciseModal(false)
+        setSelectedExercise(null)
+      }
+    } catch (error) {
+      console.error("Error saving exercise:", error)
+    }
   }
 
   const handleDeleteExercise = async (exerciseId: string) => {
@@ -425,7 +498,8 @@ export default function ExercisesPage() {
                     </label>
                     <input
                       type="text"
-                      defaultValue={selectedExercise?.name || ""}
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -434,7 +508,8 @@ export default function ExercisesPage() {
                       Tipo
                     </label>
                     <select
-                      defaultValue={selectedExercise?.type || "STRENGTH"}
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value as ExerciseType })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     >
                       <option value="STRENGTH">Fuerza</option>
@@ -450,7 +525,8 @@ export default function ExercisesPage() {
                     Descripción
                   </label>
                   <textarea
-                    defaultValue={selectedExercise?.description || ""}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   />
@@ -462,7 +538,8 @@ export default function ExercisesPage() {
                       Nivel
                     </label>
                     <select
-                      defaultValue={selectedExercise?.level || "BEGINNER"}
+                      value={formData.level}
+                      onChange={(e) => setFormData({ ...formData, level: e.target.value as UserLevel })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     >
                       <option value="BEGINNER">Principiante</option>
@@ -475,7 +552,8 @@ export default function ExercisesPage() {
                       Intensidad
                     </label>
                     <select
-                      defaultValue={selectedExercise?.intensity || "LOW"}
+                      value={formData.intensity}
+                      onChange={(e) => setFormData({ ...formData, intensity: e.target.value as IntensityLevel })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     >
                       <option value="LOW">Baja</option>
@@ -490,7 +568,8 @@ export default function ExercisesPage() {
                     Técnica
                   </label>
                   <textarea
-                    defaultValue={selectedExercise?.technique || ""}
+                    value={formData.technique}
+                    onChange={(e) => setFormData({ ...formData, technique: e.target.value })}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     placeholder="Instrucciones técnicas del ejercicio..."
@@ -504,7 +583,8 @@ export default function ExercisesPage() {
                     </label>
                     <input
                       type="url"
-                      defaultValue={selectedExercise?.videoUrl || ""}
+                      value={formData.videoUrl}
+                      onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -514,7 +594,8 @@ export default function ExercisesPage() {
                     </label>
                     <input
                       type="url"
-                      defaultValue={selectedExercise?.imageUrl || ""}
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -526,7 +607,8 @@ export default function ExercisesPage() {
                   </label>
                   <input
                     type="text"
-                    defaultValue={selectedExercise?.targetMuscles.join(", ") || ""}
+                    value={formData.targetMuscles}
+                    onChange={(e) => setFormData({ ...formData, targetMuscles: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     placeholder="Pecho, Tríceps, Hombros..."
                   />
@@ -540,7 +622,10 @@ export default function ExercisesPage() {
                 >
                   Cancelar
                 </button>
-                <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
+                <button 
+                  onClick={handleUpdateExercise}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                >
                   {isEditing ? "Actualizar" : "Crear"} Ejercicio
                 </button>
               </div>
