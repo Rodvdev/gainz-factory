@@ -160,14 +160,16 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top Navigation Bar */}
-        <TopNavBar 
-          user={user}
-          onMenuToggle={() => setSidebarOpen(true)}
-          showMenuButton={true}
-        />
+        <div className="sticky top-0 z-50">
+          <TopNavBar 
+            user={user}
+            onMenuToggle={() => setSidebarOpen(true)}
+            showMenuButton={true}
+          />
+        </div>
 
         {/* Page content */}
-        <main className="min-h-screen">
+        <main className="min-h-screen relative z-10">
           {children}
         </main>
       </div>
