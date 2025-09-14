@@ -8,9 +8,7 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye,
   Users,
-  Clock,
   Target,
   CheckCircle,
   X
@@ -23,7 +21,7 @@ interface DailyTask {
   taskType: TaskType
   title: string
   description?: string
-  taskData?: any
+  taskData?: Record<string, unknown>
   isRequired: boolean
   estimatedDuration?: number
   order: number
@@ -92,7 +90,7 @@ export default function ProgrammesPage() {
         taskType: TaskType
         title: string
         description: string
-        taskData: any
+        taskData: Record<string, unknown>
         isRequired: boolean
         estimatedDuration: number
         order: number
@@ -161,7 +159,7 @@ export default function ProgrammesPage() {
       level: programme.level || "BEGINNER",
       duration: programme.duration || 4,
       isPublic: programme.isPublic,
-      autoStart: (programme as any).autoStart || false,
+      autoStart: (programme as Programme & { autoStart?: boolean }).autoStart || false,
       weeklyPlans: programme.weeklyPlans.map(plan => ({
         weekNumber: plan.weekNumber,
         title: plan.title || "",

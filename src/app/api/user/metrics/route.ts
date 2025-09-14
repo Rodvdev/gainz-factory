@@ -129,3 +129,49 @@ export async function GET(request: NextRequest) {
     await prisma.$disconnect()
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get("authorization")
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+
+    const token = authHeader.substring(7)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+    
+    const body = await request.json()
+    const {
+      type,
+      value,
+      unit,
+      date,
+      notes,
+      photoUrl
+    } = body
+
+    // Crear nueva métrica
+    const newMetric = await prisma.progressMetrics.create({
+      data: {
+        userId: decoded.userId,
+        metricType: type,
+        value,
+        unit,
+        date: new Date(date),
+        notes,
+        photoUrl
+      }
+    })
+
+    return NextResponse.json({ metric: newMetric }, { status: 201 })
+
+  } catch (error) {
+    console.error("Error creating metric:", error)
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    )
+  } finally {
+    await prisma.$disconnect()
+  }
+}

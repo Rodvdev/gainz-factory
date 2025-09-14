@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Transformar datos para el dashboard
-    const programmes = userProgrammes.map(up => {
+    const programmes = userProgrammes.map((up) => {
       const programme = up.programme
       
       // Calcular semana actual basada en startDate

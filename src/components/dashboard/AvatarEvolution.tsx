@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Crown, Star, Zap, Flame, Target, Trophy } from "lucide-react"
+import { Zap, Trophy } from "lucide-react"
 
 interface AvatarEvolutionProps {
   level: number
@@ -83,7 +83,6 @@ export default function AvatarEvolution({ level, totalPoints, currentStreak, isA
   const currentAvatar = getCurrentAvatar(level)
   const nextAvatar = getNextAvatar(level)
   const progress = Math.min((totalPoints / nextAvatar.requirements.points) * 100, 100)
-  const streakProgress = Math.min((currentStreak / nextAvatar.requirements.streak) * 100, 100)
   
   const canEvolve = totalPoints >= nextAvatar.requirements.points && currentStreak >= nextAvatar.requirements.streak && level < 7
 

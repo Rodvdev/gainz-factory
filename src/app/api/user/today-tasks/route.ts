@@ -80,9 +80,9 @@ export async function GET(request: NextRequest) {
       // Buscar tareas para hoy en la semana actual
       const currentWeekPlan = programme.weeklyPlans.find(wp => wp.weekNumber === currentWeek)
       if (currentWeekPlan) {
-        const todayTasksFromPlan = currentWeekPlan.dailyTasks.filter(task => task.dayOfWeek === todayWeekDay)
+        const todayTasksFromPlan = currentWeekPlan.dailyTasks.filter((task: any) => task.dayOfWeek === todayWeekDay)
         
-        for (const task of todayTasksFromPlan) {
+        for (const task of todayTasksFromPlan as any[]) {
           // Verificar si ya está completada
           const isCompleted = await prisma.taskSubmission.findUnique({
             where: {
