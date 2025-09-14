@@ -28,7 +28,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Usuarios", href: "/admin/users", icon: Users },
   { name: "Ejercicios", href: "/admin/exercises", icon: Dumbbell },
-  { name: "Rutinas", href: "/admin/workouts", icon: Activity },
+  { name: "Rutinas", href: "/admin/routines", icon: Activity },
   { name: "Recetas", href: "/admin/recipes", icon: ChefHat },
   { name: "Contenido", href: "/admin/content", icon: FileText },
   { name: "Blog", href: "/admin/blog", icon: BookOpen },

@@ -266,6 +266,13 @@ export default function AdminDashboard() {
             <FileText className="w-6 h-6 text-red-600 mx-auto mb-2" />
             <p className="text-sm font-medium text-gray-900">Contenido</p>
           </a>
+          <a
+            href="/admin/routines"
+            className="p-4 bg-white rounded-lg border border-gray-200 hover:border-red-300 hover:shadow-md transition-all text-center"
+          >
+            <Activity className="w-6 h-6 text-red-600 mx-auto mb-2" />
+            <p className="text-sm font-medium text-gray-900">Rutinas</p>
+          </a>
         </div>
       </motion.div>
     </div>
