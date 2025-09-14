@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import { CalendarEventUnion } from "@/types/calendar"
 
 export async function GET(request: NextRequest) {
   try {
@@ -107,7 +108,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Convertir todos los eventos a un formato estándar
-    const events = []
+    const events: CalendarEventUnion[] = []
 
     // Eventos del calendario principal
     calendarEvents.forEach(event => {
