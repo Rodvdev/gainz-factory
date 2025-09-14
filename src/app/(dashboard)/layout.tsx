@@ -18,6 +18,7 @@ import {
   DocumentTextIcon
 } from "@heroicons/react/24/outline"
 import { cn } from "@/utilities/ui"
+import TopNavBar from "@/components/dashboard/TopNavBar"
 
 interface User {
   id: string
@@ -97,14 +98,14 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50/50 to-gray-100/50">
       {/* Mobile sidebar */}
       <div className={cn(
         "fixed inset-0 z-50 lg:hidden",
         sidebarOpen ? "block" : "hidden"
       )}>
-        <div className="fixed inset-0 bg-gray-900/50" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed top-0 left-0 bottom-0 w-64 bg-gray-900 border-r border-gray-800">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed top-0 left-0 bottom-0 w-64 bg-white border-r-2 border-gray-200 shadow-2xl">
           <SidebarContent 
             user={user} 
             navigation={navigation} 
@@ -117,7 +118,7 @@ export default function DashboardLayout({
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex-1 bg-gray-900 border-r border-gray-800">
+        <div className="flex-1 bg-white border-r-2 border-gray-200 shadow-lg">
           <SidebarContent 
             user={user} 
             navigation={navigation} 
@@ -129,26 +130,12 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="lg:pl-64">
-        {/* Top header for mobile */}
-        <div className="lg:hidden bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between">
-          <button
-            type="button"
-            className="text-white hover:text-gray-300"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Bars3Icon className="h-6 w-6" />
-          </button>
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <Image
-              src="/logo.jpeg"
-              alt="Gainz Factory"
-              width={32}
-              height={32}
-              className="rounded-full"
-            />
-            <span className="text-white font-bold">GAINZ FACTORY</span>
-          </Link>
-        </div>
+        {/* Top Navigation Bar */}
+        <TopNavBar 
+          user={user}
+          onMenuToggle={() => setSidebarOpen(true)}
+          showMenuButton={true}
+        />
 
         {/* Page content */}
         <main className="min-h-screen">
@@ -175,25 +162,25 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-6 border-b border-gray-800">
+      <div className="p-6 border-b-2 border-gray-200">
         <div className="flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-3" onClick={onClose}>
+          <Link href="/dashboard" className="flex items-center gap-3 group" onClick={onClose}>
             <Image
               src="/logo.jpeg"
               alt="Gainz Factory"
               width={40}
               height={40}
-              className="rounded-full"
+              className="rounded-full group-hover:scale-105 transition-transform duration-200"
             />
-            <div className="text-white">
-              <div className="font-bold text-lg">GAINZ</div>
-              <div className="text-red-500 text-sm font-semibold">FACTORY</div>
+            <div className="text-gray-900">
+              <div className="font-bold text-lg group-hover:text-red-600 transition-colors duration-200">GAINZ</div>
+              <div className="text-red-600 text-sm font-semibold -mt-1">FACTORY</div>
             </div>
           </Link>
           {onClose && (
             <button
               type="button"
-              className="lg:hidden text-gray-400 hover:text-white"
+              className="lg:hidden text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
               onClick={onClose}
             >
               <XMarkIcon className="h-6 w-6" />
@@ -203,26 +190,26 @@ function SidebarContent({
       </div>
 
       {/* User info */}
-      <div className="p-6 border-b border-gray-800">
+      <div className="p-6 border-b-2 border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
             {user.profileImageUrl ? (
               <Image
                 src={user.profileImageUrl}
                 alt={user.firstName}
-                width={40}
-                height={40}
+                width={48}
+                height={48}
                 className="rounded-full"
               />
             ) : (
-              <span className="text-white font-bold">
+              <span className="text-red-600 font-bold text-lg">
                 {user.firstName[0]}{user.lastName[0]}
               </span>
             )}
           </div>
-          <div className="text-white">
-            <div className="font-semibold">{user.firstName} {user.lastName}</div>
-            <div className="text-sm text-gray-400">{user.email}</div>
+          <div className="text-gray-900">
+            <div className="font-semibold text-base">{user.firstName} {user.lastName}</div>
+            <div className="text-sm text-gray-600">{user.email}</div>
           </div>
         </div>
       </div>
@@ -237,13 +224,16 @@ function SidebarContent({
               href={item.href}
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group",
                 isActive 
-                  ? "bg-red-500 text-white" 
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  ? "bg-red-600 text-white shadow-lg" 
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               )}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className={cn(
+                "h-5 w-5 transition-colors duration-200",
+                isActive ? "text-white" : "text-gray-500 group-hover:text-gray-700"
+              )} />
               {item.name}
             </Link>
           )
@@ -251,12 +241,12 @@ function SidebarContent({
       </nav>
 
       {/* Logout */}
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t-2 border-gray-200">
         <button
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group"
         >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-5 w-5 group-hover:text-red-600 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           Cerrar Sesión

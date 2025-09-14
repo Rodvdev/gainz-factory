@@ -163,87 +163,100 @@ export default function ChallengesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50/50 to-gray-100/50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Desafíos</h1>
-          <p className="text-gray-400">Supera tus límites con desafíos personalizados</p>
+        <div className="mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-3 leading-tight">
+            Desafíos
+            <span className="bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent">
+              {" "}Personales
+            </span>
+          </h1>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            Supera tus límites con desafíos personalizados y alcanza tus objetivos
+          </p>
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Total Desafíos</p>
-                <p className="text-2xl font-bold text-white">{stats.total}</p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-yellow-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <TrophyIcon className="h-6 w-6 text-yellow-600" />
               </div>
-              <TrophyIcon className="h-8 w-8 text-yellow-500" />
+              <p className="text-gray-600 text-sm font-medium">Total Desafíos</p>
             </div>
+            <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Activos</p>
-                <p className="text-2xl font-bold text-blue-500">{stats.active}</p>
+          <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-blue-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <CalendarIcon className="h-6 w-6 text-blue-600" />
               </div>
-              <CalendarIcon className="h-8 w-8 text-blue-500" />
+              <p className="text-gray-600 text-sm font-medium">Activos</p>
             </div>
+            <p className="text-3xl font-bold text-blue-600">{stats.active}</p>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Completados</p>
-                <p className="text-2xl font-bold text-green-500">{stats.completed}</p>
+          <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-green-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <span className="text-green-600 text-lg">✓</span>
               </div>
-              <span className="text-green-500 text-2xl">✓</span>
+              <p className="text-gray-600 text-sm font-medium">Completados</p>
             </div>
+            <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Tasa de Éxito</p>
-                <p className="text-2xl font-bold text-purple-500">{stats.completionRate}%</p>
+          <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-purple-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <span className="text-purple-600 text-lg">📊</span>
               </div>
-              <span className="text-purple-500 text-2xl">📊</span>
+              <p className="text-gray-600 text-sm font-medium">Tasa de Éxito</p>
             </div>
+            <p className="text-3xl font-bold text-purple-600">{stats.completionRate}%</p>
           </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="mb-8">
-          <div className="flex gap-4">
-            {[
-              { key: 'active', label: 'Activos', count: stats.active },
-              { key: 'completed', label: 'Completados', count: stats.completed },
-              { key: 'all', label: 'Todos', count: stats.total }
-            ].map((filter) => (
-              <button
-                key={filter.key}
-                onClick={() => setActiveFilter(filter.key as typeof activeFilter)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-                  activeFilter === filter.key
-                    ? 'bg-red-500 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                <span>{filter.label}</span>
-                <span className="bg-white/20 px-2 py-1 rounded-full text-xs">
-                  {filter.count}
-                </span>
-              </button>
-            ))}
+        <div className="mb-12">
+          <div className="bg-white backdrop-blur-sm border-2 border-gray-200 rounded-2xl p-6 shadow-lg">
+            <div className="flex flex-wrap gap-3">
+              {[
+                { key: 'active', label: 'Activos', count: stats.active },
+                { key: 'completed', label: 'Completados', count: stats.completed },
+                { key: 'all', label: 'Todos', count: stats.total }
+              ].map((filter) => (
+                <button
+                  key={filter.key}
+                  onClick={() => setActiveFilter(filter.key as typeof activeFilter)}
+                  className={`group flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    activeFilter === filter.key
+                      ? 'bg-red-600 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900'
+                  }`}
+                >
+                  <span>{filter.label}</span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                    activeFilter === filter.key
+                      ? 'bg-white/20'
+                      : 'bg-gray-200 group-hover:bg-gray-300'
+                  }`}>
+                    {filter.count}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Challenges List */}
           <div className="xl:col-span-2">
-            <h2 className="text-xl font-bold mb-6">Mis Desafíos</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">Mis Desafíos</h2>
             <div className="space-y-6">
               {filteredChallenges.length > 0 ? (
                 filteredChallenges.map((challenge) => (
@@ -253,17 +266,19 @@ export default function ChallengesPage() {
                   />
                 ))
               ) : (
-                <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center">
-                  <TrophyIcon className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-medium text-gray-300 mb-2">
+                <div className="bg-white backdrop-blur-sm border-2 border-gray-200 rounded-2xl p-12 text-center shadow-lg">
+                  <div className="p-4 bg-gray-100 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                    <TrophyIcon className="h-12 w-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
                     No hay desafíos {activeFilter === 'active' ? 'activos' : activeFilter === 'completed' ? 'completados' : ''}
                   </h3>
-                  <p className="text-gray-400 mb-6">
+                  <p className="text-gray-600 mb-8 leading-relaxed">
                     {activeFilter === 'active' && "Crea un nuevo desafío para comenzar tu próximo objetivo"}
                     {activeFilter === 'completed' && "Completa algunos desafíos para ver tus logros aquí"}
                     {activeFilter === 'all' && "Crea tu primer desafío para empezar"}
                   </p>
-                  <button className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                  <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                     Crear Desafío
                   </button>
                 </div>
