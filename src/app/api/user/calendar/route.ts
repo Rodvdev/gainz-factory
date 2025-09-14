@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authConfig } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authConfig)
-    if (!session?.user?.id) {
+    const user = await getCurrentUser()
+    if (!user?.id) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
@@ -18,7 +17,7 @@ export async function GET(request: NextRequest) {
     const startDate = new Date(year, month - 1, 1)
     const endDate = new Date(year, month, 0, 23, 59, 59)
 
-    const userId = session.user.id
+    const userId = user.id
 
     // Obtener eventos principales del calendario
     const calendarEvents = await prisma.calendarEvent.findMany({

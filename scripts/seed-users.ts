@@ -165,6 +165,9 @@ async function seedUsers() {
         await prisma.habit.create({
           data: {
             ...habitData,
+            category: habitData.category as any, // Cast to HabitCategory enum
+            frequency: habitData.frequency as any, // Cast to HabitFrequency enum
+            trackingType: habitData.trackingType as any, // Cast to HabitTrackingType enum
             userId: user.id
           }
         })

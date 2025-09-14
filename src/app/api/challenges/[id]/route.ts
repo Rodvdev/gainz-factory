@@ -4,7 +4,7 @@ import { getAuthenticatedUser } from "@/lib/auth-middleware"
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get authenticated user
@@ -16,7 +16,7 @@ export async function PATCH(
       )
     }
 
-    const challengeId = params.id
+    const { id: challengeId } = await params
     const body = await request.json()
     const { currentValue } = body
 
@@ -89,7 +89,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get authenticated user
@@ -101,7 +101,7 @@ export async function DELETE(
       )
     }
 
-    const challengeId = params.id
+    const { id: challengeId } = await params
 
     // Find the challenge
     const existingChallenge = await db.challenge.findFirst({

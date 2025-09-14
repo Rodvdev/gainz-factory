@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 // GET - Get specific forum
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -16,8 +16,9 @@ export async function GET(
       )
     }
 
+    const { id } = await params
     const forum = await db.forum.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         topics: {
           include: {
@@ -68,7 +69,7 @@ export async function GET(
 // PUT - Update forum
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -79,6 +80,7 @@ export async function PUT(
       )
     }
 
+    const { id } = await params
     const body = await request.json()
     const { name, description, icon, color, isActive, order } = body
 
@@ -99,7 +101,7 @@ export async function PUT(
       .trim()
 
     const forum = await db.forum.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         slug,
@@ -125,7 +127,7 @@ export async function PUT(
 // DELETE - Delete forum
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -136,9 +138,10 @@ export async function DELETE(
       )
     }
 
+    const { id } = await params
     // Check if forum has topics
     const forumWithTopics = await db.forum.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -163,7 +166,7 @@ export async function DELETE(
     }
 
     await db.forum.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Foro eliminado correctamente" })
