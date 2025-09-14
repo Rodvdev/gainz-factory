@@ -82,8 +82,8 @@ export default function CreateModal({
       }
       
       // Custom validation
-      if (field.validation && value) {
-        const error = field.validation(value)
+      if (field.validation && value && typeof value !== 'object') {
+        const error = field.validation(value as string | number | boolean)
         if (error) {
           newErrors[field.name] = error
         }
