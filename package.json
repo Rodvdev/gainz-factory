@@ -9,6 +9,7 @@
     "lint": "next lint",
     "db:seed": "tsx scripts/seed.ts",
     "db:seed-admin": "tsx scripts/seed-admin.ts",
+    "db:seed-users": "tsx scripts/seed-users.ts",
     "db:seed-recipes": "tsx scripts/seed-recipes.ts",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
