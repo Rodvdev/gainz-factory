@@ -25,6 +25,7 @@ interface User {
   firstName: string
   lastName: string
   profileImageUrl?: string
+  role?: string
 }
 
 type NavigationItem = {

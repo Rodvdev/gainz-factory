@@ -7,7 +7,8 @@ import {
   MagnifyingGlassIcon, 
   UserIcon,
   CogIcon,
-  Bars3Icon
+  Bars3Icon,
+  ShieldCheckIcon
 } from "@heroicons/react/24/outline"
 
 interface User {
@@ -16,6 +17,7 @@ interface User {
   firstName: string
   lastName: string
   profileImageUrl?: string
+  role?: string
 }
 
 interface TopNavBarProps {
@@ -137,7 +139,7 @@ export default function TopNavBar({
 
               {/* Dropdown menu */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl border-2 border-gray-200 shadow-2xl z-50">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl border-2 border-gray-200 shadow-2xl z-[9998]">
                   <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
@@ -181,6 +183,16 @@ export default function TopNavBar({
                       <CogIcon className="h-5 w-5" />
                       Configuración
                     </Link>
+                    {user.role === 'ADMIN' && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200 border-l-2 border-red-200"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <ShieldCheckIcon className="h-5 w-5" />
+                        Panel de Administración
+                      </Link>
+                    )}
                   </div>
                   
                   <div className="p-2 border-t border-gray-200">

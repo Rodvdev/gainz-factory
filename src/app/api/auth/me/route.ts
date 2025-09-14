@@ -21,7 +21,8 @@ export async function GET(request: NextRequest) {
       fitnessLevel: user.fitnessLevel,
       primaryGoals: user.primaryGoals,
       bio: user.bio,
-      profileImageUrl: user.profileImageUrl
+      profileImageUrl: user.profileImageUrl,
+      role: user.role
     })
     
   } catch (error) {

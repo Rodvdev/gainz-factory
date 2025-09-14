@@ -16,7 +16,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full fixed top-0 left-0 right-0 z-50 p-4">
+    <header className="w-full fixed top-0 left-0 right-0 z-[9999] p-4">
   <div className="max-w-6xl mx-auto">
      <div className="bg-gray-100/90 backdrop-blur-xl border border-gray-200 rounded-[3rem] shadow-2xl">
       <div className="px-0">
