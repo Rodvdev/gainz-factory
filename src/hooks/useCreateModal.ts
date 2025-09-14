@@ -42,7 +42,7 @@ export function useCreateModal() {
               type: 'text',
               placeholder: 'Ej: Ejercicio matutino',
               required: true,
-              validation: (value) => value.length < 3 ? 'El nombre debe tener al menos 3 caracteres' : null
+              validation: (value) => typeof value === 'string' && value.length < 3 ? 'El nombre debe tener al menos 3 caracteres' : null
             },
             {
               name: 'description',
@@ -110,7 +110,7 @@ export function useCreateModal() {
               type: 'text',
               placeholder: 'Ej: 30 días de ejercicio',
               required: true,
-              validation: (value) => value.length < 3 ? 'El nombre debe tener al menos 3 caracteres' : null
+              validation: (value) => typeof value === 'string' && value.length < 3 ? 'El nombre debe tener al menos 3 caracteres' : null
             },
             {
               name: 'description',
@@ -162,7 +162,7 @@ export function useCreateModal() {
               type: 'text',
               placeholder: 'Ej: Batido Proteico Post-Entreno',
               required: true,
-              validation: (value) => value.length < 3 ? 'El título debe tener al menos 3 caracteres' : null
+              validation: (value) => typeof value === 'string' && value.length < 3 ? 'El título debe tener al menos 3 caracteres' : null
             },
             {
               name: 'description',
@@ -215,7 +215,7 @@ export function useCreateModal() {
               type: 'text',
               placeholder: 'Ej: Press de Banca',
               required: true,
-              validation: (value) => value.length < 3 ? 'El nombre debe tener al menos 3 caracteres' : null
+              validation: (value) => typeof value === 'string' && value.length < 3 ? 'El nombre debe tener al menos 3 caracteres' : null
             },
             {
               name: 'description',
@@ -281,7 +281,7 @@ export function useCreateModal() {
               type: 'text',
               placeholder: 'Ej: Rutina de Fuerza Superior',
               required: true,
-              validation: (value) => value.length < 3 ? 'El título debe tener al menos 3 caracteres' : null
+              validation: (value) => typeof value === 'string' && value.length < 3 ? 'El título debe tener al menos 3 caracteres' : null
             },
             {
               name: 'objective',
@@ -330,7 +330,7 @@ export function useCreateModal() {
               type: 'text',
               placeholder: 'Ej: Ganar 5kg de músculo',
               required: true,
-              validation: (value) => value.length < 3 ? 'La meta debe tener al menos 3 caracteres' : null
+              validation: (value) => typeof value === 'string' && value.length < 3 ? 'La meta debe tener al menos 3 caracteres' : null
             },
             {
               name: 'targetDate',
