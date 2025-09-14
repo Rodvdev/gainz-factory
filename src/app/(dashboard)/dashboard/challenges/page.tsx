@@ -1,58 +1,42 @@
 "use client"
 import { useState } from "react"
 import { HabitCategory } from "@prisma/client"
-import { PlusIcon, TrophyIcon, CalendarIcon } from "@heroicons/react/24/outline"
+import { PlusIcon, TrophyIcon, CalendarIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline"
 import ChallengeCard from "@/components/challenges/ChallengeCard"
 import CreateModal from "@/components/dashboard/CreateModal"
 import { useCreateModal } from "@/hooks/useCreateModal"
-
-interface Challenge {
-  id: string
-  userId: string
-  name: string
-  description?: string
-  category?: HabitCategory
-  startDate: string
-  endDate: string
-  targetValue: number
-  currentValue: number
-  isCompleted: boolean
-  reward?: string
-}
+import { useChallenges, type CreateChallengeData } from "@/hooks/useChallenges"
 
 export default function ChallengesPage() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'completed'>('active')
   
   // Modal hook
   const { isOpen, modalType, loading: modalLoading, openModal, closeModal, setLoading: setModalLoading, getModalConfig } = useCreateModal()
+  
+  // Challenges hook
+  const { 
+    challenges, 
+    loading: challengesLoading, 
+    error: challengesError, 
+    createChallenge, 
+    updateChallengeProgress 
+  } = useChallenges(activeFilter)
 
   const handleCreateChallenge = async (data: Record<string, string | number | boolean | File | null>) => {
     try {
       setModalLoading(true)
-      const token = localStorage.getItem("authToken")
       
-      const response = await fetch("/api/challenges", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          name: data.name,
-          description: data.description,
-          targetValue: data.targetValue,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          reward: data.reward
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error("Error al crear el desafío")
+      const challengeData: CreateChallengeData = {
+        name: data.name as string,
+        description: data.description as string,
+        category: data.category as HabitCategory,
+        targetValue: data.targetValue as number,
+        startDate: data.startDate as string,
+        endDate: data.endDate as string,
+        reward: data.reward as string
       }
 
-      // Refresh challenges list
-      window.location.reload()
+      await createChallenge(challengeData)
       closeModal()
     } catch (error) {
       console.error("Error creating challenge:", error)
@@ -62,81 +46,23 @@ export default function ChallengesPage() {
     }
   }
 
-  // Sample data - will be replaced with real data
-  const sampleChallenges: Challenge[] = [
-    {
-      id: "1",
-      userId: "user-1",
-      name: "30 Días de Meditación",
-      description: "Medita al menos 10 minutos cada día durante 30 días consecutivos para desarrollar el hábito de mindfulness",
-      category: HabitCategory.MORNING_ROUTINE,
-      startDate: "2024-01-01",
-      endDate: "2024-01-30",
-      targetValue: 30,
-      currentValue: 21,
-      isCompleted: false,
-      reward: "🏆 Insignia de Mindfulness Master + 100 puntos bonus"
-    },
-    {
-      id: "2",
-      userId: "user-1",
-      name: "Semana de Fuerza",
-      description: "Completa 5 entrenamientos de fuerza esta semana para construir músculo y resistencia",
-      category: HabitCategory.PHYSICAL_TRAINING,
-      startDate: "2024-01-15",
-      endDate: "2024-01-21",
-      targetValue: 5,
-      currentValue: 3,
-      isCompleted: false,
-      reward: "💪 Insignia de Guerrero + 50 puntos"
-    },
-    {
-      id: "3",
-      userId: "user-1",
-      name: "14 Días de Lectura",
-      description: "Lee al menos 30 páginas cada día durante 2 semanas para expandir tu conocimiento",
-      category: HabitCategory.PERSONAL_DEVELOPMENT,
-      startDate: "2024-01-01",
-      endDate: "2024-01-14",
-      targetValue: 14,
-      currentValue: 14,
-      isCompleted: true,
-      reward: "📚 Insignia de Sabio + 75 puntos"
-    },
-    {
-      id: "4",
-      userId: "user-1",
-      name: "Hidratación Perfecta",
-      description: "Bebe 8 vasos de agua cada día durante una semana completa",
-      category: HabitCategory.NUTRITION,
-      startDate: "2024-01-10",
-      endDate: "2024-01-16",
-      targetValue: 7,
-      currentValue: 7,
-      isCompleted: true,
-      reward: "💧 Insignia de Hidratación + 30 puntos"
-    },
-    {
-      id: "5",
-      userId: "user-1",
-      name: "Trabajo Profundo",
-      description: "Dedica 2 horas de trabajo profundo sin distracciones durante 10 días",
-      category: HabitCategory.DEEP_WORK,
-      startDate: "2024-01-18",
-      endDate: "2024-01-27",
-      targetValue: 10,
-      currentValue: 2,
-      isCompleted: false,
-      reward: "🎯 Insignia de Concentración + 80 puntos"
+  const handleUpdateProgress = async (challengeId: string, progress: number) => {
+    try {
+      await updateChallengeProgress(challengeId, progress)
+    } catch (error) {
+      console.error("Error updating challenge progress:", error)
     }
-  ]
+  }
 
-  const filteredChallenges = sampleChallenges.filter(challenge => {
-    if (activeFilter === 'all') return true
-    if (activeFilter === 'active') return !challenge.isCompleted
-    if (activeFilter === 'completed') return challenge.isCompleted
-    return true
-  })
+  // Calculate stats from real data
+  const stats = {
+    total: challenges.length,
+    active: challenges.filter(c => !c.isCompleted).length,
+    completed: challenges.filter(c => c.isCompleted).length,
+    completionRate: challenges.length > 0 
+      ? Math.round((challenges.filter(c => c.isCompleted).length / challenges.length) * 100)
+      : 0
+  }
 
   const challengeTemplates = [
     {
@@ -196,12 +122,6 @@ export default function ChallengesPage() {
     }
   }
 
-  const stats = {
-    total: sampleChallenges.length,
-    active: sampleChallenges.filter(c => !c.isCompleted).length,
-    completed: sampleChallenges.filter(c => c.isCompleted).length,
-    completionRate: Math.round((sampleChallenges.filter(c => c.isCompleted).length / sampleChallenges.length) * 100)
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50/50 to-gray-100/50">
@@ -219,6 +139,19 @@ export default function ChallengesPage() {
           </p>
         </div>
 
+        {/* Error Message */}
+        {challengesError && (
+          <div className="mb-8 bg-red-50 border border-red-200 rounded-2xl p-6">
+            <div className="flex items-center gap-3">
+              <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
+              <div>
+                <h3 className="font-semibold text-red-800">Error al cargar desafíos</h3>
+                <p className="text-red-600 text-sm">{challengesError}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-yellow-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
@@ -228,7 +161,9 @@ export default function ChallengesPage() {
               </div>
               <p className="text-gray-600 text-sm font-medium">Total Desafíos</p>
             </div>
-            <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+            <p className="text-3xl font-bold text-gray-900">
+              {challengesLoading ? "..." : stats.total}
+            </p>
           </div>
 
           <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-blue-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
@@ -238,7 +173,9 @@ export default function ChallengesPage() {
               </div>
               <p className="text-gray-600 text-sm font-medium">Activos</p>
             </div>
-            <p className="text-3xl font-bold text-blue-600">{stats.active}</p>
+            <p className="text-3xl font-bold text-blue-600">
+              {challengesLoading ? "..." : stats.active}
+            </p>
           </div>
 
           <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-green-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
@@ -248,7 +185,9 @@ export default function ChallengesPage() {
               </div>
               <p className="text-gray-600 text-sm font-medium">Completados</p>
             </div>
-            <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
+            <p className="text-3xl font-bold text-green-600">
+              {challengesLoading ? "..." : stats.completed}
+            </p>
           </div>
 
           <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-purple-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
@@ -258,7 +197,9 @@ export default function ChallengesPage() {
               </div>
               <p className="text-gray-600 text-sm font-medium">Tasa de Éxito</p>
             </div>
-            <p className="text-3xl font-bold text-purple-600">{stats.completionRate}%</p>
+            <p className="text-3xl font-bold text-purple-600">
+              {challengesLoading ? "..." : `${stats.completionRate}%`}
+            </p>
           </div>
         </div>
 
@@ -299,11 +240,22 @@ export default function ChallengesPage() {
           <div className="xl:col-span-2">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Mis Desafíos</h2>
             <div className="space-y-6">
-              {filteredChallenges.length > 0 ? (
-                filteredChallenges.map((challenge) => (
+              {challengesLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-gray-200 rounded-xl p-6 animate-pulse">
+                      <div className="h-4 bg-gray-300 rounded w-1/3 mb-4"></div>
+                      <div className="h-3 bg-gray-300 rounded w-2/3 mb-2"></div>
+                      <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : challenges.length > 0 ? (
+                challenges.map((challenge) => (
                   <ChallengeCard 
                     key={challenge.id} 
                     challenge={challenge}
+                    onUpdate={handleUpdateProgress}
                   />
                 ))
               ) : (

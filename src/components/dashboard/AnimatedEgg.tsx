@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 
 interface AnimatedEggProps {
   currentLevel: number
-  totalXP: number
   nextLevelXP: number
   currentLevelXP: number
   isActive?: boolean
@@ -23,7 +22,6 @@ interface EggState {
 
 export default function AnimatedEgg({ 
   currentLevel, 
-  totalXP, 
   nextLevelXP, 
   currentLevelXP,
   isActive = false,
@@ -43,32 +41,32 @@ export default function AnimatedEgg({
   // Calcular el progreso hacia el siguiente nivel
   const progress = nextLevelXP > 0 ? (currentLevelXP / nextLevelXP) * 100 : 0
   
-  // Determinar el tamaño del huevo basado en el nivel y progreso
-  const calculateEggSize = () => {
-    const baseSize = 1 + (currentLevel - 1) * 0.15 // Crece 15% por nivel
-    const progressBonus = (progress / 100) * 0.1 // Bonus del 10% basado en progreso
-    return Math.min(baseSize + progressBonus, 2.5) // Máximo 2.5x
-  }
-
-  // Determinar el color del huevo basado en el nivel
-  const getEggColor = () => {
-    if (currentLevel <= 2) return "#FFE4B5" // Beige claro
-    if (currentLevel <= 4) return "#FFD700" // Dorado
-    if (currentLevel <= 6) return "#FFA500" // Naranja
-    return "#FF6347" // Tomate
-  }
-
-  // Determinar la expresión del huevo
-  const getEggExpression = () => {
-    if (progress >= 90) return "excited"
-    if (progress >= 70) return "happy"
-    if (progress >= 40) return "neutral"
-    if (progress >= 20) return "worried"
-    return "sleepy"
-  }
-
   // Efecto para actualizar el estado del huevo
   useEffect(() => {
+    // Determinar el tamaño del huevo basado en el nivel y progreso
+    const calculateEggSize = () => {
+      const baseSize = 1 + (currentLevel - 1) * 0.15 // Crece 15% por nivel
+      const progressBonus = (progress / 100) * 0.1 // Bonus del 10% basado en progreso
+      return Math.min(baseSize + progressBonus, 2.5) // Máximo 2.5x
+    }
+
+    // Determinar el color del huevo basado en el nivel
+    const getEggColor = () => {
+      if (currentLevel <= 2) return "#FFE4B5" // Beige claro
+      if (currentLevel <= 4) return "#FFD700" // Dorado
+      if (currentLevel <= 6) return "#FFA500" // Naranja
+      return "#FF6347" // Tomate
+    }
+
+    // Determinar la expresión del huevo
+    const getEggExpression = () => {
+      if (progress >= 90) return "excited"
+      if (progress >= 70) return "happy"
+      if (progress >= 40) return "neutral"
+      if (progress >= 20) return "worried"
+      return "sleepy"
+    }
+
     const newSize = calculateEggSize()
     const newColor = getEggColor()
     const newExpression = getEggExpression()
@@ -109,15 +107,6 @@ export default function AnimatedEgg({
   // Generar el SVG del huevo con diferentes expresiones
   const renderEggSVG = () => {
     const size = eggState.size * 60 // Tamaño base de 60px
-    const expressions = {
-      happy: { eyes: "😊", mouth: "happy" },
-      excited: { eyes: "🤩", mouth: "excited" },
-      neutral: { eyes: "😐", mouth: "neutral" },
-      worried: { eyes: "😟", mouth: "worried" },
-      sleepy: { eyes: "😴", mouth: "sleepy" }
-    }
-
-    const expression = expressions[eggState.expression as keyof typeof expressions] || expressions.neutral
 
     return (
       <motion.svg

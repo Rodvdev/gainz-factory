@@ -202,7 +202,6 @@ export default function TransformationOS() {
                 {userProgress?.currentLevel === 1 ? (
                   <AnimatedEgg
                     currentLevel={userProgress.currentLevel}
-                    totalXP={userProgress.totalXP}
                     nextLevelXP={userLevel?.nextLevelXP || 100}
                     currentLevelXP={userLevel?.userLevel?.currentLevelXP || 0}
                     isActive={true}

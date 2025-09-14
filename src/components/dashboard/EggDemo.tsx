@@ -40,7 +40,6 @@ export default function EggDemo() {
         {/* Huevo animado */}
         <AnimatedEgg
           currentLevel={currentLevel}
-          totalXP={totalXP}
           nextLevelXP={100}
           currentLevelXP={totalXP}
           isActive={true}
@@ -54,7 +53,7 @@ export default function EggDemo() {
               <strong>Nivel:</strong> {currentLevel} | <strong>XP:</strong> {totalXP}/100
             </p>
             <p className="text-xs text-gray-500">
-              Intentos: {attemptCount} | Toca el huevo 3 veces para ver la animación de "ilusionar"
+              Intentos: {attemptCount} | Toca el huevo 3 veces para ver la animación de &ldquo;ilusionar&rdquo;
             </p>
           </div>
           
@@ -79,7 +78,7 @@ export default function EggDemo() {
               <li>• El huevo crece según el nivel y progreso</li>
               <li>• Cambia de color según el nivel</li>
               <li>• Expresión facial según el progreso</li>
-              <li>• Animación de "ilusionar" al tercer intento</li>
+              <li>• Animación de &ldquo;ilusionar&rdquo; al tercer intento</li>
               <li>• Efectos visuales al crecer</li>
             </ul>
           </div>
