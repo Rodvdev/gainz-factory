@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
-import { Shield, Clock, Users, CheckCircle, Phone, MessageSquare } from "lucide-react";
+import { Shield, Phone } from "lucide-react";
 
 export default function PhysiotherapyPage() {
   return (

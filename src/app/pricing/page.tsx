@@ -128,7 +128,7 @@ export default function PricingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
+            {plans.map((plan) => (
               <div
                 key={plan.name}
                 className={`relative p-8 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${

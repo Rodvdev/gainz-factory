@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
-import { Apple, Clock, CheckCircle, Phone } from "lucide-react";
+import { Apple, Phone } from "lucide-react";
 
 export default function NutritionPage() {
   return (

@@ -1,11 +1,25 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
+interface User {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  isActive: boolean
+  emailVerified?: Date | null
+  personalManifesto?: string | null
+  fitnessLevel?: string | null
+  primaryGoals?: string[]
+  bio?: string | null
+  profileImageUrl?: string | null
+}
+
 interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   token: string | null
-  user: any | null
+  user: User | null
 }
 
 export function useOnboardingAuth() {

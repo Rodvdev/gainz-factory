@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
-import { Users, Clock, CheckCircle, Phone } from "lucide-react";
+import { Users, Phone } from "lucide-react";
 
 export default function FitnessStudiosPage() {
   return (

@@ -36,16 +36,17 @@ export async function GET(request: NextRequest) {
       where,
       include: {
         schedule: true,
-        habitStreak: {
+        streaks: {
           where: { isActive: true },
           orderBy: { length: 'desc' },
           take: 1
         },
-        habitLogs: {
+        entries: {
           where: {
             date: {
               gte: new Date(new Date().setHours(0, 0, 0, 0))
-            }
+            },
+            status: 'COMPLETED'
           },
           take: 1
         }
@@ -70,8 +71,8 @@ export async function GET(request: NextRequest) {
       icon: habit.icon,
       isActive: habit.isActive,
       order: habit.order,
-      currentStreak: habit.habitStreak[0]?.length || 0,
-      completedToday: habit.habitLogs.length > 0,
+      currentStreak: habit.streaks[0]?.length || 0,
+      completedToday: habit.entries.length > 0,
       schedule: habit.schedule,
       createdAt: habit.createdAt,
       updatedAt: habit.updatedAt

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
-import { Heart, Clock, Users, CheckCircle, Phone, MessageSquare } from "lucide-react";
+import { Heart, Clock, Users, CheckCircle, Phone } from "lucide-react";
 
 export default function YogaPilatesPage() {
   const features = [

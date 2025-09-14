@@ -38,38 +38,35 @@ export async function POST(
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    // Check if there's already a log for today
-    const existingLog = await db.habitLog.findFirst({
+    // Check if there's already an entry for today
+    const existingEntry = await db.habitEntry.findFirst({
       where: {
         habitId: habitId,
         date: today
       }
     })
 
-    let habitLog
+    let habitEntry
     let streakUpdate = null
 
     if (completed) {
-      if (existingLog) {
-        // Update existing log
-        habitLog = await db.habitLog.update({
-          where: { id: existingLog.id },
+      if (existingEntry) {
+        // Update existing entry
+        habitEntry = await db.habitEntry.update({
+          where: { id: existingEntry.id },
           data: {
-            completed: true,
-            value: value || 1,
-            completedAt: new Date()
+            status: 'COMPLETED',
+            value: value || 1
           }
         })
       } else {
-        // Create new log
-        habitLog = await db.habitLog.create({
+        // Create new entry
+        habitEntry = await db.habitEntry.create({
           data: {
             habitId: habitId,
-            userId: user.id,
             date: today,
-            completed: true,
-            value: value || 1,
-            completedAt: new Date()
+            status: 'COMPLETED',
+            value: value || 1
           }
         })
 
@@ -85,8 +82,7 @@ export async function POST(
           streakUpdate = await db.habitStreak.update({
             where: { id: currentStreak.id },
             data: {
-              length: currentStreak.length + 1,
-              lastCompletedDate: today
+              length: currentStreak.length + 1
             }
           })
         } else {
@@ -95,19 +91,18 @@ export async function POST(
               habitId: habitId,
               startDate: today,
               length: 1,
-              lastCompletedDate: today,
               isActive: true
             }
           })
         }
       }
     } else {
-      if (existingLog) {
-        // Delete existing log
-        await db.habitLog.delete({
-          where: { id: existingLog.id }
+      if (existingEntry) {
+        // Delete existing entry
+        await db.habitEntry.delete({
+          where: { id: existingEntry.id }
         })
-        habitLog = null
+        habitEntry = null
       }
     }
 

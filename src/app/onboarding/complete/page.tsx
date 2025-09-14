@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   Sparkles, 
-  CheckCircle, 
   ArrowRight,
   Target,
   Zap,
@@ -31,7 +29,6 @@ interface ConfettiParticle {
 export default function OnboardingComplete() {
   const [currentStep, setCurrentStep] = useState(0)
   const [confetti, setConfetti] = useState<ConfettiParticle[]>([])
-  const [userData, setUserData] = useState<any>(null)
   const router = useRouter()
 
   const steps = [
