@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import AdminSidebar from "@/components/admin/AdminSidebar"
-import AdminHeader from "@/components/admin/AdminHeader"
+import AdminTopNavBar from "@/components/admin/AdminTopNavBar"
 import { UserRole } from "@prisma/client"
 
 interface User {
@@ -93,10 +93,11 @@ export default function AdminLayout({
       
       {/* Main Content */}
       <div className="lg:pl-64">
-        {/* Header */}
-        <AdminHeader 
+        {/* Top Navigation Bar */}
+        <AdminTopNavBar 
           user={user}
-          onMenuClick={() => setSidebarOpen(true)}
+          onMenuToggle={() => setSidebarOpen(true)}
+          showMenuButton={true}
         />
         
         {/* Page Content */}

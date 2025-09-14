@@ -41,7 +41,7 @@ export default function TopNavBar({
   console.log('TopNavBar - User role:', user?.role)
 
   return (
-    <div className="bg-white backdrop-blur-sm border-b-2 border-gray-200 shadow-lg">
+    <div className="bg-white backdrop-blur-sm border-b-2 border-gray-200 shadow-lg relative z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left side - Menu button and title */}
