@@ -6,22 +6,22 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { Sparkles, Zap, Target } from "lucide-react"
 
+const messages = [
+  "¿Listo para transformar tu vida?",
+  "Tu nueva vida comienza aquí",
+  "Cada gran cambio empieza con un paso",
+  "Es hora de ser quien siempre quisiste ser"
+]
+
 export default function OnboardingWelcome() {
   const [currentMessage, setCurrentMessage] = useState(0)
-  
-  const messages = [
-    "¿Listo para transformar tu vida?",
-    "Tu nueva vida comienza aquí",
-    "Cada gran cambio empieza con un paso",
-    "Es hora de ser quien siempre quisiste ser"
-  ]
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMessage((prev) => (prev + 1) % messages.length)
     }, 3000)
     return () => clearInterval(interval)
-  }, [messages.length])
+  }, [])
 
   return (
     <div className="min-h-screen bg-white text-gray-900 overflow-hidden">

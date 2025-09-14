@@ -479,3 +479,116 @@ model HabitSchedule {
   @@index([userId])
   @@index([daysOfWeek])
 }
+
+// Configuración de la landing page
+model LandingConfig {
+  id              String   @id @default(cuid())
+  
+  // Hero Section
+  heroTitle       String
+  heroSubtitle    String
+  heroDescription String?
+  heroCtaPrimary  String   @default("Comenzar Ahora")
+  heroCtaSecondary String  @default("Ver Recetas")
+  heroCtaPrimaryLink String @default("/onboarding/welcome")
+  heroCtaSecondaryLink String @default("/ebook")
+  
+  // Stats Section
+  statsEnabled    Boolean  @default(true)
+  stat1Title      String   @default("100%")
+  stat1Subtitle   String   @default("Personalizado")
+  stat2Title      String   @default("24/7")
+  stat2Subtitle   String   @default("Soporte")
+  stat3Title      String   @default("∞")
+  stat3Subtitle   String   @default("Resultados")
+  
+  // Products Section
+  productsTitle   String   @default("Productos y Servicios")
+  productsSubtitle String  @default("Descubre todo lo que necesitas para tu transformación física y mental")
+  
+  // Footer
+  footerDescription String @default("Tu plataforma integral para transformación física y mental.")
+  instagramHandle   String @default("@elchepaaa")
+  whatsappNumber    String @default("51978381334")
+  
+  // Meta
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+// Productos/Servicios configurables
+model LandingProduct {
+  id              String   @id @default(cuid())
+  
+  // Información básica
+  title           String
+  subtitle        String
+  description     String
+  icon            String   // Nombre del icono de Lucide
+  color           String   @default("#DC2626")
+  
+  // Enlaces y comportamiento
+  link            String
+  linkType        String   @default("page") // page, whatsapp, external
+  motivational    String?  // Texto motivacional opcional
+  
+  // Configuración
+  isActive        Boolean  @default(true)
+  order           Int      @default(0)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+// Testimonios y avances (Wall of Gainz)
+model Testimonial {
+  id              String   @id @default(cuid())
+  
+  // Información del usuario
+  userName        String
+  userImage       String?
+  userLocation    String?
+  
+  // Contenido del testimonio
+  title           String
+  content         String
+  beforeImage     String?
+  afterImage      String?
+  videoUrl        String?
+  
+  // Metadatos
+  category        String   @default("general") // general, transformation, nutrition, training
+  rating          Int?     // 1-5 estrellas
+  isVerified      Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  
+  // Moderación
+  status          TestimonialStatus @default(PENDING)
+  moderatedBy     String?
+  moderatedAt     DateTime?
+  rejectionReason String?
+  
+  // Configuración
+  isActive        Boolean  @default(true)
+  order           Int      @default(0)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([category])
+}
+
+enum TestimonialStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

@@ -11,9 +11,11 @@ import {
   Target,
   Zap,
   Users,
-  Eye
+  Eye,
+  Play
 } from "lucide-react"
 import { ExerciseType, IntensityLevel, UserLevel } from "@prisma/client"
+import Image from "next/image"
 
 interface Exercise {
   id: string
@@ -319,9 +321,11 @@ export default function ExercisesPage() {
                   </div>
                 </div>
               ) : exercise.imageUrl ? (
-                <img
+                <Image
                   src={exercise.imageUrl}
                   alt={exercise.name}
+                  width={400}
+                  height={192}
                   className="w-full h-full object-cover"
                 />
               ) : (

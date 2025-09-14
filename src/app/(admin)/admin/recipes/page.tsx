@@ -15,6 +15,7 @@ import {
   Image as ImageIcon
 } from "lucide-react"
 import { UserLevel } from "@prisma/client"
+import Image from "next/image"
 
 interface Recipe {
   id: string
@@ -331,9 +332,11 @@ export default function RecipesPage() {
             {/* Recipe Image */}
             <div className="h-48 bg-gray-100 flex items-center justify-center relative">
               {recipe.imageUrl ? (
-                <img
+                <Image
                   src={recipe.imageUrl}
                   alt={recipe.title}
+                  width={400}
+                  height={192}
                   className="w-full h-full object-cover"
                 />
               ) : (

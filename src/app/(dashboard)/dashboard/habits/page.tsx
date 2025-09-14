@@ -54,10 +54,6 @@ export default function HabitsPage() {
   const [error, setError] = useState<string | null>(null)
   const [togglingHabits, setTogglingHabits] = useState<Set<string>>(new Set())
 
-  // Fetch habits data
-  useEffect(() => {
-    fetchHabits()
-  }, [activeCategory, fetchHabits])
 
   const fetchHabits = useCallback(async () => {
     try {
@@ -100,6 +96,12 @@ export default function HabitsPage() {
       setLoading(false)
     }
   }, [activeCategory])
+
+  
+  // Fetch habits data
+  useEffect(() => {
+    fetchHabits()
+  }, [activeCategory, fetchHabits])
 
   const handleToggleComplete = async (habitId: string) => {
     const habit = habits.find(h => h.id === habitId)

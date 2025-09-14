@@ -46,13 +46,12 @@ export async function POST(
       }
     })
 
-    let habitEntry: unknown
     let streakUpdate = null
 
     if (completed) {
       if (existingEntry) {
         // Update existing entry
-        habitEntry = await db.habitEntry.update({
+        await db.habitEntry.update({
           where: { id: existingEntry.id },
           data: {
             status: 'COMPLETED',
@@ -61,7 +60,7 @@ export async function POST(
         })
       } else {
         // Create new entry
-        habitEntry = await db.habitEntry.create({
+        await db.habitEntry.create({
           data: {
             habitId: habitId,
             date: today,
@@ -102,7 +101,6 @@ export async function POST(
         await db.habitEntry.delete({
           where: { id: existingEntry.id }
         })
-        habitEntry = null
       }
     }
 
