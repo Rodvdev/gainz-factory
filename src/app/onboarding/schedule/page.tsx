@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { 
   Clock, 
   Calendar, 
@@ -13,10 +12,7 @@ import {
   Sun,
   Moon,
   Coffee,
-  Zap,
-  CheckCircle,
-  Plus,
-  Minus
+  Zap
 } from "lucide-react"
 
 interface HabitSchedule {
@@ -200,7 +196,6 @@ export default function OnboardingSchedule() {
         <div className="space-y-8 mb-8">
           {habits.map((habit, index) => {
             const timeSlot = timeSlots.find(slot => slot.id === getTimeSlotForTime(habit.time))
-            const TimeIcon = timeSlot?.icon || Clock
             
             return (
               <motion.div

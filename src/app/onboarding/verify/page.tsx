@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Mail, CheckCircle, RefreshCw, Sparkles, ArrowRight } from "lucide-react"
+import { Mail, CheckCircle, RefreshCw, ArrowRight } from "lucide-react"
 
 export default function OnboardingVerify() {
   const [email, setEmail] = useState("")
@@ -160,7 +159,7 @@ export default function OnboardingVerify() {
             <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl">
               <h4 className="font-semibold text-blue-400 mb-2">📧 Revisa tu bandeja de entrada</h4>
               <p className="text-sm text-gray-300">
-                Busca el email de "Gainz Factory" y haz clic en el botón "Confirmar mi cuenta"
+                Busca el email de &quot;Gainz Factory&quot; y haz clic en el botón &quot;Confirmar mi cuenta&quot;
               </p>
             </div>
 

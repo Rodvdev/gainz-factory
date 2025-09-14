@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Sparkles, Zap, Target, Heart } from "lucide-react"
+import { Sparkles, Zap, Target } from "lucide-react"
 
 export default function OnboardingWelcome() {
   const [currentMessage, setCurrentMessage] = useState(0)
