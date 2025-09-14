@@ -74,7 +74,7 @@ export default function EggDemoPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-red-500">•</span>
                   <div>
-                    <strong>Toca el huevo:</strong> Haz clic 3 veces seguidas para ver la animación de "ilusionar"
+                    <strong>Toca el huevo:</strong> Haz clic 3 veces seguidas para ver la animación de &quot;ilusionar&quot;
                   </div>
                 </li>
               </ul>
