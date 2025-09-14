@@ -6,7 +6,6 @@ import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
-  EyeIcon,
   CalendarIcon,
   UserIcon,
   TagIcon

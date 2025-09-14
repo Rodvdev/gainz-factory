@@ -9,8 +9,7 @@ import {
   UserIcon,
   CogIcon,
   Bars3Icon,
-  HomeIcon,
-  ChartBarIcon
+  HomeIcon
 } from "@heroicons/react/24/outline"
 
 interface User {

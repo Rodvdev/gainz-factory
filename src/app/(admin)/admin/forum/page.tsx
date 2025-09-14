@@ -11,8 +11,7 @@ import {
   TrashIcon,
   CheckCircleIcon,
   XCircleIcon,
-  FlagIcon,
-  TagIcon
+  FlagIcon
 } from "@heroicons/react/24/outline"
 
 interface ForumPost {
@@ -50,12 +49,11 @@ export default function AdminForumPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null)
   const [showComments, setShowComments] = useState(false)
 
   useEffect(() => {
     fetchForumData()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchForumData = async () => {
     try {
@@ -391,7 +389,7 @@ export default function AdminForumPage() {
                     <FlagIcon className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => setSelectedPost(post)}
+                    onClick={() => {/* Edit functionality */}}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="Editar post"
                   >

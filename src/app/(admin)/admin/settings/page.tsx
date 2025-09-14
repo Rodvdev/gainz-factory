@@ -7,10 +7,7 @@ import {
   GlobeAltIcon,
   BellIcon,
   ShieldCheckIcon,
-  DatabaseIcon,
-  CloudIcon,
-  KeyIcon,
-  UserGroupIcon
+  DatabaseIcon
 } from "@heroicons/react/24/outline"
 
 interface SystemSettings {
@@ -71,7 +68,7 @@ export default function AdminSettingsPage() {
     }
   }
 
-  const handleInputChange = (key: keyof SystemSettings, value: any) => {
+  const handleInputChange = (key: keyof SystemSettings, value: string | number | boolean) => {
     setSettings(prev => ({
       ...prev,
       [key]: value
