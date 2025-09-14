@@ -51,7 +51,7 @@ const handler = NextAuth({
     signIn: "/auth/signin",
     error: "/auth/error"
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.JWT_SECRET,
 })
 
 export { handler as GET, handler as POST } 

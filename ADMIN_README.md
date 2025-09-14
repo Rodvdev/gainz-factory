@@ -27,8 +27,8 @@ npm run db:seed-admin
 Asegúrate de tener configurado tu archivo `.env` con:
 ```env
 DATABASE_URL="tu_url_de_base_de_datos"
-NEXTAUTH_SECRET="tu_secret_key"
-NEXTAUTH_URL="http://localhost:3000"
+JWT_SECRET="tu_secret_key"
+JWT_URL="http://localhost:3000"
 ```
 
 ## 👥 Usuarios de Prueba

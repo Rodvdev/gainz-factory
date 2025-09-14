@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         firstName: user.firstName,
         lastName: user.lastName
       },
-      process.env.NEXTAUTH_SECRET || "fallback-secret",
+      process.env.JWT_SECRET || "fallback-secret",
       { expiresIn: "30d" }
     )
     

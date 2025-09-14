@@ -85,7 +85,7 @@ export const authConfig = {
       return session
     }
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.JWT_SECRET,
 }
 
 // Get current user from session (for GraphQL context)
@@ -132,7 +132,7 @@ export async function verifyAuth(request: Request) {
     }
 
     const token = authHeader.substring(7) // Remove 'Bearer ' prefix
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET || "fallback-secret") as JwtPayload & { userId?: string }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret") as JwtPayload & { userId?: string }
     
     if (!decoded.userId) {
       return null

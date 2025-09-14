@@ -38,7 +38,7 @@ export async function getAuthenticatedUser(request: NextRequest): Promise<Authen
     }
 
     // Verify JWT token
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET || "fallback-secret") as { userId: string }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret") as { userId: string }
 
     if (!decoded.userId) {
       return null
