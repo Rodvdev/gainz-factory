@@ -2,127 +2,126 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import { Dumbbell, BookOpen, Pill, Shirt, Trophy } from "lucide-react";
+import { Heart, Clock, Users, CheckCircle, Phone, MessageSquare } from "lucide-react";
 
-export default function Home() {
-  const products = [
+export default function YogaPilatesPage() {
+  const features = [
     {
-      id: "transformacion",
-      title: "Transformación de VIDA",
-      subtitle: "Asesoría 1 a 1 x 3 meses mínimo",
-      description: "Programa personalizado de transformación integral",
-      icon: Dumbbell,
-      color: "#DC2626",
-      link: "https://wa.me/51978381334?text=Hola Chepa, estoy interesado en el programa de Transformación de VIDA (Asesoría 1 a 1 x 3 meses mínimo).",
-      type: "whatsapp"
+      icon: Heart,
+      title: "Bienestar Mental",
+      description: "Reduce el estrés y mejora tu bienestar emocional"
     },
     {
-      id: "recetas",
-      title: "Ebook Recetas",
-      subtitle: "Disfruta sin culpa",
-      description: "Aprende a comer rico y saludable garantizándote resultados",
-      icon: BookOpen,
-      color: "#DC2626",
-      link: "/ebook",
-      type: "page"
+      icon: Clock,
+      title: "Flexibilidad",
+      description: "Mejora tu rango de movimiento y flexibilidad corporal"
     },
     {
-      id: "tmx",
-      title: "TMX",
-      subtitle: "Toda mi suplementación con descuento",
-      description: "MyProtein, DY Nutrition, PEScience con precios galácticos",
-      icon: Pill,
-      color: "#DC2626",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa TMX - toda tu suplementación con descuento.",
-      type: "whatsapp"
+      icon: Users,
+      title: "Clases Grupales",
+      description: "Practica en un ambiente motivador y comunitario"
     },
     {
-      id: "vibenfly",
-      title: "Vibenfly",
-      subtitle: "2do Drop - Remember Who You Are",
-      description: "Nueva colección de hoodies y oversize",
-      icon: Shirt,
-      color: "#DC2626",
-      link: "https://wa.me/51978381334?text=Hola Chepa, me interesa Vibenfly, qué modelos y tallas tienes disponibles?",
-      type: "whatsapp",
-      motivational: "Atrévete a ser realmente quien eres y muestra tu VIBRA ÚNICA."
-    },
-    {
-      id: "interleague",
-      title: "Interleague Sub30",
-      subtitle: "Inscripcciones abiertas / Inicio 30 de agosto",
-      description: "Torneo Fútbol 7, Depor Plaza Jockey Club, 8k premio",
-      icon: Trophy,
-      color: "#DC2626",
-      link: "https://wa.me/51978381334?text=Hola Chepa, info Interleague SUB30 - para el 30 de Agosto, quiero separar mi cupo.",
-      type: "whatsapp"
+      icon: CheckCircle,
+      title: "Técnica Correcta",
+      description: "Aprende las posturas y movimientos de manera segura"
     }
   ];
 
-  const handleProductClick = (product: { type: string; link: string }) => {
-    if (product.type === "whatsapp") {
-      window.open(product.link, '_blank');
-    } else if (product.type === "page") {
-      window.location.href = product.link;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-gray-900 text-white">
       <Header />
-      <Hero />
       
-      {/* Products Section */}
-      <section className="py-20 bg-gray-50">
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">Productos y Servicios</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Descubre todo lo que necesitas para tu transformación física y mental
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center">
+                <Heart size={40} className="text-white" />
+              </div>
+            </div>
+            <h1 className="text-5xl sm:text-6xl font-bold text-white mb-6">
+              <span className="text-red-500">Yoga y Pilates</span>
+            </h1>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Clases de yoga y pilates para mejorar flexibilidad, fuerza y bienestar mental. 
+              Encuentra equilibrio entre cuerpo y mente.
             </p>
-          </div>
-          
-          <div className="w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <button
-                  key={product.id}
-                  onClick={() => handleProductClick(product)}
-                  className="group relative p-8 bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-gray-300 text-gray-900 rounded-2xl text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-gray-100/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative z-10">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="text-4xl text-gray-600 group-hover:text-gray-900 transition-colors duration-300">
-                          <product.icon size={32} />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold mb-1 text-gray-900">{product.title}</h3>
-                          <p className="text-sm font-medium mb-2" style={{ color: product.color }}>
-                            {product.subtitle}
-                          </p>
-                        </div>
-                        <div className="text-gray-500 group-hover:text-gray-700 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-                          </svg>
-                        </div>
-                      </div>
-                      <p className="text-gray-600 text-sm leading-relaxed">{product.description}</p>
-                      {product.id === "vibenfly" && (
-                        <p className="text-red-500 font-semibold italic text-sm">{product.motivational}</p>
-                      )}
-                    </div>
-                  </div>
-                </button>
-            ))}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="https://wa.me/51978381334?text=Hola Chepa, me interesa las clases de Yoga y Pilates."
+                className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              >
+                <Phone className="inline mr-2" size={20} />
+                Consultar Clases
+              </a>
+              <Link
+                href="/pricing"
+                className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              >
+                Ver Precios
+              </Link>
             </div>
           </div>
         </div>
       </section>
-      
+
+      {/* Features Section */}
+      <section className="py-20 bg-gray-800/50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">Beneficios del Yoga y Pilates</h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Descubre cómo estas disciplinas pueden transformar tu bienestar
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="p-6 bg-gray-800/60 backdrop-blur-sm border border-white/10 hover:border-white/30 rounded-xl text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+              >
+                <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <feature.icon size={32} className="text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-300 text-sm">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-gradient-to-r from-red-600 to-red-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">¿Listo para encontrar tu equilibrio?</h2>
+          <p className="text-xl mb-8 text-red-100">
+            Únete a nuestras clases de Yoga y Pilates y descubre una nueva forma de cuidar tu cuerpo y mente
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="https://wa.me/51978381334?text=Hola Chepa, me interesa conocer más sobre las clases de Yoga y Pilates."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white text-red-600 hover:bg-gray-100 py-3 px-8 rounded-lg font-bold transition-colors"
+            >
+              <Phone className="inline mr-2" size={20} />
+              Consultar Clases
+            </a>
+            <Link
+              href="/contact"
+              className="bg-red-800 text-white hover:bg-red-900 py-3 px-8 rounded-lg font-bold transition-colors"
+            >
+              Más Información
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
       <footer className="py-12 bg-gray-900 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">

@@ -29,6 +29,21 @@ model User {
   passwordResetToken    String?
   passwordResetExpires  DateTime?
   
+  // Onboarding & Profile Data
+  onboardingCompleted   Boolean   @default(false)
+  onboardingStep        String?   @default("welcome")
+  timezone              String?   @default("America/Lima")
+  notificationPreferences Json?   @default("[]")
+  personalManifesto     String?
+  
+  // User Preferences
+  preferredLanguage     String?   @default("es")
+  fitnessLevel          String?   // beginner, intermediate, advanced
+  primaryGoals          String[]  @default([])
+  weeklyCommitment      Int?      @default(3) // days per week
+  intensityPreference   String?   // quick, intense, balanced
+  motivationType        String?   // health, appearance, energy, performance
+  
   // Relaciones con otras entidades
   habits                Habit[]
   dailyScores           DailyScore[]
@@ -43,12 +58,15 @@ model User {
   journalEntries        JournalEntry[]
   aiInteractions        AIInteraction[]
   coach                 Coach?
+  habitSchedules        HabitSchedule[]
+  onboardingData        OnboardingData?
   
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
   @@index([email])
   @@index([isActive])
+  @@index([onboardingCompleted])
 }
 
 enum HabitFrequency {
@@ -103,6 +121,7 @@ model Habit {
 
   entries      HabitEntry[]
   streaks      HabitStreak[]
+  schedule     HabitSchedule?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
@@ -382,4 +401,72 @@ model AIInteraction {
   createdAt DateTime @default(now())
 
   @@index([userId, type])
+}
+
+// Datos completos del onboarding del usuario
+model OnboardingData {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Paso 1: Objetivos
+  selectedObjectives    String[] @default([])
+  objectivesCompletedAt DateTime?
+  
+  // Paso 2: Cuestionario
+  questionnaireAnswers  Json?    // Respuestas del cuestionario
+  questionnaireCompletedAt DateTime?
+  
+  // Paso 3: Hábitos
+  selectedHabits        Json?    // Hábitos seleccionados
+  habitsCompletedAt     DateTime?
+  
+  // Paso 4: Horarios
+  scheduleData          Json?    // Configuración de horarios
+  scheduleCompletedAt   DateTime?
+  
+  // Paso 5: Perfil
+  profileCompletedAt    DateTime?
+  personalBio           String?
+  customManifesto       String?
+  
+  // Progreso general
+  currentStep           String   @default("welcome")
+  isCompleted           Boolean  @default(false)
+  completedAt           DateTime?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isCompleted])
+}
+
+// Horarios específicos para cada hábito
+model HabitSchedule {
+  id              String    @id @default(cuid())
+  userId          String
+  habitId         String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habit           Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  
+  // Horario
+  timeSlot        String    // morning, afternoon, evening
+  specificTime    String    // "07:00", "19:30", etc.
+  daysOfWeek      String[]  @default([]) // ["monday", "tuesday", etc.]
+  
+  // Recordatorios
+  reminderEnabled Boolean   @default(true)
+  reminderMinutes Int?      @default(15) // Minutos antes del hábito
+  
+  // Configuración
+  isActive        Boolean   @default(true)
+  priority        Int       @default(1) // 1-5, para ordenar hábitos
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([habitId]) // Un hábito puede tener solo un horario
+  @@index([userId])
+  @@index([daysOfWeek])
 }
