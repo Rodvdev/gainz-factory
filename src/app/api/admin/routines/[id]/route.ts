@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get("authorization")
@@ -31,8 +31,9 @@ export async function GET(
     }
 
     // Obtener rutina específica
+    const { id } = await params
     const routine = await prisma.workoutRoutine.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: {
           select: {
@@ -85,7 +86,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get("authorization")
@@ -118,10 +119,11 @@ export async function PATCH(
       isPublic,
       exercises
     } = body
+    const { id } = await params
 
     // Verificar que la rutina existe
     const existingRoutine = await prisma.workoutRoutine.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingRoutine) {
@@ -132,7 +134,7 @@ export async function PATCH(
     const updatedRoutine = await prisma.$transaction(async (tx) => {
         // Actualizar datos básicos de la rutina
         await tx.workoutRoutine.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             title,
             objective,
@@ -146,7 +148,7 @@ export async function PATCH(
       if (exercises) {
         // Eliminar ejercicios existentes
         await tx.routineExercise.deleteMany({
-          where: { routineId: params.id }
+          where: { routineId: id }
         })
 
         // Crear nuevos ejercicios
@@ -157,7 +159,7 @@ export async function PATCH(
             reps: number
             restSeconds: number
           }, index: number) => ({
-            routineId: params.id,
+            routineId: id,
             exerciseId: exercise.exerciseId,
             order: index + 1,
             sets: exercise.sets,
@@ -169,7 +171,7 @@ export async function PATCH(
 
       // Retornar rutina actualizada con ejercicios
       return await tx.workoutRoutine.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
           user: {
             select: {
@@ -219,7 +221,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get("authorization")
@@ -244,8 +246,9 @@ export async function DELETE(
     }
 
     // Verificar que la rutina existe
+    const { id } = await params
     const existingRoutine = await prisma.workoutRoutine.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingRoutine) {
@@ -254,7 +257,7 @@ export async function DELETE(
 
     // Eliminar rutina (los ejercicios se eliminan automáticamente por cascade)
     await prisma.workoutRoutine.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Rutina eliminada exitosamente" })
