@@ -7,10 +7,8 @@ import {
   MagnifyingGlassIcon, 
   UserIcon,
   CogIcon,
-  Bars3Icon,
-  XMarkIcon
+  Bars3Icon
 } from "@heroicons/react/24/outline"
-import { cn } from "@/utilities/ui"
 
 interface User {
   id: string

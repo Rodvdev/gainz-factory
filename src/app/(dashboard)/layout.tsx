@@ -11,7 +11,6 @@ import {
   CalendarIcon,
   UserIcon,
   CogIcon,
-  Bars3Icon,
   XMarkIcon,
   BookOpenIcon,
   VideoCameraIcon,
