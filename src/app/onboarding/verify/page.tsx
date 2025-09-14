@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Mail, CheckCircle, RefreshCw, ArrowRight } from "lucide-react"
 
-export default function OnboardingVerify() {
+function OnboardingVerifyContent() {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
@@ -241,5 +241,17 @@ export default function OnboardingVerify() {
         </motion.div>
       </motion.div>
     </div>
+  )
+}
+
+export default function OnboardingVerify() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+      </div>
+    }>
+      <OnboardingVerifyContent />
+    </Suspense>
   )
 }
