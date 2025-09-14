@@ -96,7 +96,8 @@ export async function POST(request: NextRequest) {
           nextLevelXP: 100,
           levelName: "Novato GF",
           avatarEmoji: "🥚"
-        })
+        }
+      })
     }
 
     // Actualizar puntos y racha
