@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
-import { Star, Quote, MessageSquare, Phone } from "lucide-react";
+import { Star, Quote, Phone } from "lucide-react";
 
 export default function ReviewsPage() {
   const reviews = [
@@ -171,7 +171,7 @@ export default function ReviewsPage() {
                   ))}
                 </div>
 
-                <p className="text-gray-300 text-sm mb-4 leading-relaxed">"{review.text}"</p>
+                <p className="text-gray-300 text-sm mb-4 leading-relaxed">&ldquo;{review.text}&rdquo;</p>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-red-400 font-semibold text-sm">{review.beforeAfter}</span>
@@ -200,7 +200,7 @@ export default function ReviewsPage() {
                 className="p-8 bg-gradient-to-br from-red-600/20 to-red-700/20 backdrop-blur-sm border border-red-500/30 rounded-xl text-center"
               >
                 <Quote size={48} className="text-red-500 mx-auto mb-4" />
-                <p className="text-gray-300 mb-6 leading-relaxed">"{testimonial.text}"</p>
+                <p className="text-gray-300 mb-6 leading-relaxed">&ldquo;{testimonial.text}&rdquo;</p>
                 <div>
                   <h3 className="font-semibold text-white">{testimonial.author}</h3>
                   <p className="text-gray-400 text-sm">{testimonial.program}</p>

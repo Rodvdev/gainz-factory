@@ -288,35 +288,35 @@ export default function ChallengesPage() {
 
           {/* Challenge Templates */}
           <div>
-            <h2 className="text-xl font-bold mb-6">Plantillas de Desafíos</h2>
-            <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">Plantillas de Desafíos</h2>
+            <div className="space-y-6">
               {challengeTemplates.map((template, index) => {
                 const categoryInfo = getCategoryInfo(template.category)
                 return (
-                  <div key={index} className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                  <div key={index} className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-gray-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-lg ${categoryInfo.color} flex items-center justify-center`}>
+                        <div className={`w-12 h-12 rounded-lg ${categoryInfo.color} flex items-center justify-center text-lg`}>
                           {categoryInfo.icon}
                         </div>
                         <div>
-                          <h3 className="font-bold">{template.name}</h3>
-                          <p className="text-sm text-gray-400">{categoryInfo.name}</p>
+                          <h3 className="font-bold text-gray-900">{template.name}</h3>
+                          <p className="text-sm text-gray-600">{categoryInfo.name}</p>
                         </div>
                       </div>
-                      <span className={`text-sm font-medium ${getDifficultyColor(template.difficulty)}`}>
+                      <span className={`text-sm font-semibold px-2 py-1 rounded-full ${getDifficultyColor(template.difficulty)} bg-gray-100`}>
                         {template.difficulty}
                       </span>
                     </div>
                     
-                    <p className="text-gray-300 text-sm mb-4">{template.description}</p>
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">{template.description}</p>
                     
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-gray-400 text-sm">Duración: {template.duration} días</span>
-                      <span className="text-yellow-500 text-sm">{template.reward}</span>
+                    <div className="flex items-center justify-between mb-6">
+                      <span className="text-gray-500 text-sm font-medium">Duración: {template.duration} días</span>
+                      <span className="text-yellow-600 text-sm font-medium">{template.reward}</span>
                     </div>
                     
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                       Comenzar Desafío
                     </button>
                   </div>
@@ -324,11 +324,13 @@ export default function ChallengesPage() {
               })}
 
               {/* Custom Challenge */}
-              <div className="bg-gray-900 rounded-xl border border-gray-800 border-dashed p-6 text-center">
-                <PlusIcon className="h-10 w-10 text-gray-500 mx-auto mb-3" />
-                <h3 className="font-medium text-gray-300 mb-2">Desafío Personalizado</h3>
-                <p className="text-gray-400 text-sm mb-4">Crea tu propio desafío único</p>
-                <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+              <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 border-dashed hover:border-red-300 rounded-2xl p-8 text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+                <div className="p-4 bg-red-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                  <PlusIcon className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">Desafío Personalizado</h3>
+                <p className="text-gray-600 text-sm mb-6">Crea tu propio desafío único</p>
+                <button className="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                   Crear Personalizado
                 </button>
               </div>

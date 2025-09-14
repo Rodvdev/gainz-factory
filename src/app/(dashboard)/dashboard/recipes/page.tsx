@@ -9,7 +9,6 @@ import {
   PlayIcon,
   StarIcon,
   ClockIcon,
-  ChefHatIcon,
   FireIcon,
   HeartIcon
 } from "@heroicons/react/24/outline"
@@ -141,9 +140,7 @@ export default function RecipesPage() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
           <div className="group bg-white backdrop-blur-sm border-2 border-gray-200 hover:border-red-300 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <ChefHatIcon className="h-6 w-6 text-red-600" />
-              </div>
+              
               <p className="text-gray-600 text-sm font-medium">Total Recetas</p>
             </div>
             <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
@@ -382,9 +379,7 @@ export default function RecipesPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 max-w-md w-full shadow-2xl">
             <div className="text-center mb-6">
-              <div className="p-3 bg-red-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <ChefHatIcon className="h-8 w-8 text-red-600" />
-              </div>
+              
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Crear Nueva Receta</h3>
               <p className="text-gray-600 leading-relaxed">
                 El formulario de creación estará disponible en la próxima actualización.
