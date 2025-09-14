@@ -27,13 +27,6 @@ interface AnalyticsData {
   revenueGrowth: number
 }
 
-interface ChartData {
-  date: string
-  users: number
-  sessions: number
-  revenue: number
-}
-
 export default function AdminAnalyticsPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)

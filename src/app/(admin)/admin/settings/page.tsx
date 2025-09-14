@@ -4,11 +4,11 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { 
   CogIcon,
-  GlobeAltIcon,
+  Globe,
   BellIcon,
   ShieldCheckIcon,
-  DatabaseIcon
-} from "@heroicons/react/24/outline"
+  BarChart3,
+} from "lucide-react"
 
 interface SystemSettings {
   siteName: string
@@ -86,7 +86,7 @@ export default function AdminSettingsPage() {
   const settingSections = [
     {
       title: "Configuración General",
-      icon: GlobeAltIcon,
+      icon: Globe,
       settings: [
         {
           key: "siteName" as keyof SystemSettings,
@@ -152,7 +152,7 @@ export default function AdminSettingsPage() {
     },
     {
       title: "Analytics y Datos",
-      icon: DatabaseIcon,
+      icon:  BarChart3,
       settings: [
         {
           key: "analyticsEnabled" as keyof SystemSettings,
