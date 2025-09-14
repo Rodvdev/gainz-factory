@@ -467,7 +467,7 @@ async function seedAdmin() {
             status: isCompleted ? 'COMPLETED' : 'SKIPPED',
             value: isCompleted ? habit.targetValue : null,
             textValue: isCompleted ? 'Completado' : null,
-            timeSpent: habit.trackingType === 'DURATION' ? (isCompleted ? habit.targetValue * 60 : null) : null,
+            timeSpent: habit.trackingType === 'DURATION' ? (isCompleted && habit.targetValue ? habit.targetValue * 60 : null) : null,
             difficulty: isCompleted ? Math.floor(Math.random() * 5) + 1 : null,
             mood: isCompleted ? Math.floor(Math.random() * 5) + 1 : null
           }
