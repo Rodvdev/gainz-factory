@@ -125,8 +125,8 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Actualizar contador de logros en UserLevel
-    await prisma.userLevel.upsert({
+    // Actualizar contador de logros en UserLevelData
+    await prisma.userLevelData.upsert({
       where: { userId: decoded.userId },
       create: {
         userId: decoded.userId,

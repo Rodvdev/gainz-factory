@@ -15,13 +15,13 @@ export async function GET(request: NextRequest) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
     
     // Obtener o crear el nivel del usuario
-    let userLevel = await prisma.userLevel.findUnique({
+    let userLevel = await prisma.userLevelData.findUnique({
       where: { userId: decoded.userId }
     })
 
     if (!userLevel) {
       // Crear nivel inicial para el usuario
-      userLevel = await prisma.userLevel.create({
+      userLevel = await prisma.userLevelData.create({
         data: {
           userId: decoded.userId,
           currentLevel: 1,
@@ -82,12 +82,12 @@ export async function POST(request: NextRequest) {
     const { points, streak } = body
 
     // Obtener nivel actual del usuario
-    let userLevel = await prisma.userLevel.findUnique({
+    let userLevel = await prisma.userLevelData.findUnique({
       where: { userId: decoded.userId }
     })
 
     if (!userLevel) {
-      userLevel = await prisma.userLevel.create({
+      userLevel = await prisma.userLevelData.create({
         data: {
           userId: decoded.userId,
           currentLevel: 1,
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Actualizar puntos y racha
-    const updatedUserLevel = await prisma.userLevel.update({
+    const updatedUserLevel = await prisma.userLevelData.update({
       where: { userId: decoded.userId },
       data: {
         totalXP: userLevel.totalXP + (points || 0),
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
         newLevelConfig = config
         
         // Actualizar nivel del usuario
-        await prisma.userLevel.update({
+        await prisma.userLevelData.update({
           where: { userId: decoded.userId },
           data: {
             currentLevel: config.level,

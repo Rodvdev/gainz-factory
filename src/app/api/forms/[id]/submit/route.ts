@@ -43,12 +43,10 @@ export async function POST(
     }
 
     // Verificar si el usuario ya envió este formulario
-    const existingSubmission = await prisma.formSubmission.findUnique({
+    const existingSubmission = await prisma.formSubmission.findFirst({
       where: {
-        userId_formId: {
-          userId: decoded.userId,
-          formId: id
-        }
+        userId: decoded.userId,
+        formId: id
       }
     })
 

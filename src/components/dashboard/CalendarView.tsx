@@ -72,31 +72,31 @@ export default function CalendarView() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const token = localStorage.getItem("authToken")
+        const year = currentDate.getFullYear()
+        const month = currentDate.getMonth() + 1
+        
+        const response = await fetch(`/api/user/calendar?year=${year}&month=${month}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setEvents(data.events || [])
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchEvents()
   }, [currentDate])
-
-  const fetchEvents = async () => {
-    try {
-      const token = localStorage.getItem("authToken")
-      const year = currentDate.getFullYear()
-      const month = currentDate.getMonth() + 1
-      
-      const response = await fetch(`/api/user/calendar?year=${year}&month=${month}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setEvents(data.events || [])
-      }
-    } catch (error) {
-      console.error("Error fetching events:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const generateCalendarDays = (): CalendarDay[] => {
     const year = currentDate.getFullYear()

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { 
   Users2, 
   Search, 
@@ -386,9 +387,11 @@ export default function TeamPage() {
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                     {member.user.profileImageUrl ? (
-                      <img 
+                      <Image 
                         src={member.user.profileImageUrl} 
                         alt={`${member.user.firstName} ${member.user.lastName}`}
+                        width={48}
+                        height={48}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (

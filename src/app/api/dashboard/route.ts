@@ -100,12 +100,12 @@ export async function GET(request: NextRequest) {
     })
 
     // Obtener nivel del usuario
-    let userLevel = await prisma.userLevel.findUnique({
+    let userLevel = await prisma.userLevelData.findUnique({
       where: { userId: decoded.userId }
     })
 
     if (!userLevel) {
-      userLevel = await prisma.userLevel.create({
+      userLevel = await prisma.userLevelData.create({
         data: {
           userId: decoded.userId,
           currentLevel: 1,
