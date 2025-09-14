@@ -159,7 +159,7 @@ export default function ProgrammesPage() {
       level: programme.level || "BEGINNER",
       duration: programme.duration || 4,
       isPublic: programme.isPublic,
-      autoStart: (programme as Programme & { autoStart?: boolean }).autoStart || false,
+      autoStart: (programme as Programme & { autoStart?: boolean }).autoStart ?? false,
       weeklyPlans: programme.weeklyPlans.map(plan => ({
         weekNumber: plan.weekNumber,
         title: plan.title || "",

@@ -80,6 +80,16 @@ model User {
   teamMember            TeamMember?
   clientAssignments     ClientAssignment[]
   
+  // Sistema de Business
+  orders                Order[]
+  subscriptions         UserSubscription[]
+  
+  // Sistema de Community
+  communityBlogPosts    CommunityBlogPost[]
+  blogComments          BlogComment[]
+  forumTopics           ForumTopic[]
+  forumReplies          ForumReply[]
+  
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -1122,4 +1132,376 @@ model ClientAssignment {
   @@unique([clientId, teamMemberId])
   @@index([clientId])
   @@index([teamMemberId])
+}
+
+// Sistema de Business - Planes de Suscripción
+model SubscriptionPlan {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  price           Float
+  currency        String    @default("USD")
+  billingCycle    String    // monthly, quarterly, yearly
+  duration        Int?      // días de duración del plan
+  features        Json      // Array de características del plan
+  isActive        Boolean   @default(true)
+  isPopular       Boolean   @default(false)
+  maxUsers        Int?      // límite de usuarios
+  maxProgrammes   Int?      // límite de programmes
+  
+  // Relaciones
+  subscriptions   UserSubscription[]
+  orders          Order[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([isActive])
+  @@index([isPopular])
+}
+
+// Sistema de Business - Productos
+model Product {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  category        String    // physical, digital, service
+  price           Float
+  currency        String    @default("USD")
+  sku             String?   @unique
+  stock           Int?      // null para productos digitales
+  isActive        Boolean   @default(true)
+  isDigital       Boolean   @default(false)
+  imageUrl        String?
+  images          String[]  // Array de URLs de imágenes
+  
+  // Productos físicos
+  weight          Float?
+  dimensions      String?   // "10x20x30 cm"
+  shippingInfo    String?
+  
+  // Productos digitales
+  downloadUrl     String?
+  fileSize        String?
+  
+  // Relaciones
+  orderItems      OrderItem[] @relation("OrderItemProduct")
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([category])
+  @@index([isActive])
+  @@index([isDigital])
+}
+
+// Sistema de Business - Servicios
+model BusinessService {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  category        String    // consultation, training, nutrition, etc.
+  price           Float
+  currency        String    @default("USD")
+  duration        Int?      // duración en minutos
+  isActive        Boolean   @default(true)
+  isOnline        Boolean   @default(true)
+  maxParticipants Int?      // para servicios grupales
+  requirements    String[]  // requisitos previos
+  
+  // Relaciones
+  orderItems      OrderItem[] @relation("OrderItemService")
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([category])
+  @@index([isActive])
+}
+
+// Sistema de Business - Órdenes
+model Order {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderNumber     String    @unique
+  status          OrderStatus @default(PENDING)
+  subtotal        Float
+  tax             Float     @default(0)
+  shipping        Float     @default(0)
+  total           Float
+  
+  // Información de envío
+  shippingAddress Json?     // Dirección de envío
+  billingAddress  Json?     // Dirección de facturación
+  
+  // Información de pago
+  paymentMethod   String?
+  paymentStatus   PaymentStatus @default(PENDING)
+  transactionId   String?
+  
+  // Relaciones
+  items           OrderItem[]
+  subscriptionPlanId String?
+  subscriptionPlan SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([orderNumber])
+}
+
+// Items de órdenes
+model OrderItem {
+  id              String    @id @default(cuid())
+  orderId         String
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemType        String    // product, service
+  productId       String?
+  serviceId       String?
+  quantity        Int       @default(1)
+  price           Float
+  total           Float
+  
+  // Relaciones específicas
+  product         Product?  @relation("OrderItemProduct", fields: [productId], references: [id])
+  businessService BusinessService?  @relation("OrderItemService", fields: [serviceId], references: [id])
+  
+  @@index([orderId])
+  @@index([itemType])
+}
+
+// Suscripciones de usuarios
+model UserSubscription {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId          String
+  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
+  status          SubscriptionStatus @default(ACTIVE)
+  startDate       DateTime
+  endDate         DateTime?
+  autoRenew       Boolean   @default(true)
+  
+  // Información de pago
+  paymentMethod   String?
+  nextBillingDate DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([userId, planId])
+  @@index([userId])
+  @@index([status])
+  @@index([endDate])
+}
+
+// Enums para Business
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIAL_REFUND
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+  TRIAL
+}
+
+// Sistema de Community - Blog
+model CommunityBlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     String
+  excerpt     String?
+  featuredImage String?
+  status      PostStatus @default(DRAFT)
+  publishedAt DateTime?
+  
+  // SEO
+  metaTitle   String?
+  metaDescription String?
+  
+  // Autor
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  // Categorías y tags
+  categories  BlogCategory[]
+  tags        BlogTag[]
+  
+  // Engagement
+  views       Int       @default(0)
+  likes       Int       @default(0)
+  comments    BlogComment[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+}
+
+// Categorías del blog
+model BlogCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  color       String?   // Color hex para UI
+  
+  // Relaciones
+  posts       CommunityBlogPost[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Tags del blog
+model BlogTag {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  
+  // Relaciones
+  posts       CommunityBlogPost[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Comentarios del blog
+model BlogComment {
+  id          String    @id @default(cuid())
+  content     String
+  isApproved  Boolean   @default(false)
+  
+  // Autor
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  // Post
+  postId      String
+  post        CommunityBlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  // Respuestas
+  parentId    String?
+  parent      BlogComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     BlogComment[] @relation("CommentReplies")
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([postId])
+  @@index([authorId])
+  @@index([isApproved])
+}
+
+// Sistema de Community - Foros
+model Forum {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?   // Icono para UI
+  color       String?   // Color para UI
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  
+  // Relaciones
+  topics      ForumTopic[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([isActive])
+  @@index([order])
+}
+
+// Topics del foro
+model ForumTopic {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  isPinned    Boolean   @default(false)
+  isLocked    Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  
+  // Autor
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  // Foro
+  forumId     String
+  forum       Forum     @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  
+  // Engagement
+  views       Int       @default(0)
+  likes       Int       @default(0)
+  replies     ForumReply[]
+  
+  // Último post
+  lastReplyAt DateTime?
+  lastReplyBy String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([forumId])
+  @@index([authorId])
+  @@index([isPinned])
+  @@index([lastReplyAt])
+}
+
+// Respuestas del foro
+model ForumReply {
+  id          String    @id @default(cuid())
+  content     String
+  isSolution  Boolean   @default(false)
+  
+  // Autor
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  // Topic
+  topicId     String
+  topic       ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  
+  // Respuesta padre (para respuestas anidadas)
+  parentId    String?
+  parent      ForumReply? @relation("ReplyReplies", fields: [parentId], references: [id])
+  replies     ForumReply[] @relation("ReplyReplies")
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([topicId])
+  @@index([authorId])
+  @@index([isSolution])
+}
+
+// Enums para Community
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

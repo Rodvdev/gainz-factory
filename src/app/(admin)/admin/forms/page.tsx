@@ -8,7 +8,6 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye,
   Users,
   FileText,
   CheckCircle,
@@ -31,7 +30,7 @@ interface InputField {
   minValue?: number
   maxValue?: number
   pattern?: string
-  options?: any
+  options?: string[] | null
   order: number
   width?: string
 }
