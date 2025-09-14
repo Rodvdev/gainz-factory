@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
-import { Calendar, User, ArrowRight, MessageSquare, Phone } from "lucide-react";
+import { Calendar, User, ArrowRight, MessageSquare } from "lucide-react";
 
 export default function BlogPage() {
   const blogPosts = [

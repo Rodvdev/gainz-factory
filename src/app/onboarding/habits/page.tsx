@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { 
   Plus, 
   Minus, 
@@ -13,7 +12,6 @@ import {
   Sparkles,
   Target,
   Clock,
-  Zap,
   Heart,
   Dumbbell,
   Apple,

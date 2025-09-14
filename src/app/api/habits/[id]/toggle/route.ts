@@ -46,7 +46,7 @@ export async function POST(
       }
     })
 
-    let habitEntry
+    let habitEntry: any
     let streakUpdate = null
 
     if (completed) {

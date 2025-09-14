@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     let notificationPreferences = []
     try {
       notificationPreferences = JSON.parse(notifications || '[]')
-    } catch (e) {
+    } catch {
       notificationPreferences = []
     }
 
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       take: 3 // Create challenges for first 3 habits
     })
 
-    const challengePromises = userHabits.map(async (habit, index) => {
+    const challengePromises = userHabits.map(async (habit) => {
       const startDate = new Date()
       const endDate = new Date()
       endDate.setDate(endDate.getDate() + 30) // 30-day challenge

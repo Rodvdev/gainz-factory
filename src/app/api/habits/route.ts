@@ -19,7 +19,11 @@ export async function GET(request: NextRequest) {
     const isActive = searchParams.get('isActive')
 
     // Build where clause
-    const where: any = {
+    const where: {
+      userId: string
+      category?: string
+      isActive?: boolean
+    } = {
       userId: user.id
     }
 

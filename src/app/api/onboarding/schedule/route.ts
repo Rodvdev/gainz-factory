@@ -26,7 +26,12 @@ export async function POST(request: NextRequest) {
     })
 
     // Create HabitSchedule records for each habit
-    const schedulePromises = schedule.map(async (scheduleItem: any) => {
+    const schedulePromises = schedule.map(async (scheduleItem: {
+      name: string
+      time: string
+      days: string[]
+      reminder: boolean
+    }) => {
       const habit = userHabits.find(h => h.name === scheduleItem.name)
       if (habit) {
         // Determine time slot

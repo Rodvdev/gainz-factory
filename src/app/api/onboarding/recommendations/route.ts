@@ -75,7 +75,7 @@ interface UserProfile {
 }
 
 function generateHabitRecommendations(profile: UserProfile) {
-  const { objectives, fitnessLevel, weeklyCommitment, intensityPreference, motivationType } = profile
+  const { objectives, fitnessLevel, weeklyCommitment, intensityPreference } = profile
   
   const allHabits = {
     fitness: [

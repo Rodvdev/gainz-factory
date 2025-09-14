@@ -89,14 +89,14 @@ export async function POST(request: NextRequest) {
       message: "¡Onboarding completado exitosamente!",
       dashboardData: {
         dailyScore,
-        habits: habits.map((habit: any) => ({
+        habits: habits.map((habit: Habit) => ({
           id: habit.id,
           name: habit.name,
           category: habit.category,
           points: habit.points,
           color: habit.color,
           icon: habit.icon,
-          schedule: habit.schedule
+          schedule: (habit as any).schedule
         })),
         goals: goals.map((goal: UserGoal) => ({
           id: goal.id,
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function createInitialChallenges(userId: string, habits: any[]) {
+async function createInitialChallenges(userId: string, habits: Habit[]) {
   const challenges = []
 
   for (const habit of habits.slice(0, 3)) { // Create challenges for first 3 habits
@@ -154,7 +154,7 @@ async function createInitialChallenges(userId: string, habits: any[]) {
   return challenges
 }
 
-async function createInitialStreaks(userId: string, habits: any[]) {
+async function createInitialStreaks(userId: string, habits: Habit[]) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
@@ -170,7 +170,7 @@ async function createInitialStreaks(userId: string, habits: any[]) {
   }
 }
 
-function generateWelcomeMessage(userData: any, habits: Habit[], goals: UserGoal[]) {
+function generateWelcomeMessage(userData: User, habits: Habit[], goals: UserGoal[]) {
   const userName = "Transformer" // Get from user context
   const habitCount = habits.length
   const goalCount = goals.length

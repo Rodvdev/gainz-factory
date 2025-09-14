@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getAuthenticatedUser, createUnauthorizedResponse } from "@/lib/auth-middleware"
-import { Habit, HabitCategory, HabitFrequency, TrackingType } from "@prisma/client"
+import { HabitCategory, HabitFrequency, TrackingType } from "@prisma/client"
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +27,13 @@ export async function POST(request: NextRequest) {
     })
 
     // Create new habits based on selection
-    const habitPromises = habits.map(async (habitData: any, index: number) => {
+    const habitPromises = habits.map(async (habitData: {
+      name: string
+      description: string
+      category: string
+      difficulty: string
+      icon: string
+    }, index: number) => {
       // Map habit data to Prisma schema
       const habit = {
         userId: user.id,

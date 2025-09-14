@@ -2,12 +2,10 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ChevronLeft, 
-  ChevronRight, 
   ArrowRight, 
   Sparkles,
   Clock,
@@ -26,7 +24,7 @@ interface Question {
   options: {
     id: string
     label: string
-    value: any
+    value: string
     description?: string
   }[]
   type: "single" | "multiple" | "slider" | "select"
@@ -99,7 +97,7 @@ const questions: Question[] = [
 
 export default function OnboardingQuestionnaire() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, any>>({})
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -107,7 +105,7 @@ export default function OnboardingQuestionnaire() {
   const isLastQuestion = currentQuestionIndex === questions.length - 1
   const canContinue = answers[currentQuestion.id] !== undefined
 
-  const handleAnswer = (questionId: string, value: any) => {
+  const handleAnswer = (questionId: string, value: string) => {
     setAnswers(prev => ({
       ...prev,
       [questionId]: value

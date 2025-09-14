@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { HabitCategory, TrackingType } from "@prisma/client"
 import { 
@@ -8,9 +8,7 @@ import {
   Flame, 
   Star, 
   CheckCircle,
-  Clock,
   Target,
-  TrendingUp,
   Filter,
   RefreshCw,
   ArrowRight,
@@ -32,7 +30,12 @@ interface Habit {
   order: number
   currentStreak: number
   completedToday: boolean
-  schedule?: any
+  schedule?: {
+    timeSlot: string
+    specificTime: string
+    daysOfWeek: string[]
+    reminderEnabled: boolean
+  } | null  
   createdAt: string
   updatedAt: string
 }
@@ -54,9 +57,9 @@ export default function HabitsPage() {
   // Fetch habits data
   useEffect(() => {
     fetchHabits()
-  }, [activeCategory])
+  }, [activeCategory, fetchHabits])
 
-  const fetchHabits = async () => {
+  const fetchHabits = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -96,7 +99,7 @@ export default function HabitsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [activeCategory])
 
   const handleToggleComplete = async (habitId: string) => {
     const habit = habits.find(h => h.id === habitId)

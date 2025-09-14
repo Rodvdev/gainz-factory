@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { 
@@ -12,7 +11,6 @@ import {
   Heart,
   Target,
   Zap,
-  CheckCircle,
   Upload,
   X
 } from "lucide-react"
