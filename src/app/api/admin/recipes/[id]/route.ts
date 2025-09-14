@@ -5,9 +5,11 @@ const prisma = new PrismaClient()
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     const authHeader = request.headers.get("authorization")
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
@@ -39,7 +41,7 @@ export async function PUT(
 
     // Actualizar receta
     const updatedRecipe = await prisma.recipe.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         description,
@@ -66,9 +68,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     const authHeader = request.headers.get("authorization")
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
@@ -89,7 +93,7 @@ export async function DELETE(
 
     // Eliminar receta
     await prisma.recipe.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Receta eliminada correctamente" })

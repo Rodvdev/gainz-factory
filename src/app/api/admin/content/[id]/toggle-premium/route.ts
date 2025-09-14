@@ -5,9 +5,11 @@ const prisma = new PrismaClient()
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     const authHeader = request.headers.get("authorization")
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
@@ -31,7 +33,7 @@ export async function PATCH(
 
     // Actualizar el estado premium del contenido
     const updatedContent = await prisma.mediaContent.update({
-      where: { id: params.id },
+      where: { id },
       data: { isPremium }
     })
 
