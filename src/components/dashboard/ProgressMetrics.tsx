@@ -7,10 +7,7 @@ import {
   TrendingDown,
   Minus,
   Plus,
-  Camera,
   BarChart3,
-  Target,
-  Calendar,
   Save,
   X
 } from "lucide-react"

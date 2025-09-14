@@ -2,21 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { 
-  Building2, 
   Package, 
   ShoppingCart, 
   CreditCard, 
   Users, 
-  TrendingUp,
   Plus,
   Edit,
   Trash2,
   Eye,
-  DollarSign,
-  Calendar,
-  BarChart3,
-  Settings
+  BarChart3
 } from "lucide-react"
 
 interface SubscriptionPlan {
@@ -264,7 +260,7 @@ export default function BusinessPage() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'plans' | 'products' | 'services' | 'orders')}
                   className={`
                     flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm
                     ${activeTab === tab.id
@@ -366,9 +362,11 @@ export default function BusinessPage() {
                     className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow"
                   >
                     {product.imageUrl && (
-                      <img 
+                      <Image 
                         src={product.imageUrl} 
                         alt={product.name}
+                        width={400}
+                        height={192}
                         className="w-full h-48 object-cover"
                       />
                     )}

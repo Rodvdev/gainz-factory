@@ -33,44 +33,44 @@ export default function AdminAnalyticsPage() {
   const [timeRange, setTimeRange] = useState("30d")
 
   useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const token = localStorage.getItem("authToken")
+        const response = await fetch(`/api/admin/analytics?range=${timeRange}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setAnalytics(data.analytics)
+        } else {
+          // Mock data for development
+          setAnalytics({
+            totalUsers: 1247,
+            activeUsers: 892,
+            newUsers: 156,
+            totalSessions: 3456,
+            averageSessionDuration: 12.5,
+            pageViews: 15678,
+            bounceRate: 34.2,
+            conversionRate: 8.7,
+            revenue: 12450,
+            userGrowth: 12.5,
+            sessionGrowth: 8.3,
+            revenueGrowth: 15.2
+          })
+        }
+      } catch (error) {
+        console.error("Error fetching analytics:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchAnalytics()
   }, [timeRange])
-
-  const fetchAnalytics = async () => {
-    try {
-      const token = localStorage.getItem("authToken")
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setAnalytics(data.analytics)
-      } else {
-        // Mock data for development
-        setAnalytics({
-          totalUsers: 1247,
-          activeUsers: 892,
-          newUsers: 156,
-          totalSessions: 3456,
-          averageSessionDuration: 12.5,
-          pageViews: 15678,
-          bounceRate: 34.2,
-          conversionRate: 8.7,
-          revenue: 12450,
-          userGrowth: 12.5,
-          sessionGrowth: 8.3,
-          revenueGrowth: 15.2
-        })
-      }
-    } catch (error) {
-      console.error("Error fetching analytics:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
 
   const formatNumber = (num: number) => {

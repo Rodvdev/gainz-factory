@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       if (!acc[category]) acc[category] = []
       acc[category].push(achievement)
       return acc
-    }, {} as Record<string, any[]>)
+    }, {} as Record<string, typeof unlockedAchievements>)
 
     return NextResponse.json({
       achievements: unlockedAchievements,

@@ -36,6 +36,9 @@ export async function GET(request: NextRequest) {
         taskSubmissions: {
           where: {
             status: 'completed'
+          },
+          include: {
+            task: true
           }
         }
       }
@@ -77,7 +80,7 @@ export async function GET(request: NextRequest) {
       completedProgrammes,
       activeProgrammes,
       totalWorkouts,
-      recentAchievements: user.userAchievements.slice(0, 3).map((ua: any) => ({
+      recentAchievements: user.userAchievements.slice(0, 3).map((ua) => ({
         id: ua.id,
         title: ua.achievement.title,
         description: ua.achievement.description,
