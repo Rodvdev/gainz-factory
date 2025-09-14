@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 // GET - Get specific forum topic
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -16,8 +16,9 @@ export async function GET(
       )
     }
 
+    const { id } = await params
     const topic = await db.forumTopic.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         author: {
           select: {
@@ -70,7 +71,7 @@ export async function GET(
 // PUT - Update forum topic
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -81,6 +82,7 @@ export async function PUT(
       )
     }
 
+    const { id } = await params
     const body = await request.json()
     const { title, content, isPinned, isLocked, isActive } = body
 
@@ -92,7 +94,7 @@ export async function PUT(
     }
 
     const topic = await db.forumTopic.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         content,
@@ -131,7 +133,7 @@ export async function PUT(
 // DELETE - Delete forum topic
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -142,8 +144,9 @@ export async function DELETE(
       )
     }
 
+    const { id } = await params
     await db.forumTopic.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Tema eliminado correctamente" })
