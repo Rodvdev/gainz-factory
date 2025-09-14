@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
+import * as jwt from "jsonwebtoken"
 
 const prisma = new PrismaClient()
 
@@ -15,10 +16,13 @@ export async function PATCH(
 
     const token = authHeader.substring(7)
     
+    // Decodificar el JWT para obtener el userId
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+    
     // Verificar que el usuario es admin
-    const adminUser = await prisma.user.findFirst({
+    const adminUser = await prisma.user.findUnique({
       where: {
-        id: token
+        id: decoded.userId
       }
     })
 
@@ -26,7 +30,22 @@ export async function PATCH(
       return NextResponse.json({ error: "No autorizado" }, { status: 403 })
     }
 
-    const { firstName, lastName, email, role } = await request.json()
+    const body = await request.json()
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      role,
+      bio,
+      phoneNumber,
+      fitnessLevel,
+      timezone,
+      preferredLanguage,
+      weeklyCommitment,
+      intensityPreference,
+      motivationType,
+      personalManifesto
+    } = body
     const { id: userId } = await params
 
     // Verificar si el email ya existe en otro usuario
@@ -53,7 +72,16 @@ export async function PATCH(
         ...(firstName && { firstName }),
         ...(lastName && { lastName }),
         ...(email && { email }),
-        ...(role && { role })
+        ...(role && { role }),
+        ...(bio !== undefined && { bio }),
+        ...(phoneNumber !== undefined && { phoneNumber }),
+        ...(fitnessLevel !== undefined && { fitnessLevel }),
+        ...(timezone !== undefined && { timezone }),
+        ...(preferredLanguage !== undefined && { preferredLanguage }),
+        ...(weeklyCommitment !== undefined && { weeklyCommitment }),
+        ...(intensityPreference !== undefined && { intensityPreference }),
+        ...(motivationType !== undefined && { motivationType }),
+        ...(personalManifesto !== undefined && { personalManifesto })
       },
       select: {
         id: true,
@@ -66,7 +94,16 @@ export async function PATCH(
         createdAt: true,
         onboardingCompleted: true,
         fitnessLevel: true,
-        primaryGoals: true
+        primaryGoals: true,
+        bio: true,
+        phoneNumber: true,
+        profileImageUrl: true,
+        timezone: true,
+        preferredLanguage: true,
+        weeklyCommitment: true,
+        intensityPreference: true,
+        motivationType: true,
+        personalManifesto: true
       }
     })
 
@@ -95,10 +132,13 @@ export async function DELETE(
 
     const token = authHeader.substring(7)
     
+    // Decodificar el JWT para obtener el userId
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+    
     // Verificar que el usuario es admin
-    const adminUser = await prisma.user.findFirst({
+    const adminUser = await prisma.user.findUnique({
       where: {
-        id: token
+        id: decoded.userId
       }
     })
 
@@ -109,7 +149,7 @@ export async function DELETE(
     const { id: userId } = await params
 
     // No permitir que un admin se elimine a sí mismo
-    if (userId === token) {
+    if (userId === decoded.userId) {
       return NextResponse.json(
         { error: "No puedes eliminar tu propia cuenta" },
         { status: 400 }

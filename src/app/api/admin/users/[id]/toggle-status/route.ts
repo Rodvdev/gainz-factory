@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
+import * as jwt from "jsonwebtoken"
 
 const prisma = new PrismaClient()
 
@@ -17,10 +18,13 @@ export async function PATCH(
 
     const token = authHeader.substring(7)
     
+    // Decodificar el JWT para obtener el userId
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+    
     // Verificar que el usuario es admin
-    const adminUser = await prisma.user.findFirst({
+    const adminUser = await prisma.user.findUnique({
       where: {
-        id: token
+        id: decoded.userId
       }
     })
 
@@ -46,7 +50,16 @@ export async function PATCH(
         createdAt: true,
         onboardingCompleted: true,
         fitnessLevel: true,
-        primaryGoals: true
+        primaryGoals: true,
+        bio: true,
+        phoneNumber: true,
+        profileImageUrl: true,
+        timezone: true,
+        preferredLanguage: true,
+        weeklyCommitment: true,
+        intensityPreference: true,
+        motivationType: true,
+        personalManifesto: true
       }
     })
 

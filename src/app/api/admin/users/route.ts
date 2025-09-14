@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 })
     }
 
-    // Obtener todos los usuarios con información básica
+    // Obtener todos los usuarios con información completa
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -40,7 +40,16 @@ export async function GET(request: NextRequest) {
         createdAt: true,
         onboardingCompleted: true,
         fitnessLevel: true,
-        primaryGoals: true
+        primaryGoals: true,
+        bio: true,
+        phoneNumber: true,
+        profileImageUrl: true,
+        timezone: true,
+        preferredLanguage: true,
+        weeklyCommitment: true,
+        intensityPreference: true,
+        motivationType: true,
+        personalManifesto: true
       },
       orderBy: { createdAt: "desc" }
     })
@@ -116,7 +125,16 @@ export async function POST(request: NextRequest) {
         createdAt: true,
         onboardingCompleted: true,
         fitnessLevel: true,
-        primaryGoals: true
+        primaryGoals: true,
+        bio: true,
+        phoneNumber: true,
+        profileImageUrl: true,
+        timezone: true,
+        preferredLanguage: true,
+        weeklyCommitment: true,
+        intensityPreference: true,
+        motivationType: true,
+        personalManifesto: true
       }
     })
 

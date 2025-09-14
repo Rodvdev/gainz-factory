@@ -119,7 +119,12 @@ export async function POST(request: NextRequest) {
         duration,
         isPublic: isPublic || false,
         exercises: {
-          create: exercises.map((exercise: any, index: number) => ({
+          create: exercises.map((exercise: {
+            exerciseId: string
+            sets: number
+            reps: number
+            restSeconds: number
+          }, index: number) => ({
             exerciseId: exercise.exerciseId,
             order: index + 1,
             sets: exercise.sets,

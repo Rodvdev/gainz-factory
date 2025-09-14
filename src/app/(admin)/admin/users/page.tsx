@@ -24,6 +24,15 @@ interface User {
   onboardingCompleted: boolean
   fitnessLevel?: string
   primaryGoals?: string[]
+  bio?: string
+  phoneNumber?: string
+  profileImageUrl?: string
+  timezone?: string
+  preferredLanguage?: string
+  weeklyCommitment?: number
+  intensityPreference?: string
+  motivationType?: string
+  personalManifesto?: string
 }
 
 export default function UsersPage() {
@@ -93,19 +102,33 @@ export default function UsersPage() {
           firstName: selectedUser.firstName,
           lastName: selectedUser.lastName,
           email: selectedUser.email,
-          role: selectedUser.role
+          role: selectedUser.role,
+          bio: selectedUser.bio,
+          phoneNumber: selectedUser.phoneNumber,
+          fitnessLevel: selectedUser.fitnessLevel,
+          timezone: selectedUser.timezone,
+          preferredLanguage: selectedUser.preferredLanguage,
+          weeklyCommitment: selectedUser.weeklyCommitment,
+          intensityPreference: selectedUser.intensityPreference,
+          motivationType: selectedUser.motivationType,
+          personalManifesto: selectedUser.personalManifesto
         })
       })
 
       if (response.ok) {
+        const data = await response.json()
         setUsers(users.map(user => 
-          user.id === selectedUser.id ? selectedUser : user
+          user.id === selectedUser.id ? data.user : user
         ))
         setShowUserModal(false)
         setSelectedUser(null)
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || "Error al actualizar usuario")
       }
     } catch (error) {
       console.error("Error updating user:", error)
+      alert("Error al actualizar usuario")
     }
   }
 
@@ -122,12 +145,17 @@ export default function UsersPage() {
       })
 
       if (response.ok) {
+        const data = await response.json()
         setUsers(users.map(user => 
-          user.id === userId ? { ...user, isActive: !currentStatus } : user
+          user.id === userId ? data.user : user
         ))
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || "Error al cambiar estado del usuario")
       }
     } catch (error) {
       console.error("Error toggling user status:", error)
+      alert("Error al cambiar estado del usuario")
     }
   }
 
@@ -144,12 +172,17 @@ export default function UsersPage() {
       })
 
       if (response.ok) {
+        const data = await response.json()
         setUsers(users.map(user => 
-          user.id === userId ? { ...user, role: newRole } : user
+          user.id === userId ? data.user : user
         ))
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || "Error al cambiar rol del usuario")
       }
     } catch (error) {
       console.error("Error changing user role:", error)
+      alert("Error al cambiar rol del usuario")
     }
   }
 
@@ -395,58 +428,164 @@ export default function UsersPage() {
       {/* User Modal */}
       {showUserModal && selectedUser && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Editar Usuario
               </h3>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedUser.firstName}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, firstName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Nombre
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedUser.firstName}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, firstName: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedUser.lastName}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, lastName: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Apellido
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedUser.lastName}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, lastName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={selectedUser.email}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Teléfono
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedUser.phoneNumber || ""}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, phoneNumber: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={selectedUser.email}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Rol
+                    </label>
+                    <select
+                      value={selectedUser.role}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value as UserRole })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      <option value="USER">Usuario</option>
+                      <option value="COACH">Coach</option>
+                      <option value="ADMIN">Admin</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Nivel de Fitness
+                    </label>
+                    <select
+                      value={selectedUser.fitnessLevel || ""}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, fitnessLevel: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      <option value="">Sin nivel</option>
+                      <option value="beginner">Principiante</option>
+                      <option value="intermediate">Intermedio</option>
+                      <option value="advanced">Avanzado</option>
+                    </select>
+                  </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Compromiso Semanal (días)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="7"
+                      value={selectedUser.weeklyCommitment || ""}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, weeklyCommitment: parseInt(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preferencia de Intensidad
+                    </label>
+                    <select
+                      value={selectedUser.intensityPreference || ""}
+                      onChange={(e) => setSelectedUser({ ...selectedUser, intensityPreference: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      <option value="">Sin preferencia</option>
+                      <option value="quick">Rápido</option>
+                      <option value="intense">Intenso</option>
+                      <option value="balanced">Equilibrado</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Rol
+                    Tipo de Motivación
                   </label>
                   <select
-                    value={selectedUser.role}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value as UserRole })}
+                    value={selectedUser.motivationType || ""}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, motivationType: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   >
-                    <option value="USER">Usuario</option>
-                    <option value="COACH">Coach</option>
-                    <option value="ADMIN">Admin</option>
+                    <option value="">Sin tipo</option>
+                    <option value="health">Salud</option>
+                    <option value="appearance">Apariencia</option>
+                    <option value="energy">Energía</option>
+                    <option value="performance">Rendimiento</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Biografía
+                  </label>
+                  <textarea
+                    value={selectedUser.bio || ""}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, bio: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Manifiesto Personal
+                  </label>
+                  <textarea
+                    value={selectedUser.personalManifesto || ""}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, personalManifesto: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  />
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">

@@ -130,17 +130,17 @@ export async function PATCH(
 
     // Actualizar rutina usando transacción para manejar ejercicios
     const updatedRoutine = await prisma.$transaction(async (tx) => {
-      // Actualizar datos básicos de la rutina
-      const routine = await tx.workoutRoutine.update({
-        where: { id: params.id },
-        data: {
-          title,
-          objective,
-          level,
-          duration,
-          isPublic
-        }
-      })
+        // Actualizar datos básicos de la rutina
+        await tx.workoutRoutine.update({
+          where: { id: params.id },
+          data: {
+            title,
+            objective,
+            level,
+            duration,
+            isPublic
+          }
+        })
 
       // Si se proporcionan ejercicios, actualizar la lista
       if (exercises) {
@@ -151,7 +151,12 @@ export async function PATCH(
 
         // Crear nuevos ejercicios
         await tx.routineExercise.createMany({
-          data: exercises.map((exercise: any, index: number) => ({
+          data: exercises.map((exercise: {
+            exerciseId: string
+            sets: number
+            reps: number
+            restSeconds: number
+          }, index: number) => ({
             routineId: params.id,
             exerciseId: exercise.exerciseId,
             order: index + 1,

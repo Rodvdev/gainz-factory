@@ -12,12 +12,8 @@ import {
   Clock,
   Users,
   Eye,
-  Play,
   User,
-  Calendar,
-  Zap,
-  CheckCircle,
-  XCircle
+  CheckCircle
 } from "lucide-react"
 import { UserLevel, ExerciseType, IntensityLevel } from "@prisma/client"
 
@@ -80,7 +76,12 @@ export default function RoutinesPage() {
     level: "BEGINNER" as UserLevel,
     duration: 30,
     isPublic: false,
-    exercises: [] as any[]
+    exercises: [] as Array<{
+      exerciseId: string
+      sets: number
+      reps: number
+      restSeconds: number
+    }>
   })
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([])
 
@@ -245,7 +246,7 @@ export default function RoutinesPage() {
     })
   }
 
-  const updateExerciseInRoutine = (index: number, field: string, value: any) => {
+  const updateExerciseInRoutine = (index: number, field: string, value: string | number) => {
     const newExercises = [...formData.exercises]
     newExercises[index] = { ...newExercises[index], [field]: value }
     setFormData({ ...formData, exercises: newExercises })
