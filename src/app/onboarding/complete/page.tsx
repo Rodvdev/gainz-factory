@@ -12,7 +12,7 @@ import {
   Heart,
   Trophy,
   Star,
-  Fire,
+  Flame,
   Rocket
 } from "lucide-react"
 
@@ -186,7 +186,7 @@ export default function OnboardingComplete() {
           }}
           transition={{ duration: 6, repeat: Infinity }}
         >
-          <Fire className="w-10 h-10 text-red-500 opacity-50" />
+          <Flame className="w-10 h-10 text-red-500 opacity-50" />
         </motion.div>
       </div>
 

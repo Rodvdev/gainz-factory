@@ -44,6 +44,9 @@ model User {
   intensityPreference   String?   // quick, intense, balanced
   motivationType        String?   // health, appearance, energy, performance
   
+  // Role & Permissions
+  role                  UserRole  @default(USER)
+  
   // Relaciones con otras entidades
   habits                Habit[]
   dailyScores           DailyScore[]
@@ -303,6 +306,12 @@ enum UserLevel {
   BEGINNER
   INTERMEDIATE
   ADVANCED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  COACH
 }
 
 model Exercise {
