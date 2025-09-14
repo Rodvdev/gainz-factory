@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getAuthenticatedUser } from "@/lib/auth-middleware"
+import { HabitCategory, HabitFrequency } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,14 +22,14 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: {
       userId: string
-      category?: string
+      category?: HabitCategory
       isActive?: boolean
     } = {
       userId: user.id
     }
 
     if (category && category !== 'ALL') {
-      where.category = category
+      where.category = category as HabitCategory
     }
 
     if (isActive !== null) {
@@ -114,6 +115,7 @@ export async function POST(request: NextRequest) {
       name,
       description,
       category,
+      frequency,
       trackingType,
       targetCount,
       points,
@@ -122,7 +124,7 @@ export async function POST(request: NextRequest) {
     } = body
 
     // Validate required fields
-    if (!name || !category || !trackingType) {
+    if (!name || !category || !frequency || !trackingType) {
       return NextResponse.json(
         { error: "Faltan campos requeridos" },
         { status: 400 }
@@ -141,7 +143,8 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         description,
-        category,
+        category: category as HabitCategory,
+        frequency: frequency as HabitFrequency,
         trackingType,
         targetCount: targetCount || 1,
         points: points || 5,
@@ -169,6 +172,7 @@ export async function POST(request: NextRequest) {
         name: habit.name,
         description: habit.description,
         category: habit.category,
+        frequency: habit.frequency,
         trackingType: habit.trackingType,
         targetCount: habit.targetCount,
         points: habit.points,

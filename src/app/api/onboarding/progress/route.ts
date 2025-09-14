@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       currentStep,
       isCompleted,
       progress: {
-        objectives: !!(onboardingData?.selectedObjectives?.length > 0),
+        objectives: !!(onboardingData?.selectedObjectives && onboardingData.selectedObjectives.length > 0),
         questionnaire: !!onboardingData?.questionnaireAnswers,
         habits: habits.length > 0,
         schedule: schedules.length > 0,
