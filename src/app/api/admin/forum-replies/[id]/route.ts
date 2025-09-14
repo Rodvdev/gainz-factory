@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 // GET - Get specific forum reply
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -16,8 +16,9 @@ export async function GET(
       )
     }
 
+    const { id } = await params
     const reply = await db.forumReply.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         author: {
           select: {
@@ -72,7 +73,7 @@ export async function GET(
 // PUT - Update forum reply
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -83,6 +84,7 @@ export async function PUT(
       )
     }
 
+    const { id } = await params
     const body = await request.json()
     const { content, isSolution } = body
 
@@ -94,7 +96,7 @@ export async function PUT(
     }
 
     const reply = await db.forumReply.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         content,
         isSolution
@@ -134,7 +136,7 @@ export async function PUT(
 // DELETE - Delete forum reply
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request)
@@ -145,8 +147,9 @@ export async function DELETE(
       )
     }
 
+    const { id } = await params
     await db.forumReply.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Respuesta eliminada correctamente" })

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { HabitCategory } from '@prisma/client'
 
 export interface Challenge {
@@ -40,7 +40,7 @@ export function useChallenges(filter: 'all' | 'active' | 'completed' = 'all'): U
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchChallenges = async () => {
+  const fetchChallenges = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -67,7 +67,7 @@ export function useChallenges(filter: 'all' | 'active' | 'completed' = 'all'): U
     } finally {
       setLoading(false)
     }
-  }
+  }, [filter])
 
   const createChallenge = async (data: CreateChallengeData) => {
     try {
@@ -162,7 +162,7 @@ export function useChallenges(filter: 'all' | 'active' | 'completed' = 'all'): U
 
   useEffect(() => {
     fetchChallenges()
-  }, [filter])
+  }, [fetchChallenges])
 
   return {
     challenges,

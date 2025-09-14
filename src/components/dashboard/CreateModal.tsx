@@ -45,9 +45,15 @@ export default function CreateModal({
     if (isOpen) {
       const initialData: Record<string, string | number | boolean | File | null> = {}
       fields.forEach(field => {
-        initialData[field.name] = field.type === 'checkbox' ? false : 
-                                 field.type === 'number' ? 0 : 
-                                 field.type === 'date' ? new Date().toISOString().split('T')[0] : ''
+        if (field.type === 'checkbox') {
+          initialData[field.name] = false
+        } else if (field.type === 'number') {
+          initialData[field.name] = 0
+        } else if (field.type === 'date') {
+          initialData[field.name] = new Date().toISOString().split('T')[0]
+        } else {
+          initialData[field.name] = ''
+        }
       })
       setFormData(initialData)
       setErrors({})
@@ -109,12 +115,6 @@ export default function CreateModal({
     }
   }
 
-  const getStringValue = (value: string | number | boolean | File | null | undefined): string => {
-    if (typeof value === 'string') return value
-    if (typeof value === 'number') return value.toString()
-    return ''
-  }
-
   const getNumberValue = (value: string | number | boolean | File | null | undefined): number => {
     if (typeof value === 'number') return value
     if (typeof value === 'string') return parseFloat(value) || 0
@@ -134,7 +134,7 @@ export default function CreateModal({
         return (
           <input
             type="text"
-            value={getStringValue(formData[field.name])}
+            value={formData[field.name] as string || ''}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             placeholder={field.placeholder}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
@@ -146,7 +146,7 @@ export default function CreateModal({
       case 'textarea':
         return (
           <textarea
-            value={getStringValue(formData[field.name])}
+            value={formData[field.name] as string || ''}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             placeholder={field.placeholder}
             rows={4}
@@ -159,7 +159,7 @@ export default function CreateModal({
       case 'select':
         return (
           <select
-            value={getStringValue(formData[field.name])}
+            value={formData[field.name] as string || ''}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
               hasError ? 'border-red-500' : 'border-gray-300'
@@ -204,7 +204,7 @@ export default function CreateModal({
         return (
           <input
             type="date"
-            value={getStringValue(formData[field.name])}
+            value={formData[field.name] as string || ''}
             onChange={(e) => handleInputChange(field.name, e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
               hasError ? 'border-red-500' : 'border-gray-300'
