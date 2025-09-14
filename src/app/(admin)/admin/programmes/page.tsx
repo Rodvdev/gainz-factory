@@ -169,7 +169,7 @@ export default function ProgrammesPage() {
           taskType: task.taskType,
           title: task.title,
           description: task.description || "",
-          taskData: task.taskData,
+          taskData: task.taskData || {},
           isRequired: task.isRequired,
           estimatedDuration: task.estimatedDuration || 30,
           order: task.order
