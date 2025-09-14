@@ -14,6 +14,7 @@ export interface AuthenticatedUser {
   primaryGoals?: string[]
   bio?: string | null
   profileImageUrl?: string | null
+  role: string
 }
 
 export async function getAuthenticatedUser(request: NextRequest): Promise<AuthenticatedUser | null> {
@@ -57,7 +58,8 @@ export async function getAuthenticatedUser(request: NextRequest): Promise<Authen
         fitnessLevel: true,
         primaryGoals: true,
         bio: true,
-        profileImageUrl: true
+        profileImageUrl: true,
+        role: true
       }
     })
 
