@@ -142,7 +142,13 @@ export default function TopNavBar({
 
               {/* Dropdown menu */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl border-2 border-gray-200 shadow-2xl z-[9998]">
+                <>
+                  {/* Overlay to close menu when clicking outside */}
+                  <div 
+                    className="fixed inset-0 z-[9997]" 
+                    onClick={() => setShowUserMenu(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl border-2 border-gray-200 shadow-2xl z-[9998] transform translate-y-0 animate-in slide-in-from-top-2 duration-200">
                   <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
@@ -219,6 +225,7 @@ export default function TopNavBar({
                     </button>
                   </div>
                 </div>
+                </>
               )}
             </div>
           </div>
