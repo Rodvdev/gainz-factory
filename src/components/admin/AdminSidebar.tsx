@@ -16,7 +16,9 @@ import {
   BookOpen,
   ShoppingCart,
   Shield,
-  Activity
+  Activity,
+  Calendar,
+  ClipboardList
 } from "lucide-react"
 
 interface AdminSidebarProps {
@@ -29,6 +31,8 @@ const navigation = [
   { name: "Usuarios", href: "/admin/users", icon: Users },
   { name: "Ejercicios", href: "/admin/exercises", icon: Dumbbell },
   { name: "Rutinas", href: "/admin/routines", icon: Activity },
+  { name: "Programas", href: "/admin/programmes", icon: Calendar },
+  { name: "Formularios", href: "/admin/forms", icon: ClipboardList },
   { name: "Recetas", href: "/admin/recipes", icon: ChefHat },
   { name: "Contenido", href: "/admin/content", icon: FileText },
   { name: "Blog", href: "/admin/blog", icon: BookOpen },

@@ -62,7 +62,15 @@ model User {
   aiInteractions        AIInteraction[]
   coach                 Coach?
   habitSchedules        HabitSchedule[]
-  onboardingData        OnboardingData?
+  onboardingData        OnboardingData[]
+  
+  // Nuevas relaciones para Programmes y Forms
+  taskSubmissions       TaskSubmission[]
+  formSubmissions       FormSubmission[]
+  
+  // Gamificación
+  userLevel             UserLevelData?
+  userAchievements      UserAchievement[]
   
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
@@ -208,15 +216,208 @@ model Challenge {
 }
 
 model Recipe {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   title       String
   description String?
   objective   String?
   level       UserLevel?
-  isPremium   Boolean  @default(false)
+  category    ContentCategory @default(DIET)
+  isPremium   Boolean         @default(false)
   imageUrl    String?
   videoUrl    String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime        @default(now())
+}
+
+// Modelo para contenido de Mindset
+model MindsetContent {
+  id          String          @id @default(cuid())
+  title       String
+  description String?
+  content     String          // Contenido principal del mindset
+  category    ContentCategory @default(MINDSET)
+  level       UserLevel?
+  type        String?         // meditation, motivation, reflection, etc.
+  duration    Int?            // duración en minutos
+  isPremium   Boolean         @default(false)
+  imageUrl    String?
+  videoUrl    String?
+  audioUrl    String?
+  createdAt   DateTime        @default(now())
+}
+
+// Sistema de Programmes (Programas semanales)
+model Programme {
+  id          String          @id @default(cuid())
+  title       String
+  description String?
+  category    ContentCategory
+  level       UserLevel?
+  duration    Int?            // duración en semanas
+  isActive    Boolean         @default(true)
+  isPublic    Boolean         @default(false)
+  createdBy   String          // ID del usuario que crea el programa
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  // Relaciones
+  weeklyPlans WeeklyPlan[]
+  
+  @@index([isActive])
+  @@index([category])
+}
+
+// Plan semanal dentro de un programa
+model WeeklyPlan {
+  id          String    @id @default(cuid())
+  programmeId String
+  programme   Programme @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+  weekNumber  Int       // Número de semana (1, 2, 3, etc.)
+  title       String?
+  description String?
+  createdAt   DateTime  @default(now())
+  
+  // Relaciones
+  dailyTasks  DailyTask[]
+  
+  @@unique([programmeId, weekNumber])
+  @@index([programmeId])
+}
+
+// Tareas diarias dentro de un plan semanal
+model DailyTask {
+  id            String    @id @default(cuid())
+  weeklyPlanId  String
+  weeklyPlan    WeeklyPlan @relation(fields: [weeklyPlanId], references: [id], onDelete: Cascade)
+  dayOfWeek     Int       // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+  taskType      TaskType
+  title         String
+  description   String?
+  
+  // Datos específicos según el tipo de tarea
+  taskData      Json?     // Datos específicos: routineId, videoUrl, formId, etc.
+  
+  // Configuración
+  isRequired    Boolean   @default(true)
+  estimatedDuration Int?  // duración estimada en minutos
+  order         Int       @default(0)
+  
+  createdAt     DateTime  @default(now())
+  
+  // Relaciones
+  submissions   TaskSubmission[]
+  
+  @@index([weeklyPlanId, dayOfWeek])
+  @@index([taskType])
+}
+
+// Envíos/completado de tareas por usuarios
+model TaskSubmission {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId      String
+  task        DailyTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  // Datos del envío
+  submittedData Json?   // Datos específicos del envío
+  files        String[] // URLs de archivos subidos
+  notes        String?
+  
+  // Estado
+  status      String    @default("completed") // completed, partial, failed
+  score       Float?    // Puntuación si aplica
+  feedback    String?   // Comentarios del coach/admin
+  
+  completedAt DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  
+  @@unique([userId, taskId])
+  @@index([userId])
+  @@index([taskId])
+  @@index([completedAt])
+}
+
+// Sistema de Formularios
+model Form {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  category    ContentCategory?
+  isActive    Boolean     @default(true)
+  isRequired  Boolean     @default(false)
+  createdBy   String      // ID del usuario que crea el formulario
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // Relaciones
+  fields      InputField[]
+  submissions FormSubmission[]
+  
+  @@index([isActive])
+  @@index([category])
+}
+
+// Campos de entrada para formularios
+model InputField {
+  id          String      @id @default(cuid())
+  formId      String
+  form        Form        @relation(fields: [formId], references: [id], onDelete: Cascade)
+  
+  // Configuración del campo
+  name        String      // Nombre del campo (para el backend)
+  label       String      // Etiqueta visible para el usuario
+  type        InputType
+  placeholder String?
+  helpText    String?
+  
+  // Validación
+  isRequired  Boolean     @default(false)
+  minLength   Int?
+  maxLength   Int?
+  minValue    Float?
+  maxValue    Float?
+  pattern     String?     // Regex pattern para validación
+  
+  // Opciones para campos de selección
+  options     Json?       // Array de opciones para SELECT, RADIO, CHECKBOX
+  
+  // Configuración visual
+  order       Int         @default(0)
+  width       String?     // CSS width (ej: "100%", "50%")
+  
+  createdAt   DateTime    @default(now())
+  
+  @@index([formId])
+  @@index([order])
+}
+
+// Envíos de formularios por usuarios
+model FormSubmission {
+  id          String   @id @default(cuid())
+  formId      String
+  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Datos del envío
+  data        Json     // Respuestas del formulario
+  files       String[] // URLs de archivos subidos
+  
+  // Metadatos
+  ipAddress   String?
+  userAgent   String?
+  submittedAt DateTime @default(now())
+  
+  // Estado y procesamiento
+  status      String   @default("submitted") // submitted, reviewed, approved, rejected
+  reviewedBy  String?  // ID del usuario que revisó
+  reviewedAt  DateTime?
+  feedback    String?
+  
+  @@index([formId])
+  @@index([userId])
+  @@index([submittedAt])
+  @@index([status])
 }
 
 enum ServiceLevel {
@@ -314,6 +515,48 @@ enum UserRole {
   COACH
 }
 
+// Categorías superiores para organizar el contenido
+enum ContentCategory {
+  EXERCISE    // Ejercicios físicos
+  ROUTINE     // Rutinas de entrenamiento
+  DIET        // Nutrición y dietas
+  MINDSET     // Desarrollo mental y motivación
+}
+
+// Tipos de tareas para los programas semanales
+enum TaskType {
+  WORKOUT           // Entrenamiento con rutinas
+  CARDIO            // Ejercicio cardiovascular
+  VIDEO             // Video educativo o motivacional
+  NUTRITION         // Tarea relacionada con nutrición
+  RECORD_PROGRESS   // Registrar progreso con métricas personales
+  PHOTO             // Subir fotos de progreso
+  SESSION           // Sesión presencial o online
+  MESSAGE           // Mensaje programado
+  FORM              // Completar formulario
+}
+
+// Tipos de entrada para formularios
+enum InputType {
+  TEXT              // Campo de texto
+  TEXTAREA          // Área de texto multilínea
+  NUMBER            // Campo numérico
+  EMAIL             // Campo de email
+  PASSWORD          // Campo de contraseña
+  DATE              // Selector de fecha
+  TIME              // Selector de hora
+  SELECT            // Lista desplegable
+  MULTISELECT       // Selección múltiple
+  RADIO             // Botones de radio
+  CHECKBOX          // Casillas de verificación
+  FILE              // Subida de archivo
+  RATING            // Calificación (estrellas)
+  SLIDER            // Control deslizante
+  URL               // Campo de URL
+  PHONE             // Campo de teléfono
+  COLOR             // Selector de color
+}
+
 model Exercise {
   id          String          @id @default(cuid())
   name        String
@@ -321,6 +564,7 @@ model Exercise {
   type        ExerciseType
   intensity   IntensityLevel
   level       UserLevel
+  category    ContentCategory @default(EXERCISE)
   technique   String?
   videoUrl    String?
   imageUrl    String?
@@ -336,6 +580,7 @@ model WorkoutRoutine {
   title       String
   objective   String?
   level       UserLevel
+  category    ContentCategory @default(ROUTINE)
   duration    Int?         // total en minutos
   isPublic    Boolean      @default(false)
   createdAt   DateTime     @default(now())
@@ -585,6 +830,109 @@ model Testimonial {
   @@index([isActive])
   @@index([isFeatured])
   @@index([category])
+}
+
+// Sistema de Gamificación - Logros
+enum AchievementRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum AchievementCategory {
+  STREAK
+  HABITS
+  CHALLENGES
+  MILESTONE
+  SOCIAL
+  CONSISTENCY
+}
+
+model Achievement {
+  id          String              @id @default(cuid())
+  title       String
+  description String
+  icon        String              // emoji
+  rarity      AchievementRarity   @default(COMMON)
+  category    AchievementCategory @default(HABITS)
+  points      Int                 @default(10)
+  requirements Json?              // condiciones específicas
+  isActive    Boolean             @default(true)
+  
+  // Relaciones
+  userAchievements UserAchievement[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([title, category])
+  @@index([rarity])
+  @@index([category])
+  @@index([isActive])
+}
+
+// Logros desbloqueados por usuarios
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  achievementId String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime    @default(now())
+  isViewed      Boolean     @default(false)
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([unlockedAt])
+}
+
+// Sistema de Niveles y XP
+model UserLevelData {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentLevel    Int      @default(1)
+  totalXP         Int      @default(0)
+  currentLevelXP  Int      @default(0)
+  nextLevelXP     Int      @default(100)
+  levelName       String   @default("Novato GF")
+  avatarEmoji     String   @default("🥚")
+  
+  // Estadísticas
+  totalPoints     Int      @default(0)
+  longestStreak   Int      @default(0)
+  achievementsUnlocked Int @default(0)
+  
+  // Configuración
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([currentLevel])
+}
+
+// Configuración de Niveles
+model LevelConfig {
+  id          String   @id @default(cuid())
+  level       Int      @unique
+  name        String
+  description String
+  emoji       String
+  requiredXP  Int
+  color       String   @default("#3B82F6")
+  
+  // Beneficios del nivel
+  benefits    Json?    // array de beneficios
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([level])
+  @@index([isActive])
 }
 
 enum TestimonialStatus {
