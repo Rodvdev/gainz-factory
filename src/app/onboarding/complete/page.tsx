@@ -107,7 +107,7 @@ export default function OnboardingComplete() {
     }, 1500)
 
     return () => clearInterval(stepInterval)
-  }, [])
+  }, [steps.length])
 
   useEffect(() => {
     // Animate confetti

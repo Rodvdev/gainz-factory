@@ -21,7 +21,7 @@ export default function OnboardingWelcome() {
       setCurrentMessage((prev) => (prev + 1) % messages.length)
     }, 3000)
     return () => clearInterval(interval)
-  }, [])
+  }, [messages.length])
 
   return (
     <div className="min-h-screen bg-white text-gray-900 overflow-hidden">

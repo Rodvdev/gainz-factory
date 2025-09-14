@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
           points: habit.points,
           color: habit.color,
           icon: habit.icon,
-          schedule: (habit as any).schedule
+          schedule: (habit as { schedule?: unknown }).schedule
         })),
         goals: goals.map((goal: UserGoal) => ({
           id: goal.id,
