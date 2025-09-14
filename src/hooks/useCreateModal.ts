@@ -84,7 +84,7 @@ export function useCreateModal() {
               type: 'number',
               placeholder: '1',
               required: true,
-              validation: (value) => value <= 0 ? 'El valor debe ser mayor a 0' : null
+              validation: (value) => typeof value === 'number' && value <= 0 ? 'El valor debe ser mayor a 0' : null
             },
             {
               name: 'points',
@@ -92,7 +92,7 @@ export function useCreateModal() {
               type: 'number',
               placeholder: '1',
               required: true,
-              validation: (value) => value <= 0 ? 'Los puntos deben ser mayor a 0' : null
+              validation: (value) => typeof value === 'number' && value <= 0 ? 'Los puntos deben ser mayor a 0' : null
             }
           ]
         }
@@ -125,7 +125,7 @@ export function useCreateModal() {
               type: 'number',
               placeholder: '30',
               required: true,
-              validation: (value) => value <= 0 ? 'El valor debe ser mayor a 0' : null
+              validation: (value) => typeof value === 'number' && value <= 0 ? 'El valor debe ser mayor a 0' : null
             },
             {
               name: 'startDate',
@@ -307,7 +307,7 @@ export function useCreateModal() {
               type: 'number',
               placeholder: '60',
               required: false,
-              validation: (value) => value && value <= 0 ? 'La duración debe ser mayor a 0' : null
+              validation: (value) => typeof value === 'number' && value <= 0 ? 'La duración debe ser mayor a 0' : null
             },
             {
               name: 'isPublic',
