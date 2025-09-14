@@ -13,28 +13,26 @@ import {
   Target,
   BookOpen,
   Star,
-  Zap
+  Zap,
+  CheckCircle,
+  Trophy,
+  ClipboardList,
+  FileText,
+  Calendar as CalendarIcon2,
+  Assignment,
+  TrendingUp,
+  Book,
+  Ticket,
+  Award,
+  UserCheck,
+  ShoppingCart,
+  CreditCard,
+  Edit,
+  MessageSquare,
+  Reply,
+  Users
 } from "lucide-react"
-
-interface CalendarEvent {
-  id: string
-  title: string
-  type: string
-  startTime: string
-  endTime: string
-  location?: string
-  coach?: string
-  programmeId?: string
-  programmeTitle?: string
-  status: string
-}
-
-interface CalendarDay {
-  date: Date
-  isCurrentMonth: boolean
-  isToday: boolean
-  events: CalendarEvent[]
-}
+import { CalendarEventUnion, CalendarDay, EVENT_TYPE_CONFIG } from "@/types/calendar"
 
 const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -44,30 +42,48 @@ const MONTHS = [
 const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 const getEventTypeIcon = (type: string) => {
-  switch (type.toLowerCase()) {
-    case 'workout': return <Target className="w-4 h-4" />
-    case 'cardio': return <Zap className="w-4 h-4" />
-    case 'nutrition': return <BookOpen className="w-4 h-4" />
-    case 'mindset': return <Star className="w-4 h-4" />
-    case 'session': return <User className="w-4 h-4" />
-    default: return <Clock className="w-4 h-4" />
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    'workout': Target,
+    'cardio': Zap,
+    'nutrition': BookOpen,
+    'mindset': Star,
+    'session': User,
+    'meeting': Users,
+    'habit': CheckCircle,
+    'challenge': Trophy,
+    'task': ClipboardList,
+    'form': FileText,
+    'programme': CalendarIcon2,
+    'assignment': Assignment,
+    'progress': TrendingUp,
+    'journal': Book,
+    'goal': Target,
+    'ticket': Ticket,
+    'achievement': Award,
+    'coach-assignment': UserCheck,
+    'order': ShoppingCart,
+    'subscription': CreditCard,
+    'blog': Edit,
+    'forum-topic': MessageSquare,
+    'forum-reply': Reply
   }
+  
+  const IconComponent = iconMap[type.toLowerCase()] || Clock
+  return <IconComponent className="w-4 h-4" />
 }
 
 const getEventTypeColor = (type: string) => {
-  switch (type.toLowerCase()) {
-    case 'workout': return 'bg-red-100 text-red-600 border-red-200'
-    case 'cardio': return 'bg-orange-100 text-orange-600 border-orange-200'
-    case 'nutrition': return 'bg-green-100 text-green-600 border-green-200'
-    case 'mindset': return 'bg-purple-100 text-purple-600 border-purple-200'
-    case 'session': return 'bg-blue-100 text-blue-600 border-blue-200'
-    default: return 'bg-gray-100 text-gray-600 border-gray-200'
+  const config = EVENT_TYPE_CONFIG[type.toLowerCase()]
+  if (!config) {
+    return 'bg-gray-100 text-gray-600 border-gray-200'
   }
+  
+  return `${config.bgColor} ${config.color} ${config.borderColor}`
 }
 
 export default function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [events, setEvents] = useState<CalendarEvent[]>([])
+  const [events, setEvents] = useState<CalendarEventUnion[]>([])
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -335,6 +351,69 @@ export default function CalendarView() {
                         {event.programmeTitle && (
                           <div className="text-sm text-blue-600 mt-1">
                             Programa: {event.programmeTitle}
+                          </div>
+                        )}
+
+                        {/* Información específica según el tipo de evento */}
+                        {event.type === 'habit' && 'habitCategory' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Categoría: {event.habitCategory.replace('_', ' ').toLowerCase()}
+                          </div>
+                        )}
+                        
+                        {event.type === 'challenge' && 'targetValue' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Progreso: {event.currentValue}/{event.targetValue}
+                            {event.reward && ` • Recompensa: ${event.reward}`}
+                          </div>
+                        )}
+                        
+                        {event.type === 'task' && 'taskType' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Tipo: {event.taskType.replace('_', ' ').toLowerCase()}
+                            {event.score && ` • Puntuación: ${event.score}`}
+                          </div>
+                        )}
+                        
+                        {event.type === 'progress' && 'metricType' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Métrica: {event.metricType.replace('_', ' ').toLowerCase()}
+                          </div>
+                        )}
+                        
+                        {event.type === 'achievement' && 'points' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Puntos: {event.points} • Rarity: {event.rarity}
+                          </div>
+                        )}
+                        
+                        {event.type === 'order' && 'total' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Total: ${event.total} • Estado: {event.paymentStatus}
+                          </div>
+                        )}
+                        
+                        {event.type === 'subscription' && 'planName' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Plan: {event.planName} • ${event.planPrice}/{event.billingCycle}
+                          </div>
+                        )}
+                        
+                        {event.type === 'blog' && 'views' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Vistas: {event.views} • Likes: {event.likes}
+                          </div>
+                        )}
+                        
+                        {event.type === 'forum-topic' && 'repliesCount' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Respuestas: {event.repliesCount} • Vistas: {event.views}
+                          </div>
+                        )}
+                        
+                        {event.type === 'coach-assignment' && 'coachName' in event && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Coach: {event.coachName} • {event.coachRole}
                           </div>
                         )}
                       </div>

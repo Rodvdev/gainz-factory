@@ -1,76 +1,94 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-import * as jwt from "jsonwebtoken"
-
-const prisma = new PrismaClient()
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/db"
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
-    
     const { searchParams } = new URL(request.url)
-    const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString())
-    const month = parseInt(searchParams.get('month') || (new Date().getMonth() + 1).toString())
-    
-    // Calcular rango de fechas para el mes
+    const year = parseInt(searchParams.get("year") || new Date().getFullYear().toString())
+    const month = parseInt(searchParams.get("month") || (new Date().getMonth() + 1).toString())
+
+    // Crear fechas de inicio y fin del mes
     const startDate = new Date(year, month - 1, 1)
     const endDate = new Date(year, month, 0, 23, 59, 59)
-    
-    // Obtener eventos del calendario del usuario
+
+    const userId = session.user.id
+
+    // Obtener eventos principales del calendario
     const calendarEvents = await prisma.calendarEvent.findMany({
       where: {
-        userId: decoded.userId,
+        userId,
         startTime: {
           gte: startDate,
           lte: endDate
         }
       },
       include: {
-        programme: {
-          select: {
-            id: true,
-            title: true
-          }
-        },
+        programme: true,
         teamMember: {
           include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true
-              }
-            }
+            user: true
           }
         }
-      },
-      orderBy: { startTime: 'asc' }
+      }
     })
 
-    // Obtener tareas de programmes activos para el mes
-    const userProgrammes = await prisma.userProgramme.findMany({
+    // Obtener entradas de hábitos
+    const habitEntries = await prisma.habitEntry.findMany({
       where: {
-        userId: decoded.userId,
-        status: 'active',
-        startDate: {
+        habit: { userId },
+        date: {
+          gte: startDate,
           lte: endDate
-        },
-        OR: [
-          { endDate: null },
-          { endDate: { gte: startDate } }
-        ]
+        }
       },
       include: {
-        programme: {
+        habit: true
+      }
+    })
+
+    // Obtener desafíos
+    const challenges = await prisma.challenge.findMany({
+      where: {
+        userId,
+        OR: [
+          {
+            startDate: {
+              gte: startDate,
+              lte: endDate
+            }
+          },
+          {
+            endDate: {
+              gte: startDate,
+              lte: endDate
+            }
+          }
+        ]
+      }
+    })
+
+    // Obtener envíos de tareas
+    const taskSubmissions = await prisma.taskSubmission.findMany({
+      where: {
+        userId,
+        completedAt: {
+          gte: startDate,
+          lte: endDate
+        }
+      },
+      include: {
+        task: {
           include: {
-            weeklyPlans: {
+            weeklyPlan: {
               include: {
-                dailyTasks: true
+                programme: true
               }
             }
           }
@@ -78,72 +96,132 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Generar eventos de programmes para el mes
-    const programmeEvents = []
-    
-    for (const userProgramme of userProgrammes) {
-      const programme = userProgramme.programme
-      const startProgrammeDate = new Date(userProgramme.startDate)
-      
-      for (const weeklyPlan of programme.weeklyPlans) {
-        const weekStartDate = new Date(startProgrammeDate)
-        weekStartDate.setDate(startProgrammeDate.getDate() + (weeklyPlan.weekNumber - 1) * 7)
-        
-        for (const dailyTask of weeklyPlan.dailyTasks) {
-          const taskDate = new Date(weekStartDate)
-          taskDate.setDate(weekStartDate.getDate() + dailyTask.dayOfWeek)
-          
-          // Verificar si la tarea está en el rango del mes solicitado
-          if (taskDate >= startDate && taskDate <= endDate) {
-            // Verificar si ya está completada
-            const isCompleted = await prisma.taskSubmission.findUnique({
-              where: {
-                userId_taskId: {
-                  userId: decoded.userId,
-                  taskId: dailyTask.id
-                }
-              }
-            })
-
-            programmeEvents.push({
-              id: `programme-${dailyTask.id}`,
-              title: dailyTask.title,
-              type: dailyTask.taskType.toLowerCase(),
-              startTime: taskDate.toISOString(),
-              endTime: new Date(taskDate.getTime() + (dailyTask.estimatedDuration || 30) * 60000).toISOString(),
-              status: isCompleted ? 'completed' : 'scheduled',
-              programmeId: programme.id,
-              programmeTitle: programme.title,
-              taskData: dailyTask.taskData
-            })
-          }
+    // Obtener métricas de progreso
+    const progressMetrics = await prisma.progressMetrics.findMany({
+      where: {
+        userId,
+        date: {
+          gte: startDate,
+          lte: endDate
         }
       }
-    }
+    })
 
-    // Combinar eventos del calendario con eventos de programmes
-    const allEvents = [
-      ...calendarEvents.map(event => ({
+    // Convertir todos los eventos a un formato estándar
+    const events = []
+
+    // Eventos del calendario principal
+    calendarEvents.forEach(event => {
+      events.push({
         id: event.id,
         title: event.title,
         type: event.type,
         startTime: event.startTime.toISOString(),
         endTime: event.endTime.toISOString(),
         location: event.location,
-        coach: event.teamMember ? 
-          `${event.teamMember.user.firstName} ${event.teamMember.user.lastName}` : 
-          null,
+        coach: event.teamMember?.user?.firstName + ' ' + event.teamMember?.user?.lastName,
         programmeId: event.programmeId,
         programmeTitle: event.programme?.title,
-        status: event.status
-      })),
-      ...programmeEvents
-    ]
+        status: event.status,
+        description: event.description,
+        isRecurring: event.isRecurring,
+        source: 'calendar'
+      })
+    })
+
+    // Entradas de hábitos
+    habitEntries.forEach(entry => {
+      const eventDate = new Date(entry.date)
+      eventDate.setHours(9, 0, 0, 0) // Hora por defecto 9:00 AM
+      const endDate = new Date(eventDate)
+      endDate.setHours(10, 0, 0, 0) // Duración de 1 hora
+
+      events.push({
+        id: `habit-${entry.id}`,
+        title: `${entry.habit.name} - ${entry.status}`,
+        type: 'habit',
+        startTime: eventDate.toISOString(),
+        endTime: endDate.toISOString(),
+        status: entry.status.toLowerCase(),
+        description: entry.note || entry.habit.description,
+        habitId: entry.habitId,
+        habitCategory: entry.habit.category,
+        source: 'habit'
+      })
+    })
+
+    // Desafíos
+    challenges.forEach(challenge => {
+      const startDate = new Date(challenge.startDate)
+      const endDate = new Date(challenge.endDate)
+      
+      events.push({
+        id: `challenge-${challenge.id}`,
+        title: challenge.name,
+        type: 'challenge',
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString(),
+        status: challenge.isCompleted ? 'completed' : 'active',
+        description: challenge.description,
+        targetValue: challenge.targetValue,
+        currentValue: challenge.currentValue,
+        reward: challenge.reward,
+        source: 'challenge'
+      })
+    })
+
+    // Envíos de tareas
+    taskSubmissions.forEach(submission => {
+      events.push({
+        id: `task-${submission.id}`,
+        title: submission.task.title,
+        type: 'task',
+        startTime: submission.completedAt.toISOString(),
+        endTime: new Date(submission.completedAt.getTime() + 30 * 60000).toISOString(), // +30 min
+        status: submission.status,
+        description: submission.task.description,
+        programmeTitle: submission.task.weeklyPlan.programme.title,
+        programmeId: submission.task.weeklyPlan.programmeId,
+        taskType: submission.task.taskType,
+        score: submission.score,
+        feedback: submission.feedback,
+        source: 'task'
+      })
+    })
+
+    // Métricas de progreso
+    progressMetrics.forEach(metric => {
+      const eventDate = new Date(metric.date)
+      eventDate.setHours(8, 0, 0, 0) // Hora por defecto 8:00 AM
+      const endDate = new Date(eventDate)
+      endDate.setHours(9, 0, 0, 0) // Duración de 1 hora
+
+      events.push({
+        id: `metric-${metric.id}`,
+        title: `Progreso: ${metric.metricType} - ${metric.value} ${metric.unit}`,
+        type: 'progress',
+        startTime: eventDate.toISOString(),
+        endTime: endDate.toISOString(),
+        status: 'completed',
+        description: metric.notes,
+        metricType: metric.metricType,
+        value: metric.value,
+        unit: metric.unit,
+        photoUrl: metric.photoUrl,
+        isPrivate: metric.isPrivate,
+        source: 'progress'
+      })
+    })
 
     // Ordenar eventos por fecha
-    allEvents.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+    events.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
 
-    return NextResponse.json({ events: allEvents })
+    return NextResponse.json({
+      events,
+      total: events.length,
+      month,
+      year
+    })
 
   } catch (error) {
     console.error("Error fetching calendar events:", error)
@@ -151,75 +229,5 @@ export async function GET(request: NextRequest) {
       { error: "Error interno del servidor" },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
-    
-    const body = await request.json()
-    const {
-      type,
-      title,
-      description,
-      startTime,
-      endTime,
-      location,
-      programmeId,
-      teamMemberId
-    } = body
-
-    // Crear nuevo evento en el calendario
-    const newEvent = await prisma.calendarEvent.create({
-      data: {
-        userId: decoded.userId,
-        type,
-        title,
-        description,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-        location,
-        programmeId,
-        teamMemberId
-      },
-      include: {
-        programme: {
-          select: {
-            id: true,
-            title: true
-          }
-        },
-        teamMember: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true
-              }
-            }
-          }
-        }
-      }
-    })
-
-    return NextResponse.json({ event: newEvent }, { status: 201 })
-
-  } catch (error) {
-    console.error("Error creating calendar event:", error)
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    )
-  } finally {
-    await prisma.$disconnect()
   }
 }

@@ -19,6 +19,7 @@ import {
   Star,
   Zap
 } from "lucide-react"
+import AnimatedEgg from "./AnimatedEgg"
 
 interface UserProgress {
   totalXP: number
@@ -29,6 +30,22 @@ interface UserProgress {
   completedProgrammes: number
   activeProgrammes: number
   totalWorkouts: number
+  currentLevelXP?: number
+  nextLevelXP?: number
+  progress?: number
+}
+
+interface UserLevelData {
+  userLevel: {
+    currentLevel: number
+    totalXP: number
+    currentLevelXP: number
+    nextLevelXP: number
+    levelName: string
+    avatarEmoji: string
+  }
+  nextLevelXP: number
+  progress: number
 }
 
 interface ActiveProgramme {
@@ -65,6 +82,7 @@ interface ProgressMetric {
 
 export default function TransformationOS() {
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
+  const [userLevel, setUserLevel] = useState<UserLevelData | null>(null)
   const [activeProgrammes, setActiveProgrammes] = useState<ActiveProgramme[]>([])
   const [todayTasks, setTodayTasks] = useState<TodayTask[]>([])
   const [progressMetrics, setProgressMetrics] = useState<ProgressMetric[]>([])
@@ -103,6 +121,13 @@ export default function TransformationOS() {
           }
         })
 
+        // Fetch user level data
+        const levelResponse = await fetch("/api/user/level", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        })
+
         if (progressResponse.ok) {
           const progressData = await progressResponse.json()
           setUserProgress(progressData.progress)
@@ -121,6 +146,11 @@ export default function TransformationOS() {
         if (metricsResponse.ok) {
           const metricsData = await metricsResponse.json()
           setProgressMetrics(metricsData.metrics || [])
+        }
+
+        if (levelResponse.ok) {
+          const levelData = await levelResponse.json()
+          setUserLevel(levelData)
         }
 
       } catch (error) {
@@ -169,7 +199,18 @@ export default function TransformationOS() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="text-3xl">{userProgress?.avatarEmoji || "🥚"}</div>
+                {userProgress?.currentLevel === 1 ? (
+                  <AnimatedEgg
+                    currentLevel={userProgress.currentLevel}
+                    totalXP={userProgress.totalXP}
+                    nextLevelXP={userLevel?.nextLevelXP || 100}
+                    currentLevelXP={userLevel?.userLevel?.currentLevelXP || 0}
+                    isActive={true}
+                    onAttempt={() => console.log("¡El huevo fue tocado!")}
+                  />
+                ) : (
+                  <div className="text-3xl">{userProgress?.avatarEmoji || "🥚"}</div>
+                )}
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
                     Hola, Bienvenido a tu Transformación

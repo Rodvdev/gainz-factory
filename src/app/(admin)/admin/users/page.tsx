@@ -43,6 +43,22 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [newUser, setNewUser] = useState<Partial<User>>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "USER",
+    bio: "",
+    phoneNumber: "",
+    fitnessLevel: "",
+    timezone: "",
+    preferredLanguage: "",
+    weeklyCommitment: 3,
+    intensityPreference: "",
+    motivationType: "",
+    personalManifesto: ""
+  })
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -82,9 +98,92 @@ export default function UsersPage() {
     return matchesSearch && matchesRole && matchesStatus
   })
 
+  const handleCreateUser = () => {
+    setNewUser({
+      firstName: "",
+      lastName: "",
+      email: "",
+      role: "USER",
+      bio: "",
+      phoneNumber: "",
+      fitnessLevel: "",
+      timezone: "",
+      preferredLanguage: "",
+      weeklyCommitment: 3,
+      intensityPreference: "",
+      motivationType: "",
+      personalManifesto: ""
+    })
+    setIsCreating(true)
+    setShowUserModal(true)
+  }
+
   const handleEditUser = (user: User) => {
     setSelectedUser({ ...user })
+    setIsCreating(false)
     setShowUserModal(true)
+  }
+
+  const handleCreateNewUser = async () => {
+    if (!newUser.firstName || !newUser.lastName || !newUser.email) {
+      alert("Por favor completa los campos obligatorios")
+      return
+    }
+
+    try {
+      const token = localStorage.getItem("authToken")
+      const response = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          email: newUser.email,
+          role: newUser.role,
+          bio: newUser.bio,
+          phoneNumber: newUser.phoneNumber,
+          fitnessLevel: newUser.fitnessLevel,
+          timezone: newUser.timezone,
+          preferredLanguage: newUser.preferredLanguage,
+          weeklyCommitment: newUser.weeklyCommitment,
+          intensityPreference: newUser.intensityPreference,
+          motivationType: newUser.motivationType,
+          personalManifesto: newUser.personalManifesto
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setUsers([...users, data.user])
+        setShowUserModal(false)
+        setIsCreating(false)
+        setNewUser({
+          firstName: "",
+          lastName: "",
+          email: "",
+          role: "USER",
+          bio: "",
+          phoneNumber: "",
+          fitnessLevel: "",
+          timezone: "",
+          preferredLanguage: "",
+          weeklyCommitment: 3,
+          intensityPreference: "",
+          motivationType: "",
+          personalManifesto: ""
+        })
+        alert("Usuario creado exitosamente")
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || "Error al crear usuario")
+      }
+    } catch (error) {
+      console.error("Error creating user:", error)
+      alert("Error al crear usuario")
+    }
   }
 
   const handleUpdateUser = async () => {
@@ -219,7 +318,10 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">Gestión de Usuarios</h1>
           <p className="text-gray-600 mt-2">Administra usuarios, roles y permisos</p>
         </div>
-        <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+        <button 
+          onClick={handleCreateUser}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+        >
           <Plus className="w-4 h-4" />
           <span>Nuevo Usuario</span>
         </button>
@@ -426,12 +528,12 @@ export default function UsersPage() {
       </div>
 
       {/* User Modal */}
-      {showUserModal && selectedUser && (
+      {showUserModal && (selectedUser || isCreating) && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Editar Usuario
+                {isCreating ? "Crear Nuevo Usuario" : "Editar Usuario"}
               </h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -441,8 +543,14 @@ export default function UsersPage() {
                     </label>
                     <input
                       type="text"
-                      value={selectedUser.firstName}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, firstName: e.target.value })}
+                      value={isCreating ? newUser.firstName || "" : selectedUser?.firstName || ""}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, firstName: e.target.value })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, firstName: e.target.value })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -452,8 +560,14 @@ export default function UsersPage() {
                     </label>
                     <input
                       type="text"
-                      value={selectedUser.lastName}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, lastName: e.target.value })}
+                      value={isCreating ? newUser.lastName || "" : selectedUser?.lastName || ""}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, lastName: e.target.value })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, lastName: e.target.value })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -466,8 +580,14 @@ export default function UsersPage() {
                     </label>
                     <input
                       type="email"
-                      value={selectedUser.email}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
+                      value={isCreating ? newUser.email || "" : selectedUser?.email || ""}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, email: e.target.value })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, email: e.target.value })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -477,8 +597,14 @@ export default function UsersPage() {
                     </label>
                     <input
                       type="text"
-                      value={selectedUser.phoneNumber || ""}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, phoneNumber: e.target.value })}
+                      value={isCreating ? newUser.phoneNumber || "" : selectedUser?.phoneNumber || ""}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, phoneNumber: e.target.value })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, phoneNumber: e.target.value })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -490,8 +616,14 @@ export default function UsersPage() {
                       Rol
                     </label>
                     <select
-                      value={selectedUser.role}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value as UserRole })}
+                      value={isCreating ? newUser.role || "USER" : selectedUser?.role || "USER"}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, role: e.target.value as UserRole })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, role: e.target.value as UserRole })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     >
                       <option value="USER">Usuario</option>
@@ -504,8 +636,14 @@ export default function UsersPage() {
                       Nivel de Fitness
                     </label>
                     <select
-                      value={selectedUser.fitnessLevel || ""}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, fitnessLevel: e.target.value })}
+                      value={isCreating ? newUser.fitnessLevel || "" : selectedUser?.fitnessLevel || ""}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, fitnessLevel: e.target.value })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, fitnessLevel: e.target.value })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     >
                       <option value="">Sin nivel</option>
@@ -525,8 +663,14 @@ export default function UsersPage() {
                       type="number"
                       min="1"
                       max="7"
-                      value={selectedUser.weeklyCommitment || ""}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, weeklyCommitment: parseInt(e.target.value) })}
+                      value={isCreating ? newUser.weeklyCommitment || 3 : selectedUser?.weeklyCommitment || 3}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, weeklyCommitment: parseInt(e.target.value) })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, weeklyCommitment: parseInt(e.target.value) })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
@@ -535,8 +679,14 @@ export default function UsersPage() {
                       Preferencia de Intensidad
                     </label>
                     <select
-                      value={selectedUser.intensityPreference || ""}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, intensityPreference: e.target.value })}
+                      value={isCreating ? newUser.intensityPreference || "" : selectedUser?.intensityPreference || ""}
+                      onChange={(e) => {
+                        if (isCreating) {
+                          setNewUser({ ...newUser, intensityPreference: e.target.value })
+                        } else {
+                          setSelectedUser({ ...selectedUser!, intensityPreference: e.target.value })
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     >
                       <option value="">Sin preferencia</option>
@@ -552,8 +702,14 @@ export default function UsersPage() {
                     Tipo de Motivación
                   </label>
                   <select
-                    value={selectedUser.motivationType || ""}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, motivationType: e.target.value })}
+                    value={isCreating ? newUser.motivationType || "" : selectedUser?.motivationType || ""}
+                    onChange={(e) => {
+                      if (isCreating) {
+                        setNewUser({ ...newUser, motivationType: e.target.value })
+                      } else {
+                        setSelectedUser({ ...selectedUser!, motivationType: e.target.value })
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   >
                     <option value="">Sin tipo</option>
@@ -569,8 +725,14 @@ export default function UsersPage() {
                     Biografía
                   </label>
                   <textarea
-                    value={selectedUser.bio || ""}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, bio: e.target.value })}
+                    value={isCreating ? newUser.bio || "" : selectedUser?.bio || ""}
+                    onChange={(e) => {
+                      if (isCreating) {
+                        setNewUser({ ...newUser, bio: e.target.value })
+                      } else {
+                        setSelectedUser({ ...selectedUser!, bio: e.target.value })
+                      }
+                    }}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   />
@@ -581,8 +743,14 @@ export default function UsersPage() {
                     Manifiesto Personal
                   </label>
                   <textarea
-                    value={selectedUser.personalManifesto || ""}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, personalManifesto: e.target.value })}
+                    value={isCreating ? newUser.personalManifesto || "" : selectedUser?.personalManifesto || ""}
+                    onChange={(e) => {
+                      if (isCreating) {
+                        setNewUser({ ...newUser, personalManifesto: e.target.value })
+                      } else {
+                        setSelectedUser({ ...selectedUser!, personalManifesto: e.target.value })
+                      }
+                    }}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   />
@@ -590,16 +758,20 @@ export default function UsersPage() {
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button
-                  onClick={() => setShowUserModal(false)}
+                  onClick={() => {
+                    setShowUserModal(false)
+                    setIsCreating(false)
+                    setSelectedUser(null)
+                  }}
                   className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
                 >
                   Cancelar
                 </button>
                 <button 
-                  onClick={handleUpdateUser}
+                  onClick={isCreating ? handleCreateNewUser : handleUpdateUser}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
                 >
-                  Guardar Cambios
+                  {isCreating ? "Crear Usuario" : "Guardar Cambios"}
                 </button>
               </div>
             </div>

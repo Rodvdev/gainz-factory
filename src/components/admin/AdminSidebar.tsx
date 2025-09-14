@@ -30,19 +30,19 @@ interface AdminSidebarProps {
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Usuarios", href: "/admin/users", icon: Users },
-  { name: "Ejercicios", href: "/admin/exercises", icon: Dumbbell },
-  { name: "Rutinas", href: "/admin/routines", icon: Activity },
-  { name: "Programas", href: "/admin/programmes", icon: Calendar },
-  { name: "Formularios", href: "/admin/forms", icon: ClipboardList },
-  { name: "Recetas", href: "/admin/recipes", icon: ChefHat },
-  { name: "Contenido", href: "/admin/content", icon: FileText },
-  { name: "Equipo", href: "/admin/team", icon: Users2 },
-  { name: "Business", href: "/admin/business", icon: Building2 },
-  { name: "Blog", href: "/admin/blog", icon: BookOpen },
-  { name: "Servicios", href: "/admin/services", icon: ShoppingCart },
-  { name: "Foro", href: "/admin/forum", icon: MessageSquare },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { name: "Usuarios", href: "/admin/users", icon: Users },
+  { name: "Equipo", href: "/admin/team", icon: Users2 },
+  { name: "Programas", href: "/admin/programmes", icon: Calendar },
+  { name: "Rutinas", href: "/admin/routines", icon: Activity },
+  { name: "Ejercicios", href: "/admin/exercises", icon: Dumbbell },
+  { name: "Recetas", href: "/admin/recipes", icon: ChefHat },
+  { name: "Business", href: "/admin/business", icon: Building2 },
+  { name: "Servicios", href: "/admin/services", icon: ShoppingCart },
+  { name: "Formularios", href: "/admin/forms", icon: ClipboardList },
+  { name: "Contenido", href: "/admin/content", icon: FileText },
+  { name: "Blog", href: "/admin/blog", icon: BookOpen },
+  { name: "Foro", href: "/admin/forum", icon: MessageSquare },
   { name: "Configuración", href: "/admin/settings", icon: Settings },
 ]
 
@@ -76,16 +76,16 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           >
             <div className="flex h-full flex-col">
               {/* Header */}
-              <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200">
+              <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200 bg-gradient-to-r from-red-600 to-red-700">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">GF</span>
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="text-red-600 font-bold text-sm">GF</span>
                   </div>
-                  <span className="text-xl font-bold text-gray-900">Admin</span>
+                  <span className="text-xl font-bold text-white">Admin Panel</span>
                 </div>
                 <button
                   onClick={onClose}
-                  className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                  className="lg:hidden p-2 rounded-md text-white hover:text-gray-200 hover:bg-red-500"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -99,10 +99,10 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                         isActive
-                          ? "bg-red-50 text-red-700 border border-red-200"
-                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                          ? "bg-red-50 text-red-700 border border-red-200 shadow-sm"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm"
                       }`}
                       onClick={() => {
                         // Close mobile sidebar when navigating
@@ -143,12 +143,12 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
         <div className="flex h-full flex-col bg-white shadow-xl border-r border-gray-200">
           {/* Header */}
-          <div className="flex h-16 items-center px-6 border-b border-gray-200">
+          <div className="flex h-16 items-center px-6 border-b border-gray-200 bg-gradient-to-r from-red-600 to-red-700">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">GF</span>
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-red-600 font-bold text-sm">GF</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Admin</span>
+              <span className="text-xl font-bold text-white">Admin Panel</span>
             </div>
           </div>
 
@@ -160,10 +160,10 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "bg-red-50 text-red-700 border border-red-200"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      ? "bg-red-50 text-red-700 border border-red-200 shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm"
                   }`}
                 >
                   <item.icon
