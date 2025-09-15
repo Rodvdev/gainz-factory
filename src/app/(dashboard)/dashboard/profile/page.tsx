@@ -30,12 +30,75 @@ interface User {
 }
 
 interface ProfileStats {
+  // Estadísticas principales
   totalDays: number;
+  daysSinceRegistration: number;
   currentStreak: number;
   longestStreak: number;
-  completedHabits: number;
   totalPoints: number;
   averageScore: number;
+  completedHabits: number;
+  
+  // Programas y tareas
+  completedProgrammes: number;
+  activeProgrammes: number;
+  completedTasks: number;
+  
+  // Logros y desafíos
+  achievementsUnlocked: number;
+  completedChallenges: number;
+  recentAchievements: Array<{
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+    rarity: string;
+    unlockedAt: string;
+  }>;
+  
+  // Nivel y gamificación
+  level: number;
+  levelName: string;
+  avatarEmoji: string;
+  totalXP: number;
+  
+  // Progreso físico
+  latestWeight?: {
+    value: number;
+    unit: string;
+    date: string;
+  } | null;
+  latestBodyFat?: {
+    value: number;
+    unit: string;
+    date: string;
+  } | null;
+  latestMuscleMass?: {
+    value: number;
+    unit: string;
+    date: string;
+  } | null;
+  
+  // Estadísticas de período
+  last30Days: {
+    points: number;
+    averageScore: number;
+    activeDays: number;
+  };
+  
+  // Análisis detallado
+  habitSuccessRates: Array<{
+    id: string;
+    name: string;
+    category: string;
+    successRate: number;
+    totalEntries: number;
+    completedEntries: number;
+  }>;
+  progressTrend: 'up' | 'down' | 'stable';
+  
+  // Satisfacción
+  satisfaction: number;
 }
 
 type TabType = 'info' | 'stats' | 'goals' | 'preferences';
@@ -44,6 +107,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshingStats, setRefreshingStats] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('info');
 
@@ -58,6 +122,22 @@ export default function ProfilePage() {
   useEffect(() => {
     loadUserData();
     loadUserStats();
+
+    // Listen for metrics updates to refresh stats
+    const handleMetricsUpdate = () => {
+      setRefreshingStats(true);
+      loadUserStats().finally(() => {
+        setRefreshingStats(false);
+      });
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('metricsUpdated', handleMetricsUpdate);
+      
+      return () => {
+        window.removeEventListener('metricsUpdated', handleMetricsUpdate);
+      };
+    }
   }, []);
 
   const loadUserData = async () => {
@@ -84,17 +164,58 @@ export default function ProfilePage() {
 
   const loadUserStats = async () => {
     try {
-      // Simulated stats - in real app would come from API
-      setStats({
-        totalDays: 45,
-        currentStreak: 12,
-        longestStreak: 28,
-        completedHabits: 287,
-        totalPoints: 3420,
-        averageScore: 78.5
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      const response = await fetch('/api/user/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch stats');
+      }
+
+      const data = await response.json();
+      setStats(data.stats);
     } catch (error) {
       console.error('Error loading stats:', error);
+      // Fallback to default stats if API fails
+      setStats({
+        totalDays: 0,
+        daysSinceRegistration: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        totalPoints: 0,
+        averageScore: 0,
+        completedHabits: 0,
+        completedProgrammes: 0,
+        activeProgrammes: 0,
+        completedTasks: 0,
+        achievementsUnlocked: 0,
+        completedChallenges: 0,
+        recentAchievements: [],
+        level: 1,
+        levelName: "Novato GF",
+        avatarEmoji: "🥚",
+        totalXP: 0,
+        latestWeight: null,
+        latestBodyFat: null,
+        latestMuscleMass: null,
+        last30Days: {
+          points: 0,
+          averageScore: 0,
+          activeDays: 0
+        },
+        habitSuccessRates: [],
+        progressTrend: 'stable' as const,
+        satisfaction: 0
+      });
     }
   };
 
@@ -333,6 +454,43 @@ export default function ProfilePage() {
       {/* Statistics Tab */}
       {activeTab === 'stats' && stats && (
         <div className="space-y-6">
+          {refreshingStats && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+              <span className="text-blue-700 text-sm font-medium">Actualizando estadísticas...</span>
+            </div>
+          )}
+          {/* Nivel y Progreso */}
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-4xl">{stats.avatarEmoji}</span>
+                  <div>
+                    <h3 className="text-xl font-bold">Nivel {stats.level}</h3>
+                    <p className="text-blue-100">{stats.levelName}</p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Progreso</span>
+                    <span>{stats.totalXP} XP</span>
+                  </div>
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <div 
+                      className="bg-white h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min((stats.totalXP % 1000) / 10, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold">{stats.satisfaction}%</p>
+                <p className="text-blue-100 text-sm">Satisfacción</p>
+              </div>
+            </div>
+          </div>
+
           {/* Main Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-lg border shadow-sm">
@@ -375,7 +533,46 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Additional Stats */}
+          {/* Progreso Físico */}
+          {(stats.latestWeight || stats.latestBodyFat || stats.latestMuscleMass) && (
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Progreso Físico</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {stats.latestWeight && (
+                  <div className="text-center">
+                    <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <span className="text-2xl">⚖️</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">{stats.latestWeight.value} {stats.latestWeight.unit}</p>
+                    <p className="text-sm text-gray-500">Peso</p>
+                    <p className="text-xs text-gray-400">{new Date(stats.latestWeight.date).toLocaleDateString('es-ES')}</p>
+                  </div>
+                )}
+                {stats.latestBodyFat && (
+                  <div className="text-center">
+                    <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <span className="text-2xl">📊</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">{stats.latestBodyFat.value} {stats.latestBodyFat.unit}</p>
+                    <p className="text-sm text-gray-500">Grasa Corporal</p>
+                    <p className="text-xs text-gray-400">{new Date(stats.latestBodyFat.date).toLocaleDateString('es-ES')}</p>
+                  </div>
+                )}
+                {stats.latestMuscleMass && (
+                  <div className="text-center">
+                    <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <span className="text-2xl">💪</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">{stats.latestMuscleMass.value} {stats.latestMuscleMass.unit}</p>
+                    <p className="text-sm text-gray-500">Masa Muscular</p>
+                    <p className="text-xs text-gray-400">{new Date(stats.latestMuscleMass.date).toLocaleDateString('es-ES')}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Estadísticas Detalladas */}
           <div className="bg-white rounded-lg border shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Logros y Progreso</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -385,6 +582,7 @@ export default function ProfilePage() {
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalDays}</p>
                 <p className="text-sm text-gray-500">Días activos</p>
+                <p className="text-xs text-gray-400">de {stats.daysSinceRegistration} días</p>
               </div>
 
               <div className="text-center">
@@ -407,11 +605,117 @@ export default function ProfilePage() {
                 <div className="h-16 w-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <HeartIcon className="h-8 w-8 text-pink-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">95%</p>
-                <p className="text-sm text-gray-500">Satisfacción</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.achievementsUnlocked}</p>
+                <p className="text-sm text-gray-500">Logros desbloqueados</p>
               </div>
             </div>
           </div>
+
+          {/* Programas y Tareas */}
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Programas y Tareas</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <TrophyIcon className="h-8 w-8 text-green-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{stats.completedProgrammes}</p>
+                <p className="text-sm text-gray-500">Programas completados</p>
+              </div>
+
+              <div className="text-center">
+                <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <ChartBarIcon className="h-8 w-8 text-blue-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{stats.activeProgrammes}</p>
+                <p className="text-sm text-gray-500">Programas activos</p>
+              </div>
+
+              <div className="text-center">
+                <div className="h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <CheckIcon className="h-8 w-8 text-purple-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{stats.completedTasks}</p>
+                <p className="text-sm text-gray-500">Tareas completadas</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Últimos 30 días */}
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Últimos 30 Días</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-900">{stats.last30Days.points}</p>
+                <p className="text-sm text-gray-500">Puntos obtenidos</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-900">{stats.last30Days.averageScore}%</p>
+                <p className="text-sm text-gray-500">Promedio de completación</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-900">{stats.last30Days.activeDays}</p>
+                <p className="text-sm text-gray-500">Días activos</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Logros Recientes */}
+          {stats.recentAchievements.length > 0 && (
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Logros Recientes</h3>
+              <div className="space-y-3">
+                {stats.recentAchievements.map((achievement) => (
+                  <div key={achievement.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <span className="text-2xl">{achievement.icon}</span>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">{achievement.title}</h4>
+                      <p className="text-sm text-gray-500">{achievement.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        achievement.rarity === 'LEGENDARY' ? 'bg-yellow-100 text-yellow-800' :
+                        achievement.rarity === 'EPIC' ? 'bg-purple-100 text-purple-800' :
+                        achievement.rarity === 'RARE' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {achievement.rarity}
+                      </span>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(achievement.unlockedAt).toLocaleDateString('es-ES')}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Hábitos más exitosos */}
+          {stats.habitSuccessRates.length > 0 && (
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Hábitos más Exitosos</h3>
+              <div className="space-y-3">
+                {stats.habitSuccessRates.map((habit) => (
+                  <div key={habit.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <BoltIcon className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">{habit.name}</h4>
+                        <p className="text-sm text-gray-500">{habit.category.replace('_', ' ')}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-gray-900">{habit.successRate}%</p>
+                      <p className="text-xs text-gray-500">{habit.completedEntries}/{habit.totalEntries}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

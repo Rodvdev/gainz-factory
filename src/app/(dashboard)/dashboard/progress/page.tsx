@@ -25,10 +25,14 @@ export default function ProgressPage() {
         })
 
         if (!response.ok) {
+          console.error("Auth check failed:", response.status, response.statusText)
           localStorage.removeItem("authToken")
+          localStorage.removeItem("token")
           router.push("/login")
           return
         }
+
+        console.log("Auth check successful, loading metrics page")
 
         setLoading(false)
       } catch (error) {
