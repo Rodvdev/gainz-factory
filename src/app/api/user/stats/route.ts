@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
 import * as jwt from "jsonwebtoken"
+import { 
+  UserWithStats, 
+  DailyScoreWithStats, 
+  HabitSuccessRate, 
+  RecentAchievement, 
+  LatestMetric, 
+  UserStatsResponse 
+} from "@/types/stats-api"
 
 const prisma = new PrismaClient()
 
@@ -81,11 +89,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function calculateUserStats(user: any) {
+async function calculateUserStats(user: UserWithStats): Promise<UserStatsResponse> {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000))
-  const ninetyDaysAgo = new Date(today.getTime() - (90 * 24 * 60 * 60 * 1000))
 
   // 1. Días activos (días con al menos un daily score)
   const activeDays = user.dailyScores.length
@@ -98,21 +105,21 @@ async function calculateUserStats(user: any) {
   const longestStreak = calculateLongestStreak(user.dailyScores)
 
   // 4. Puntos totales (suma de todos los daily scores)
-  const totalPoints = user.dailyScores.reduce((sum: number, score: any) => sum + score.totalPoints, 0)
+  const totalPoints = user.dailyScores.reduce((sum: number, score: DailyScoreWithStats) => sum + score.totalPoints, 0)
 
   // 5. Promedio diario de completación
   const averageScore = activeDays > 0 
-    ? user.dailyScores.reduce((sum: number, score: any) => sum + (score.completedHabits / score.totalHabits * 100), 0) / activeDays
+    ? user.dailyScores.reduce((sum: number, score: DailyScoreWithStats) => sum + (score.completedHabits / score.totalHabits * 100), 0) / activeDays
     : 0
 
   // 6. Hábitos completados (total de entradas completadas)
-  const completedHabits = user.habits.reduce((sum: number, habit: any) => 
-    sum + habit.entries.filter((entry: any) => entry.status === 'COMPLETED').length, 0
+  const completedHabits = user.habits.reduce((sum: number, habit) => 
+    sum + habit.entries.filter((entry) => entry.status === 'COMPLETED').length, 0
   )
 
   // 7. Programas completados
-  const completedProgrammes = user.userProgrammes.filter((up: any) => up.status === 'completed').length
-  const activeProgrammes = user.userProgrammes.filter((up: any) => up.status === 'active').length
+  const completedProgrammes = user.userProgrammes.filter((up) => up.status === 'completed').length
+  const activeProgrammes = user.userProgrammes.filter((up) => up.status === 'active').length
 
   // 8. Tareas completadas
   const completedTasks = user.taskSubmissions.length
@@ -125,9 +132,9 @@ async function calculateUserStats(user: any) {
   const completedChallenges = user.challenges.length
 
   // 11. Progreso físico (últimas métricas)
-  const latestWeight = user.progressMetrics.find((m: any) => m.metricType === 'weight')
-  const latestBodyFat = user.progressMetrics.find((m: any) => m.metricType === 'body_fat')
-  const latestMuscleMass = user.progressMetrics.find((m: any) => m.metricType === 'muscle_mass')
+  const latestWeight = user.progressMetrics.find((m) => m.metricType === 'weight')
+  const latestBodyFat = user.progressMetrics.find((m) => m.metricType === 'body_fat')
+  const latestMuscleMass = user.progressMetrics.find((m) => m.metricType === 'muscle_mass')
 
   // 12. Nivel y XP
   const userLevel = user.userLevel || {
@@ -141,18 +148,18 @@ async function calculateUserStats(user: any) {
   }
 
   // 13. Estadísticas de los últimos 30 días
-  const last30DaysScores = user.dailyScores.filter((score: any) => 
+  const last30DaysScores = user.dailyScores.filter((score) => 
     new Date(score.date) >= thirtyDaysAgo
   )
-  const last30DaysPoints = last30DaysScores.reduce((sum: number, score: any) => sum + score.totalPoints, 0)
+  const last30DaysPoints = last30DaysScores.reduce((sum: number, score) => sum + score.totalPoints, 0)
   const last30DaysAverage = last30DaysScores.length > 0 
-    ? last30DaysScores.reduce((sum: number, score: any) => sum + (score.completedHabits / score.totalHabits * 100), 0) / last30DaysScores.length
+    ? last30DaysScores.reduce((sum: number, score) => sum + (score.completedHabits / score.totalHabits * 100), 0) / last30DaysScores.length
     : 0
 
   // 14. Hábitos más exitosos (por completación)
-  const habitSuccessRates = user.habits.map((habit: any) => {
+  const habitSuccessRates: HabitSuccessRate[] = user.habits.map((habit) => {
     const totalEntries = habit.entries.length
-    const completedEntries = habit.entries.filter((entry: any) => entry.status === 'COMPLETED').length
+    const completedEntries = habit.entries.filter((entry) => entry.status === 'COMPLETED').length
     const successRate = totalEntries > 0 ? (completedEntries / totalEntries) * 100 : 0
     
     return {
@@ -163,7 +170,7 @@ async function calculateUserStats(user: any) {
       totalEntries,
       completedEntries
     }
-  }).sort((a: any, b: any) => b.successRate - a.successRate)
+  }).sort((a, b) => b.successRate - a.successRate)
 
   // 15. Tendencias de progreso
   const progressTrend = calculateProgressTrend(user.dailyScores, 7) // Última semana
@@ -186,7 +193,7 @@ async function calculateUserStats(user: any) {
     // Logros y desafíos
     achievementsUnlocked,
     completedChallenges,
-    recentAchievements: recentAchievements.map((ua: any) => ({
+    recentAchievements: recentAchievements.map((ua): RecentAchievement => ({
       id: ua.achievement.id,
       title: ua.achievement.title,
       description: ua.achievement.description,
@@ -206,17 +213,17 @@ async function calculateUserStats(user: any) {
       value: latestWeight.value,
       unit: latestWeight.unit,
       date: latestWeight.date
-    } : null,
+    } as LatestMetric : null,
     latestBodyFat: latestBodyFat ? {
       value: latestBodyFat.value,
       unit: latestBodyFat.unit,
       date: latestBodyFat.date
-    } : null,
+    } as LatestMetric : null,
     latestMuscleMass: latestMuscleMass ? {
       value: latestMuscleMass.value,
       unit: latestMuscleMass.unit,
       date: latestMuscleMass.date
-    } : null,
+    } as LatestMetric : null,
     
     // Estadísticas de período
     last30Days: {
@@ -238,7 +245,7 @@ async function calculateUserStats(user: any) {
   }
 }
 
-function calculateCurrentStreak(dailyScores: any[], today: Date): number {
+function calculateCurrentStreak(dailyScores: DailyScoreWithStats[], today: Date): number {
   if (dailyScores.length === 0) return 0
   
   const sortedScores = dailyScores.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -260,7 +267,7 @@ function calculateCurrentStreak(dailyScores: any[], today: Date): number {
   return streak
 }
 
-function calculateLongestStreak(dailyScores: any[]): number {
+function calculateLongestStreak(dailyScores: DailyScoreWithStats[]): number {
   if (dailyScores.length === 0) return 0
   
   const sortedScores = dailyScores.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -283,7 +290,7 @@ function calculateLongestStreak(dailyScores: any[]): number {
   return Math.max(maxStreak, currentStreak)
 }
 
-function calculateProgressTrend(dailyScores: any[], days: number): 'up' | 'down' | 'stable' {
+function calculateProgressTrend(dailyScores: DailyScoreWithStats[], days: number): 'up' | 'down' | 'stable' {
   if (dailyScores.length < days) return 'stable'
   
   const recentScores = dailyScores.slice(0, days)
