@@ -333,14 +333,14 @@ export default function CalendarView() {
                             </span>
                           </div>
                           
-                          {event.location && (
+                          {'location' in event && event.location && (
                             <div className="flex items-center space-x-1">
                               <MapPin className="w-4 h-4" />
                               <span>{event.location}</span>
                             </div>
                           )}
                           
-                          {event.coach && (
+                          {'coach' in event && event.coach && (
                             <div className="flex items-center space-x-1">
                               <User className="w-4 h-4" />
                               <span>{event.coach}</span>
@@ -348,7 +348,7 @@ export default function CalendarView() {
                           )}
                         </div>
                         
-                        {event.programmeTitle && (
+                        {'programmeTitle' in event && event.programmeTitle && (
                           <div className="text-sm text-blue-600 mt-1">
                             Programa: {event.programmeTitle}
                           </div>

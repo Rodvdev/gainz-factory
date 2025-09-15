@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { CalendarEventUnion } from "@/types/calendar"
+import { 
+  CalendarEventWithRelations, 
+  HabitEntryWithHabit, 
+  ChallengeWithRelations, 
+  TaskSubmissionWithRelations, 
+  ProgressMetricsWithRelations 
+} from "@/types/calendar-api"
 
 export async function GET(request: NextRequest) {
   try {
@@ -111,10 +118,10 @@ export async function GET(request: NextRequest) {
     const events: CalendarEventUnion[] = []
 
     // Eventos del calendario principal
-    calendarEvents.forEach((event: any) => {
+    calendarEvents.forEach((event: CalendarEventWithRelations) => {
       // Validar que el tipo sea uno de los tipos permitidos
       const validTypes = ['workout', 'nutrition', 'mindset', 'session', 'meeting'] as const
-      const eventType = validTypes.includes(event.type as any) ? event.type as 'workout' | 'nutrition' | 'mindset' | 'session' | 'meeting' : 'workout'
+      const eventType = validTypes.includes(event.type as 'workout' | 'nutrition' | 'mindset' | 'session' | 'meeting') ? event.type as 'workout' | 'nutrition' | 'mindset' | 'session' | 'meeting' : 'workout'
       
       events.push({
         id: event.id,
@@ -122,19 +129,19 @@ export async function GET(request: NextRequest) {
         type: eventType,
         startTime: event.startTime.toISOString(),
         endTime: event.endTime.toISOString(),
-        location: event.location,
+        location: event.location ?? undefined,
         coach: event.teamMember?.user?.firstName + ' ' + event.teamMember?.user?.lastName,
-        programmeId: event.programmeId,
-        programmeTitle: event.programme?.title,
+        programmeId: event.programmeId ?? undefined,
+        programmeTitle: event.programme?.title ?? undefined,
         status: event.status,
-        description: event.description,
+        description: event.description ?? undefined,
         isRecurring: event.isRecurring,
         source: 'calendar'
       })
     })
 
     // Entradas de hábitos
-    habitEntries.forEach((entry: any) => {
+    habitEntries.forEach((entry: HabitEntryWithHabit) => {
       const eventDate = new Date(entry.date)
       eventDate.setHours(9, 0, 0, 0) // Hora por defecto 9:00 AM
       const endDate = new Date(eventDate)
@@ -147,7 +154,7 @@ export async function GET(request: NextRequest) {
         startTime: eventDate.toISOString(),
         endTime: endDate.toISOString(),
         status: entry.status.toLowerCase(),
-        description: entry.note || entry.habit.description,
+        description: entry.note || entry.habit.description || undefined,
         habitId: entry.habitId,
         habitCategory: entry.habit.category,
         source: 'habit'
@@ -155,7 +162,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Desafíos
-    challenges.forEach((challenge: any) => {
+    challenges.forEach((challenge: ChallengeWithRelations) => {
       const startDate = new Date(challenge.startDate)
       const endDate = new Date(challenge.endDate)
       
@@ -166,16 +173,16 @@ export async function GET(request: NextRequest) {
         startTime: startDate.toISOString(),
         endTime: endDate.toISOString(),
         status: challenge.isCompleted ? 'completed' : 'active',
-        description: challenge.description,
+        description: challenge.description ?? undefined,
         targetValue: challenge.targetValue,
         currentValue: challenge.currentValue,
-        reward: challenge.reward,
+        reward: challenge.reward ?? undefined,
         source: 'challenge'
       })
     })
 
     // Envíos de tareas
-    taskSubmissions.forEach((submission: any) => {
+    taskSubmissions.forEach((submission: TaskSubmissionWithRelations) => {
       events.push({
         id: `task-${submission.id}`,
         title: submission.task.title,
@@ -183,18 +190,18 @@ export async function GET(request: NextRequest) {
         startTime: submission.completedAt.toISOString(),
         endTime: new Date(submission.completedAt.getTime() + 30 * 60000).toISOString(), // +30 min
         status: submission.status,
-        description: submission.task.description,
+        description: submission.task.description ?? undefined,
         programmeTitle: submission.task.weeklyPlan.programme.title,
         programmeId: submission.task.weeklyPlan.programmeId,
         taskType: submission.task.taskType,
-        score: submission.score,
-        feedback: submission.feedback,
+        score: submission.score ?? undefined,
+        feedback: submission.feedback ?? undefined,
         source: 'task'
       })
     })
 
     // Métricas de progreso
-    progressMetrics.forEach((metric: any) => {
+    progressMetrics.forEach((metric: ProgressMetricsWithRelations) => {
       const eventDate = new Date(metric.date)
       eventDate.setHours(8, 0, 0, 0) // Hora por defecto 8:00 AM
       const endDate = new Date(eventDate)
@@ -207,11 +214,11 @@ export async function GET(request: NextRequest) {
         startTime: eventDate.toISOString(),
         endTime: endDate.toISOString(),
         status: 'completed',
-        description: metric.notes,
+        description: metric.notes ?? undefined,
         metricType: metric.metricType,
         value: metric.value,
         unit: metric.unit,
-        photoUrl: metric.photoUrl,
+        photoUrl: metric.photoUrl ?? undefined,
         isPrivate: metric.isPrivate,
         source: 'progress'
       })
