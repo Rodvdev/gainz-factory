@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/db"
-import * as jwt from "jsonwebtoken"
+import { db } from "@/lib/db"
+import { getAuthenticatedUser } from "@/lib/auth-middleware"
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    // Get authenticated user
+    const user = await getAuthenticatedUser(request)
+    if (!user) {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 401 }
+      )
     }
-
-    const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
     
     // Obtener métricas recientes del usuario
-    const recentMetrics = await prisma.progressMetrics.findMany({
+    const recentMetrics = await db.progressMetrics.findMany({
       where: {
-        userId: decoded.userId
+        userId: user.id
       },
       orderBy: {
         date: 'desc'
@@ -23,14 +24,29 @@ export async function GET(request: NextRequest) {
       take: 20 // Últimas 20 métricas
     })
 
-    console.log(`Found ${recentMetrics.length} metrics for user ${decoded.userId}`)
-    console.log('Raw metrics:', recentMetrics)
+    console.log(`Found ${recentMetrics.length} metrics for user ${user.id}`)
 
-    // Procesar métricas directamente sin agrupar
-    const metrics = recentMetrics.map((metric: { metricType: string; id: string; value: number; unit: string; date: Date; notes?: string | null; photoUrl?: string | null }) => {
+    // Agrupar métricas por tipo y obtener la más reciente de cada tipo
+    const latestMetrics = new Map()
+    
+    for (const metric of recentMetrics) {
+      if (!latestMetrics.has(metric.metricType)) {
+        latestMetrics.set(metric.metricType, { latest: metric, previous: null })
+      } else {
+        const existing = latestMetrics.get(metric.metricType)
+        if (!existing.previous) {
+          existing.previous = metric
+        }
+      }
+    }
+
+    // Procesar métricas agrupadas por tipo
+    const processedMetrics = []
+    
+    for (const [metricType, { latest, previous }] of latestMetrics) {
       // Determinar etiqueta amigable
-      let label = metric.metricType
-      switch (metric.metricType.toLowerCase()) {
+      let label = metricType
+      switch (metricType.toLowerCase()) {
         case 'weight':
           label = 'Peso'
           break
@@ -56,31 +72,40 @@ export async function GET(request: NextRequest) {
           label = 'Altura'
           break
         default:
-          label = metric.metricType.charAt(0).toUpperCase() + metric.metricType.slice(1)
+          label = metricType.charAt(0).toUpperCase() + metricType.slice(1)
       }
       
-      return {
-        id: metric.id,
-        type: metric.metricType,
-        label,
-        value: metric.value,
-        unit: metric.unit,
-        change: 0, // Por ahora sin cálculo de tendencia
-        trend: 'neutral',
-        date: metric.date,
-        notes: metric.notes,
-        photoUrl: metric.photoUrl
+      // Calcular progreso si hay métrica anterior
+      let change = 0
+      let trend = 'neutral'
+      
+      if (previous) {
+        change = previous.value > 0 ? 
+          ((latest.value - previous.value) / previous.value) * 100 : 0
+        trend = change > 0 ? 'up' : change < 0 ? 'down' : 'neutral'
       }
-    })
+      
+      processedMetrics.push({
+        id: latest.id,
+        type: metricType,
+        label,
+        value: latest.value,
+        unit: latest.unit,
+        change: Math.abs(change),
+        trend,
+        date: latest.date,
+        notes: latest.notes,
+        photoUrl: latest.photoUrl
+      })
+    }
 
     // Ordenar por fecha más reciente
-    metrics.sort((a: { date: Date }, b: { date: Date }) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    processedMetrics.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-    console.log(`Processed ${metrics.length} metrics for response`)
-    console.log('Final metrics:', metrics)
+    console.log(`Processed ${processedMetrics.length} metrics for response`)
 
     // Si no hay métricas, devolver array vacío para mostrar estado inicial
-    if (metrics.length === 0) {
+    if (processedMetrics.length === 0) {
       console.log('No metrics found, returning empty array')
       return NextResponse.json({
         metrics: [],
@@ -88,7 +113,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ metrics })
+    return NextResponse.json({ metrics: processedMetrics })
 
   } catch (error) {
     console.error("Error fetching user metrics:", error)
@@ -96,20 +121,19 @@ export async function GET(request: NextRequest) {
       { error: "Error interno del servidor" },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    // Get authenticated user
+    const user = await getAuthenticatedUser(request)
+    if (!user) {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 401 }
+      )
     }
-
-    const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
     
     const body = await request.json()
     const {
@@ -121,12 +145,20 @@ export async function POST(request: NextRequest) {
       photoUrl
     } = body
 
+    // Validate required fields
+    if (!type || value === undefined || !unit || !date) {
+      return NextResponse.json(
+        { error: "Campos requeridos: type, value, unit, date" },
+        { status: 400 }
+      )
+    }
+
     // Crear nueva métrica
-    const newMetric = await prisma.progressMetrics.create({
+    const newMetric = await db.progressMetrics.create({
       data: {
-        userId: decoded.userId,
+        userId: user.id,
         metricType: type,
-        value,
+        value: parseFloat(value),
         unit,
         date: new Date(date),
         notes,
@@ -142,7 +174,5 @@ export async function POST(request: NextRequest) {
       { error: "Error interno del servidor" },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }

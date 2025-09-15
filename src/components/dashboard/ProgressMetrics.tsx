@@ -197,8 +197,8 @@ export default function ProgressMetrics() {
           notes: ''
         })
         
-        // Refresh metrics to ensure data consistency
-        await fetchMetrics(true)
+        // No need to refresh since optimistic update already added the metric
+        // await fetchMetrics(true)
         
         // Trigger profile stats refresh if available
         if (typeof window !== 'undefined' && window.dispatchEvent) {
